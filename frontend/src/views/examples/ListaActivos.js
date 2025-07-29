@@ -1,79 +1,64 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2024 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-// reactstrap components
 import React, { useState, useEffect } from "react";
 import {
-  Badge,
+  Badge, 
   Card,
   CardHeader,
-  CardFooter,
   DropdownMenu,
   DropdownItem,
   UncontrolledDropdown,
   DropdownToggle,
   Media,
-  Pagination,
-  PaginationItem,
-  PaginationLink,
-  Progress,
   Table,
   Container,
   Row,
-  UncontrolledTooltip,
   FormGroup,
   Input,
   Label,
   Col
 } from "reactstrap";
-// core components
+
 import HeaderBlanco from "components/Headers/HeaderBlanco.js";
+import productosDePrueba from 'data/productosDePrueba'; 
 
-
-const ListaActivos = ({ inventoryData }) => {
+const ListaActivos = () => { 
+  const [inventarioOriginal, setInventarioOriginal] = useState([]); 
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [uniqueCategories, setUniqueCategories] = useState([]);
-  const [searchQuery, setSearchQuery] = useState(""); // <-- NUEVO: Estado para el término de búsqueda
+  const [uniqueCategories, setUniqueCategories] = useState([]); 
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Extraer categorías únicas de inventoryData
+  
   useEffect(() => {
-    if (inventoryData && inventoryData.length > 0) {
-      const categories = [...new Set(inventoryData.map(asset => asset.categoria))];
+    setInventarioOriginal(productosDePrueba);
+
+    if (productosDePrueba && productosDePrueba.length > 0) {
+      const categories = [...new Set(productosDePrueba.map(asset => asset.categoria))];
       setUniqueCategories(["all", ...categories]);
     } else {
       setUniqueCategories(["all"]);
     }
-  }, [inventoryData]);
+  }, []); 
 
-  // Filtrar activos basados en la categoría seleccionada y el término de búsqueda
-  const filteredAssets = inventoryData.filter(asset => {
-    const matchesCategory = selectedCategory === "all" || asset.categoria === selectedCategory;
+  const filteredAssets = inventarioOriginal.filter(asset => { 
+    
+    const matchesCategory = selectedCategory === "all" || asset.categoria === selectedCategory; 
+    
     const matchesSearch = asset.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          asset.codigo.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+                          asset.codigo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          (asset.descripcion && asset.descripcion.toLowerCase().includes(searchQuery.toLowerCase())) || 
+                          (asset.ubicacion && asset.ubicacion.toLowerCase().includes(searchQuery.toLowerCase())) ||   
+                          (asset.asignado && asset.asignado.toLowerCase().includes(searchQuery.toLowerCase())) ||     
+                          (asset.observacion && asset.observacion.toLowerCase().includes(searchQuery.toLowerCase())); 
+    return matchesCategory && matchesSearch; 
   });
 
   return (
     <>
       <HeaderBlanco />
-      {/* Page content */}
+      {}
       <Container className="mt--7" fluid>
-        {/* Filtros de Categorías y Búsqueda */}
+        {}
         <Row className="mb-4">
+          {}
           <Col md="4">
             <FormGroup>
               <Label htmlFor="category-filter">Filtrar por Categoría:</Label>
@@ -92,13 +77,13 @@ const ListaActivos = ({ inventoryData }) => {
               </Input>
             </FormGroup>
           </Col>
-          <Col md="5"> {/* Ajustamos el tamaño de la columna para dejar espacio */}
+          <Col md="5"> 
             <FormGroup>
-              <Label htmlFor="search-input">Buscar por Nombre o Código:</Label>
+              <Label htmlFor="search-input">Buscar por Nombre, Código o Detalles:</Label>
               <Input
                 type="text"
                 id="search-input"
-                placeholder="Ej. Laptop, ACT001"
+                placeholder="Ej. Laptop, INV001, PC de escritorio, Juan Pérez, En uso"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="form-control-alternative"
@@ -106,7 +91,7 @@ const ListaActivos = ({ inventoryData }) => {
             </FormGroup>
           </Col>
         </Row>
-        {/* Table */}
+        {}
         <Row>
           <div className="col">
             <Card className="shadow">
@@ -116,21 +101,20 @@ const ListaActivos = ({ inventoryData }) => {
               <Table className="align-items-center table-flush" responsive>
                 <thead className="thead-light">
                   <tr>
-                    <th scope="col">Código</th>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Categoría</th>
-                    <th scope="col">Cantidad</th>
-                    <th scope="col">Estado</th>
-                    <th scope="col">Ubicación</th>
-                    <th scope="col">Valor</th>
-                    <th scope="col">Fecha Adquisición</th>
-                    <th scope="col" />
+                    <th scope="col">CÓDIGO</th>
+                    <th scope="col">NOMBRE</th>
+                    <th scope="col">DESCRIPCIÓN</th>
+                    <th scope="col">CANTIDAD</th>
+                    <th scope="col">UBICACIÓN</th>
+                    <th scope="col">ASIGNADO</th>
+                    <th scope="col">OBSERVACIÓN</th>
+                    <th scope="col" /> 
                   </tr>
                 </thead>
                 <tbody>
                   {filteredAssets.length > 0 ? (
                     filteredAssets.map((asset) => (
-                      <tr key={asset.id}>
+                      <tr key={asset.codigo}>
                         <th scope="row">
                           <Media className="align-items-center">
                             <Media>
@@ -141,17 +125,11 @@ const ListaActivos = ({ inventoryData }) => {
                           </Media>
                         </th>
                         <td>{asset.nombre}</td>
-                        <td>{asset.categoria}</td>
+                        <td>{asset.descripcion}</td>
                         <td>{asset.cantidad}</td>
-                        <td>
-                          <Badge color="" className="badge-dot mr-4">
-                            <i className={asset.estado === "Disponible" ? "bg-success" : asset.estado === "Mantenimiento" ? "bg-warning" : "bg-danger"} />
-                            {asset.estado}
-                          </Badge>
-                        </td>
                         <td>{asset.ubicacion}</td>
-                        <td>${asset.valor.toLocaleString()}</td>
-                        <td>{asset.fechaAdquisicion}</td>
+                        <td>{asset.asignado}</td>
+                        <td>{asset.observacion}</td>
                         <td className="text-right">
                           <UncontrolledDropdown>
                             <DropdownToggle
@@ -169,19 +147,19 @@ const ListaActivos = ({ inventoryData }) => {
                                 href="#pablo"
                                 onClick={(e) => e.preventDefault()}
                               >
-                                Acción
+                                Ver Detalles
                               </DropdownItem>
                               <DropdownItem
                                 href="#pablo"
                                 onClick={(e) => e.preventDefault()}
                               >
-                                Otra acción
+                                Editar
                               </DropdownItem>
                               <DropdownItem
                                 href="#pablo"
                                 onClick={(e) => e.preventDefault()}
                               >
-                                Algo más aquí
+                                Eliminar
                               </DropdownItem>
                             </DropdownMenu>
                           </UncontrolledDropdown>
@@ -190,12 +168,11 @@ const ListaActivos = ({ inventoryData }) => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="9" className="text-center">No hay activos registrados o que coincidan con los filtros.</td>
+                      <td colSpan="8" className="text-center">No hay activos registrados o que coincidan con los filtros.</td> 
                     </tr>
                   )}
                 </tbody>
               </Table>
-              {/* Puedes añadir paginación aquí si es necesario */}
             </Card>
           </div>
         </Row>
