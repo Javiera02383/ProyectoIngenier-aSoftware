@@ -107,7 +107,8 @@ exports.obtenerFacturas = async (req, res) => {
           as: 'persona'  
         }]  
       }]  
-    });  
+    }); 
+     
     res.json({ facturas });
   } catch (error) {
     console.error(error);
@@ -303,7 +304,7 @@ exports.crearFacturaCompleta = async (req, res) => {
     // LOGO DEL CANAL (lado izquierdo)  
     const logoPath = path.join(__dirname, '../../img/logoCanal.png');  
     if (fs.existsSync(logoPath)) {  
-      doc.image(logoPath, 50, 50, { width: 100, height: 60 });  
+      doc.image(logoPath, "PNG", 10, 10, 30, 30);  
     }  
     else {  
       console.log('Logo no encontrado en la ruta especificada');  
@@ -318,9 +319,8 @@ exports.crearFacturaCompleta = async (req, res) => {
       .text('CONTIGUO A RESTAURANTE LO DE KERPO,', 120, 88)  
       .text('COMAYAGUA, COMAYAGUA, HONDURAS, C.A.', 120, 101)  
       .text('Tel: 2772-7427 / 2770-6810 Fax: 2772-6810 Cel: 9957-4580', 120, 114)  
-      .text('Propietario: José Dolores Gámez Suazo', 120, 127)  
-      .text(`RTN: ${caiActivo.rtnEmpresa}`, 120, 140)  
-      .text('E-mail: televisioncomayagua@yahoo.com', 120, 153);  
+      .text(`Propietario: José Dolores Gámez Suazo   RTN: ${caiActivo.rtnEmpresa}  E-mail: televisioncomayagua@yahoo.com`, 120, 140)  
+  
   
     // Línea separadora          
     doc.moveTo(50, 170).lineTo(550, 170).stroke();          

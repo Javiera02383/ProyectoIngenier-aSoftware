@@ -1,68 +1,156 @@
 // views/Facturas/ListaFacturas.js  
 import React, { useState, useEffect } from 'react';  
 import {  
-  Card,  
-  CardHeader,  
-  CardBody,  
-  Table,  
-  Container,  
-  Row,  
-  Col,  
-  Button,  
-  Badge,  
-  Input,  
-  InputGroup,  
-  InputGroupAddon,  
-  InputGroupText  
+  Card,    
+  CardHeader,    
+  CardBody,    
+  Table,    
+  Container,    
+  Row,    
+  Col,    
+  Button,    
+  Badge,    
+  Input,    
+  InputGroup,    
+  InputGroupAddon,    
+  InputGroupText,  
+  Alert,  
+  Modal,  
+  ModalHeader,  
+  ModalBody,  
+  ModalFooter   
 } from 'reactstrap';  
 import HeaderBlanco from 'components/Headers/HeaderBlanco.js';  
 import { facturaService } from 'services/facturacion/facturaService.js';  
-  
-const ListaFacturas = () => {  
-  const [facturas, setFacturas] = useState([]);  
-  const [loading, setLoading] = useState(true);  
-  const [filtro, setFiltro] = useState('');  
+
+ 
+const ListaFacturas = () => {    
+  const [facturas, setFacturas] = useState([]);    
+  const [loading, setLoading] = useState(true);    
+  const [filtro, setFiltro] = useState(''); // Búsqueda general  
+  const [filtroId, setFiltroId] = useState(''); // Búsqueda por ID específico     
   const [error, setError] = useState(null);  
-  
-  useEffect(() => {  
-    cargarFacturas();  
-  }, []);  
-  
-  const cargarFacturas = async () => {  
+  const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });  
+  const [modalAnular, setModalAnular] = useState(false);  
+  const [facturaSeleccionada, setFacturaSeleccionada] = useState(null);  
+  const [procesandoAnulacion, setProcesandoAnulacion] = useState(false);  
+   
+  useEffect(() => {    
+    cargarFacturas();    
+  }, []);    
+    
+  const cargarFacturas = async () => {    
+    try {    
+      setLoading(true);    
+      const response = await facturaService.obtenerFacturas();    
+      setFacturas(response.facturas || []);    
+      setError(null);    
+    } catch (error) {    
+      console.error('Error al cargar facturas:', error);    
+      setError('Error al cargar las facturas');    
+    } finally {    
+      setLoading(false);    
+    }    
+  };    
+    
+  const handleDescargarPDF = async (idFactura) => {  
     try {  
-      setLoading(true);  
-      const response = await facturaService.obtenerFacturas();  
-      setFacturas(response.facturas || []);  
-      setError(null);  
+      setMensaje({ tipo: '', texto: '' });  
+      await facturaService.descargarPDF(idFactura);  
     } catch (error) {  
-      console.error('Error al cargar facturas:', error);  
-      setError('Error al cargar las facturas');  
-    } finally {  
-      setLoading(false);  
+      console.error('Error al descargar PDF:', error);  
+      setMensaje({  
+        tipo: 'danger',  
+        texto: 'Error al descargar el PDF de la factura'  
+      });  
     }  
   };  
   
-  const handleDescargarPDF = (idFactura) => {  
-    facturaService.descargarPDF(idFactura);  
-  };  
+  // Función para confirmar anulación  
+const confirmarAnulacion = (factura) => {  
+  setFacturaSeleccionada(factura);  
+  setModalAnular(true);  
+};  
   
-  const facturasFiltradas = facturas.filter(factura =>  
-    factura.idFactura.toString().includes(filtro) ||  
-    (factura.Cliente?.nombre || '').toLowerCase().includes(filtro.toLowerCase()) ||  
-    factura.estadoFactura.toLowerCase().includes(filtro.toLowerCase())  
+// Función para ejecutar la anulación  
+const handleAnularFactura = async () => {  
+  if (!facturaSeleccionada) return;  
+  
+  try {  
+    setProcesandoAnulacion(true);  
+    await facturaService.anularFactura(facturaSeleccionada.idFactura);  
+      
+    // Mostrar mensaje de éxito y recargar lista  
+    await cargarFacturas();  
+    setModalAnular(false);  
+    setFacturaSeleccionada(null);  
+  } catch (error) {  
+    console.error('Error al anular factura:', error);  
+    // Mostrar mensaje de error  
+  } finally {  
+    setProcesandoAnulacion(false);  
+  }  
+};  
+  
+  const cancelarAnulacion = () => {  
+    setModalAnular(false);  
+    setFacturaSeleccionada(null);  
+  };  
+    
+  const facturasFiltradas = facturas.filter(factura => {  
+  const filtroLower = filtro.toLowerCase();  
+    
+  // Construir nombre completo del cliente desde persona  
+  const nombreCompleto = factura.Cliente?.persona ?   
+    `${factura.Cliente.persona.Pnombre} ${factura.Cliente.persona.Snombre || ''} ${factura.Cliente.persona.Papellido} ${factura.Cliente.persona.Sapellido || ''}`.trim()   
+    : '';  
+    
+  // Filtro por ID específico (tiene prioridad si está presente)  
+  const cumpleFiltroId = filtroId === '' || factura.idFactura.toString().includes(filtroId);  
+    
+  // Filtro general (solo se aplica si no hay filtro por ID)  
+  const cumpleFiltroGeneral = filtro === '' || (  
+    // Búsqueda por nombre completo del cliente  
+    nombreCompleto.toLowerCase().includes(filtroLower) ||  
+      
+    // Búsqueda por DNI/RTN del cliente  
+    (factura.Cliente?.persona?.DNI || '').toLowerCase().includes(filtroLower) ||  
+      
+    // Búsqueda por estado de factura  
+    factura.estadoFactura.toLowerCase().includes(filtroLower) ||  
+      
+    // Búsqueda por tipo de documento  
+    (factura.Tipo_documento || '').toLowerCase().includes(filtroLower) ||  
+      
+    // Búsqueda por campos específicos de TV (si existen)  
+    (factura.productoCliente || '').toLowerCase().includes(filtroLower) ||  
+    (factura.agencia || '').toLowerCase().includes(filtroLower) ||  
+    (factura.mencion || '').toLowerCase().includes(filtroLower) ||  
+      
+    // Búsqueda por monto (convertir a string)  
+    factura.Total_Facturado.toString().includes(filtro) ||  
+      
+    // Búsqueda por fecha (formato legible)  
+    new Date(factura.Fecha).toLocaleDateString('es-HN').includes(filtro)  
   );  
+    
+  return cumpleFiltroId && cumpleFiltroGeneral;  
+  }); 
+    
+  const formatearFecha = (fecha) => {    
+    return new Date(fecha).toLocaleDateString('es-HN');    
+  };    
+    
+  const formatearMoneda = (monto) => {    
+    return `L. ${parseFloat(monto).toFixed(2)}`;    
+  };    
+    
+  const getBadgeColor = (estado) => {    
+    return estado === 'activa' ? 'success' : 'danger';    
+  };   
   
-  const formatearFecha = (fecha) => {  
-    return new Date(fecha).toLocaleDateString('es-HN');  
-  };  
   
-  const formatearMoneda = (monto) => {  
-    return `L. ${parseFloat(monto).toFixed(2)}`;  
-  };  
-  
-  const getBadgeColor = (estado) => {  
-    return estado === 'activa' ? 'success' : 'danger';  
-  };  
+      
   
   return (  
     <>  
@@ -79,39 +167,54 @@ const ListaFacturas = () => {
                   <Col xs="4" className="text-right">  
                     <Button  
                       color="primary"  
-                      href="/admin/crear-factura"  
+                      href="/admin/crear-factura-nueva"  
                       size="sm"  
                     >  
                       Nueva Factura  
                     </Button>  
                   </Col>  
                 </Row>  
-                <Row className="mt-3">  
-                  <Col md="6">  
-                    <InputGroup>  
-                      <InputGroupAddon addonType="prepend">  
-                        <InputGroupText>  
-                          <i className="fas fa-search" />  
-                        </InputGroupText>  
-                      </InputGroupAddon>  
-                      <Input  
-                        placeholder="Buscar por número, cliente o estado..."  
-                        type="text"  
-                        value={filtro}  
-                        onChange={(e) => setFiltro(e.target.value)}  
-                      />  
-                    </InputGroup>  
+                <Row className="mt-3">    
+                  <Col md="4">    
+                    <InputGroup>    
+                      <InputGroupAddon addonType="prepend">    
+                        <InputGroupText>    
+                          <i className="fas fa-hashtag" />    
+                        </InputGroupText>    
+                      </InputGroupAddon>    
+                      <Input    
+                        placeholder="Buscar por ID de factura..."    
+                        type="number"    
+                        value={filtroId}    
+                        onChange={(e) => setFiltroId(e.target.value)}    
+                      />    
+                    </InputGroup>    
                   </Col>  
-                  <Col md="6" className="text-right">  
-                    <Button  
-                      color="secondary"  
-                      size="sm"  
-                      onClick={cargarFacturas}  
-                    >  
-                      <i className="fas fa-sync" /> Actualizar  
-                    </Button>  
+                  <Col md="6">    
+                    <InputGroup>    
+                      <InputGroupAddon addonType="prepend">    
+                        <InputGroupText>    
+                          <i className="fas fa-search" />    
+                        </InputGroupText>    
+                      </InputGroupAddon>    
+                      <Input    
+                        placeholder="Buscar por cliente, DNI, estado, monto, fecha..."    
+                        type="text"    
+                        value={filtro}    
+                        onChange={(e) => setFiltro(e.target.value)}    
+                      />    
+                    </InputGroup>    
                   </Col>  
-                </Row>  
+                  <Col md="2" className="text-right">    
+                    <Button    
+                      color="secondary"    
+                      size="sm"    
+                      onClick={cargarFacturas}    
+                    >    
+                      <i className="fas fa-sync" /> Actualizar    
+                    </Button>    
+                  </Col>    
+                </Row> 
               </CardHeader>  
               <CardBody>  
                 {loading ? (  
@@ -191,19 +294,17 @@ const ListaFacturas = () => {
                             >  
                               <i className="fas fa-download" /> PDF  
                             </Button>  
-                            {factura.estadoFactura === 'activa' && (  
-                              <Button  
-                                color="warning"  
-                                size="sm"  
-                                className="ml-2"  
-                                onClick={() => {  
-                                  // Implementar anulación de factura  
-                                  console.log('Anular factura:', factura.idFactura);  
-                                }}  
-                              >  
-                                <i className="fas fa-ban" /> Anular  
-                              </Button>  
-                            )}  
+                            {factura.estadoFactura === 'activa' && (    
+                              <Button    
+                                color="warning"    
+                                size="sm"    
+                                className="ml-2"    
+                                onClick={() => confirmarAnulacion(factura)}  
+                                title="Anular factura"  
+                              >    
+                                <i className="fas fa-ban" /> Anular    
+                              </Button>    
+                            )}   
                           </td>  
                         </tr>  
                       ))}  
@@ -214,8 +315,61 @@ const ListaFacturas = () => {
             </Card>  
           </Col>  
         </Row>  
-      </Container>  
-    </>  
+          
+        {/* Modal de confirmación para anular factura */}  
+          <Modal isOpen={modalAnular} toggle={cancelarAnulacion}>  
+            <ModalHeader toggle={cancelarAnulacion}>  
+              Confirmar Anulación de Factura  
+            </ModalHeader>  
+            <ModalBody>  
+              {facturaSeleccionada && (  
+                <div>  
+                  <p>¿Está seguro que desea anular la siguiente factura?</p>  
+                  <div className="bg-light p-3 rounded">  
+                    
+                    <strong>Factura No:</strong> {facturaSeleccionada.idFactura.toString().padStart(8, '0')}<br/>  
+                    <strong>Cliente:</strong> {facturaSeleccionada.Cliente?.persona ?   
+  `${facturaSeleccionada.Cliente.persona.Pnombre} ${facturaSeleccionada.Cliente.persona.Snombre || ''} ${facturaSeleccionada.Cliente.persona.Papellido} ${facturaSeleccionada.Cliente.persona.Sapellido || ''}`.trim()   
+  : 'N/A'}<br/>  
+                    <strong>Total:</strong> {formatearMoneda(facturaSeleccionada.Total_Facturado)}<br/>  
+                    <strong>Fecha:</strong> {formatearFecha(facturaSeleccionada.Fecha)}  
+                  </div>  
+                  <div className="mt-3">  
+                    <small className="text-warning">  
+                      <i className="fas fa-exclamation-triangle" />   
+                       - Esta acción no se puede deshacer. La factura quedará marcada como anulada permanentemente.  
+                    </small>  
+                  </div>  
+                </div>  
+              )}  
+            </ModalBody>  
+            <ModalFooter>  
+              <Button   
+                color="secondary"   
+                onClick={cancelarAnulacion}  
+                disabled={procesandoAnulacion}  
+              >  
+                Cancelar  
+              </Button>  
+              <Button   
+                color="danger"   
+                onClick={handleAnularFactura}  
+                disabled={procesandoAnulacion}  
+              >  
+                {procesandoAnulacion ? (  
+                  <>  
+                    <i className="fas fa-spinner fa-spin" /> Anulando...  
+                  </>  
+                ) : (  
+                  <>  
+                    <i className="fas fa-ban" /> Confirmar Anulación  
+                  </>  
+                )}  
+              </Button>  
+            </ModalFooter>  
+          </Modal>  
+      </Container>    
+    </>     
   );  
 };  
   

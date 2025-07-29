@@ -2,7 +2,7 @@ const { body, validationResult } = require('express-validator');
 const Cliente = require('../../modelos/gestion_cliente/Cliente');
 const Persona = require('../../modelos/seguridad/Persona');
 const { Op } = require('sequelize');
-
+ 
 // === VALIDACIONES ===
 const reglasCrear = [
   body('idPersona')
@@ -47,7 +47,7 @@ const crearCliente = [
           html: `
             <div style="font-family: Arial, sans-serif; background: #f7f7f7; padding: 30px;">
               <div style="max-width: 500px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #ccc; padding: 24px;">
-                <h2 style="color: #2e7d32; text-align: center;">¡Bienvenido a Óptica Expertos!</h2>
+                <h2 style="color: #2e7d32; text-align: center;">¡Bienvenido a Canal 40!</h2>
                 <p style="font-size: 18px; color: #333;">Hola <b>${persona.Pnombre}</b>,</p>
                 <p style="font-size: 16px; color: #333;">Te informamos que has sido registrado exitosamente como cliente por el administrador.</p>
                 <p style="font-size: 16px; color: #333;">Si tienes dudas, puedes contactarnos respondiendo a este correo.</p>
@@ -103,6 +103,8 @@ const obtenerClientePorId = async (req, res) => {
     res.status(500).json({ mensaje: 'Error al obtener cliente', error: error.message });
   }
 };
+
+
 
 // Editar cliente
 const editarCliente = [

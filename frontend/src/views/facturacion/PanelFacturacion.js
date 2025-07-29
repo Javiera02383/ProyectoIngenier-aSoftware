@@ -74,12 +74,16 @@ const PanelFacturacion = () => {
         <Col md="12">  
           <Card className="shadow border-0">  
             <CardBody className="text-center">  
-              <h5 className="mb-4">Acciones del Módulo de Facturación</h5>  
               <div className="d-flex flex-wrap justify-content-center gap-3">  
-                <Button color="primary" href="/admin/facturacion/crear" className="m-2">  
+                <Button color="primary" href="/admin/crear-factura-nueva" className="m-2">  
                   <i className="ni ni-fat-add mr-2" />  
                   Crear Factura  
                 </Button>  
+
+                <Button color="danger" href="/admin/facturas" className="m-2">  
+                  <i className="ni ni-archive-2 mr-2" />  
+                  Lista de Facturas  
+                </Button> 
                   
                 <Button color="info" href="/admin/facturacion/pagos" className="m-2">  
                   <i className="ni ni-credit-card mr-2" />  
@@ -101,10 +105,7 @@ const PanelFacturacion = () => {
                   Administrar CAI  
                 </Button>  
                   
-                <Button color="danger" href="/admin/facturacion/historial" className="m-2">  
-                  <i className="ni ni-archive-2 mr-2" />  
-                  Ver Historial  
-                </Button>  
+ 
               </div>  
             </CardBody>  
           </Card>  
@@ -186,74 +187,8 @@ const PanelFacturacion = () => {
         </Col>
       </Row>
 
-
-      {/* FILTROS Y TABLA */}
-        <Card>
-          <CardBody>
-            <Row form>
-              <Col md={4}>
-                <FormGroup>
-                  <Label>Cliente</Label>
-                  <Input name="cliente" onChange={handleFiltro} placeholder="Buscar cliente" />
-                </FormGroup>
-              </Col>
-              <Col md={4}>
-                <FormGroup>
-                  <Label>Fecha</Label>
-                  <Input type="date" name="fecha" onChange={handleFiltro} />
-                </FormGroup>
-              </Col>
-              <Col md={4}>
-                <FormGroup>
-                  <Label>Estado</Label>
-                  <Input type="select" name="estado" onChange={handleFiltro}>
-                    <option value="">Todos</option>
-                    <option value="pendiente">Pendiente</option>
-                    <option value="pagada">Pagada</option>
-                  </Input>
-                </FormGroup>
-              </Col>
-            </Row>
-
-            <Table responsive striped>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Cliente</th>
-                  <th>Fecha</th>
-                  <th>Estado</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {facturasFiltradas.length === 0 ? (
-                  <tr>
-                    <td colSpan="5" className="text-center text-muted">
-                      No hay facturas que coincidan.
-                    </td>
-                  </tr>
-                ) : (
-                  facturasFiltradas.map((factura, index) => (
-                    <tr key={factura.id}>
-                      <td>{index + 1}</td>
-                      <td>{factura.cliente}</td>
-                      <td>{factura.fecha}</td>
-                      <td>
-                        <Badge color={factura.estado === "pagada" ? "success" : "warning"}>
-                          {factura.estado}
-                        </Badge>
-                      </td>
-                      <td>L. {factura.total.toFixed(2)}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </Table>
-          </CardBody>
-        </Card>
-
         {/* ESTADO DEL CAI */}
-        <Card className="m-4">
+        <Card className="mb-4">
           <CardHeader>
             <strong>Estado del CAI</strong>
           </CardHeader>

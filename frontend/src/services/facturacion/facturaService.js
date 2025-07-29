@@ -59,13 +59,30 @@ export const facturaService = {
     return response.json();  
   },  
     
-  // Anular factura  
-  anularFactura: async (id) => {  
-    const token = getAuthToken();  
-    const response = await fetch(`${API_BASE}/factura/${id}/anular`, {  
-      method: 'PUT',  
+  // Anular factura - CORREGIDO  
+anularFactura: async (id) => {  
+  const token = getAuthToken();  
+  const response = await fetch(`${API_BASE}/facturas/${id}/anular`, { // URL corregida (plural)  
+    method: 'PATCH', // Método corregido  
+    headers: {  
+      'Content-Type': 'application/json',  
+      'Authorization': `Bearer ${token}`  
+    }  
+  });  
+    
+  if (!response.ok) {  
+    throw new Error(`HTTP error! status: ${response.status}`);  
+  }  
+  return response.json();  
+},    
+    
+  // Descargar PDF de factura  
+descargarPDF: async (id) => {  
+  const token = getAuthToken();  
+  try {  
+    const response = await fetch(`${API_BASE}/factura/${id}/pdf`, {  
+      method: 'GET',  
       headers: {  
-        'Content-Type': 'application/json',  
         'Authorization': `Bearer ${token}`  
       }  
     });  
@@ -73,15 +90,20 @@ export const facturaService = {
     if (!response.ok) {  
       throw new Error(`HTTP error! status: ${response.status}`);  
     }  
-    return response.json();  
-  },  
-    
-  // Descargar PDF de factura  
-  descargarPDF: (id) => {  
-    const token = getAuthToken();  
-    // Para descargas de archivos, agregamos el token como query parameter  
-    window.open(`${API_BASE}/factura/${id}/pdf?token=${token}`, '_blank');  
+      
+    const blob = await response.blob();  
+    const url = window.URL.createObjectURL(blob);  
+    const a = document.createElement('a');  
+    a.href = url;  
+    a.download = `factura_${id}.pdf`;  
+    document.body.appendChild(a);  
+    a.click();  
+    window.URL.revokeObjectURL(url);  
+    document.body.removeChild(a);  
+  } catch (error) {  
+    console.error('Error al descargar PDF:', error);  
   }  
+} 
 };
 
 
