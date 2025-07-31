@@ -121,6 +121,7 @@ const Reportes = () => {
   return (
     <>
       {/* 🔵 Estilos personalizados */}
+      {/* Prueba*/}
       <style>
         {`
           .card-hover {
