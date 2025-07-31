@@ -2,6 +2,7 @@
 // Gestion Clientes
 import Clientes from "views/gestion_cliente/Clientes.js";
 import ClienteForm from "views/gestion_cliente/ClienteForm.js";
+// Gestion Empleados
 import Empleados from "views/gestion_cliente/Empleados.js";
 import EmpleadoForm from "views/gestion_cliente/EmpleadoForm.js";
 
@@ -87,14 +88,14 @@ const routes = [
     name: "Nuevo Cliente",
     component: ClienteForm,
     layout: "/admin",
-    hidden: true,
+    
   },
   {
     path: "/clientes/editar/:id",
     name: "Editar Cliente",
     component: ClienteForm,
     layout: "/admin",
-    hidden: true,
+    
   },
   {
     path: "/empleados",
@@ -108,14 +109,14 @@ const routes = [
     name: "Nuevo Empleado",
     component: EmpleadoForm,
     layout: "/admin",
-    hidden: true,
+    
   },
   {
     path: "/empleados/editar/:id",
     name: "Editar Empleado",
     component: EmpleadoForm,
     layout: "/admin",
-    hidden: true,
+    
   },
 
   // Productos

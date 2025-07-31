@@ -16,7 +16,7 @@ const PublicRoute = ({ children }) => {
   }
 
   if (user) {
-    return <Navigate to="/auth/login" replace />;
+    return <Navigate to="/admin/index" replace />;
   }
 
   return children;
