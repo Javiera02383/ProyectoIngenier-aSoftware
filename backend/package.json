@@ -19,6 +19,7 @@
     "dotenv": "^17.0.0",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
+    "html2pdf.js": "^0.10.3",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "multer": "^2.0.1",

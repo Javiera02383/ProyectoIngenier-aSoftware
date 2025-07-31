@@ -16,9 +16,9 @@ import HeaderResponsive from "components/Headers/HeaderResponsive";
 
 // Datos simulados: facturas pendientes para pago
 const facturasSimuladas = [
-  { id: 1, numero: "F001", cliente: "Juan Pérez", total: 1500.0, saldo: 500.0 },
-  { id: 2, numero: "F002", cliente: "María López", total: 2300.5, saldo: 2300.5 },
-  { id: 3, numero: "F003", cliente: "Carlos Ramírez", total: 1200.75, saldo: 0 }, // pagada
+  { id: 1, numero: "001", cliente: "Juan Antonio Pérez", total: 1500.0, saldo: 500.0 },
+  { id: 2, numero: "002", cliente: "María López", total: 2300.5, saldo: 2300.5 },
+  { id: 3, numero: "003", cliente: "Carlos Ramírez", total: 1200.75, saldo: 500 }, // pagada
 ];
 
 const formasPago = [

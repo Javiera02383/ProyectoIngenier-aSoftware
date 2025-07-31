@@ -66,6 +66,21 @@ const crearCliente = [
   }
 ];
 
+// Obtener todos los clientes sin filtros  
+const obtenerTodosLosClientes = async (req, res) => {  
+  try {  
+    const clientes = await Cliente.findAll({  
+      include: [{  
+        model: Persona,  
+        as: 'persona'  
+      }]  
+    });  
+    res.json(clientes);  
+  } catch (error) {  
+    res.status(500).json({ mensaje: 'Error al obtener todos los clientes', error: error.message });  
+  }  
+};  
+  
 // Obtener todos los clientes con búsqueda por nombre/apellido de Persona
 const obtenerClientes = async (req, res) => {
   try {
@@ -145,5 +160,6 @@ module.exports = {
   obtenerClientes,
   obtenerClientePorId,
   editarCliente,
+  obtenerTodosLosClientes,
   eliminarCliente
 };

@@ -4,43 +4,47 @@ import Clientes from "views/gestion_cliente/Clientes.js";
 
 import Index from "views/Index.js";
 // seguridad
+import Login from "views/seguridad/Login.js";
 import Profile from "views/seguridad/Profile.js";
 import Register from "views/seguridad/Register.js";
-import Login from "views/seguridad/Login.js";
 // Mapa
 import Maps from "views/examples/Maps.js";
 
 // Facturación
-import PanelFacturacion from "views/facturacion/PanelFacturacion";
-import CrearFactura from "views/facturacion/CrearFactura";
-import HistorialFactura from "views/facturacion/HistorialFactura";
-import Factura from "views/facturacion/Factura";
-import RegistrarPago from "views/facturacion/RegistrarPago";
 import CAI from "views/facturacion/Cai";
-import Contratos from "views/facturacion/Contratos";
 import Canjes from "views/facturacion/Canjes";
+import Contratos from "views/facturacion/Contratos";
+import CrearFactura from "views/facturacion/CrearFactura";
+import Factura from "views/facturacion/Factura";
+import HistorialFactura from "views/facturacion/HistorialFactura";
+import PanelFacturacion from "views/facturacion/PanelFacturacion";
+import RegistrarPago from "views/facturacion/RegistrarPago";
 // Facturación - Crear Factura
 import CrearFacturaNueva from "views/facturacion/CrearFacturaNueva";
 import ListaFacturas from "views/facturacion/ListasFacturas.js";
 
 
 // Reportes
-import Reporte from "views/examples/Reporte.js";
-import VerDetalle from "views/examples/VerDetalle.js";
 import HistoricoReportes from "views/examples/HistoricoReportes.js";
+import Reporte from "views/examples/Reporte.js";
+import ReporteInventario from "views/examples/ReporteInventario.js";
+import VerDetalle from "views/examples/VerDetalle.js";
+import ReporteCliente from './views/examples/ReporteCliente.js';
+import InformacionCliente from './views/examples/InformacionCliente.js';
 
 // Inventario
+import GenerarReportes from "views/examples/GenerarReportes.js";
+import GestionarMantenimiento from "views/examples/GestionarMantenimiento.js";
+import GestionarStock from "views/examples/GestionarStock.js";
+import InventarioHub from "views/examples/InventarioHub.js";
 import ListaActivos from "views/examples/ListaActivos.js";
 import RegistrarActivo from "views/examples/RegistrarActivo.js";
-import GestionarStock from "views/examples/GestionarStock.js";
-import GestionarMantenimiento from "views/examples/GestionarMantenimiento.js";
-import GenerarReportes from "views/examples/GenerarReportes.js";
-import InventarioHub from "views/examples/InventarioHub.js";
 
 // Programación
-import Programacion from "views/programacion/programacion";
-import CrearPrograma from "views/programacion/CrearPrograma.js";
+import ReportePautaPorCliente from "views/examples/ReportePautaPorCliente";
 import CrearPauta from "views/programacion/CrearPauta.js";
+import CrearPrograma from "views/programacion/CrearPrograma.js";
+import Programacion from "views/programacion/programacion";
 
 
 
@@ -131,13 +135,15 @@ const routes = [
     icon: "ni ni-fat-add text-green",  
     component: CrearFacturaNueva,  
     layout: "/admin",  
+    hidden: true,
   },
   {  
     path: "/facturas",  
     name: "Facturas",  
     icon: "ni ni-single-copy-04 text-pink",  
     component: ListaFacturas,  
-    layout: "/admin",  
+    layout: "/admin", 
+    hidden: true, 
   }, 
   {
     path: "/facturacion/crear",
@@ -244,7 +250,38 @@ const routes = [
     layout: "/admin",
     hidden: true,
   },
-
+  {
+    path: "/ReporteInventario",
+    name: "Informe de Inventario",
+    icon: "ni ni-archive-2 text-info",
+    component: ReporteInventario,
+    layout: "/admin",
+    hidden: true,
+  },
+  {
+    path: "/ReportePautaPorCliente",
+    name: "Informe de Pauta Publicitaria",
+    icon: "ni ni-archive-2 text-info",
+    component: ReportePautaPorCliente,
+    layout: "/admin",
+    hidden: true,
+  },
+  {
+    path: "/ReporteCliente",
+    name: "Informe de Clientes",
+    icon: "ni ni-archive-2 text-info",
+    component: ReporteCliente,
+    layout: "/admin",
+    hidden: true,
+  },
+  {
+    path: "/InformacionCliente",
+    name: "Informe de Clientes",
+    icon: "ni ni-archive-2 text-info",
+    component: InformacionCliente,
+    layout: "/admin",
+    hidden: true,
+  },
   // Perfil de Usuario
     {
     path: "/user-profile",

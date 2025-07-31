@@ -4,6 +4,8 @@ const empleadoController = require('../../controladores/gestion_cliente/Empleado
 const { verificarUsuario } = require('../../configuraciones/passport');
 const router = express.Router();
 
+router.get('/todos-empleados', verificarUsuario, empleadoController.obtenerTodosLosEmpleados);
+
 /**
  * @swagger
  * /empleados/empleado:

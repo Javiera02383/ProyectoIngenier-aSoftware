@@ -145,36 +145,170 @@ INSERT INTO reparacion_de_lentes (Tipo_Reparacion, idConsulta, Descripcion, Cost
 ('Modificación de contenido', 2, 'Actualización de spot publicitario', 50);  
   
 -- 5. TABLAS DE FACTURACIÓN  
- INSERT INTO factura (
-  idFactura,
-  Fecha, Total_Facturado, Tipo_documento,
-  productoCliente, mencion, periodoInicio, periodoFin,
-  tipoServicio, agencia, ordenNo,
-  idCliente, idFormaPago, idEmpleado,
-  archivo_pdf, estadoFactura
-) VALUES 
-(
-  1, NOW(), 1725.00, 'Factura',
-  'Motomundo S.A.', 'Deportiva', '2025-05-01', '2025-05-30',
-  'spot', 'MASS PUBLICIDAD', 2025001,
-  1, 1, 2,
-  'factura_1.pdf', 'activa'
-),
-(
-  2, NOW(), 2300.00, 'Factura',
-  'Supermercados La Colonia', 'Comercial', '2025-05-15', '2025-06-15',
-  'programa', 'Publicidad Central', 025002,
-  2, 2, 2,
-  'factura_2.pdf', 'activa'
-),
-(
-  3, NOW(), 1500.00, 'Factura',
-  'Banco Atlántida', 'Financiera', '2025-06-01', '2025-06-30',
-  'spot', 'Creativos Unidos', 2025003,
-  3, 3, 2,
-  'factura_3.pdf', 'pendiente'
+ INSERT INTO factura (  
+  idFactura,  
+  Fecha,  
+  Total_Facturado,  
+  Tipo_documento,  
+  productoCliente,  
+  mencion,  
+  periodoInicio,  
+  periodoFin,  
+  tipoServicio,  
+  agencia,  
+  ordenNo,  
+  ordenCompraExenta,  
+  numeroRegistroSAG,  
+  constanciaExonerado,  
+  idCliente,  
+  idFormaPago,  
+  idEmpleado,  
+  archivo_pdf,  
+  estadoFactura  
+) VALUES (  
+  1,                                    -- idFactura  
+  '2025-01-15 10:30:00',               -- Fecha  
+  2500.00,                             -- Total_Facturado  
+  'Factura',                           -- Tipo_documento  
+  'Supermercados La Colonia',          -- productoCliente  
+  'Comercial',                         -- mencion  
+  '2025-01-01',                        -- periodoInicio  
+  '2025-01-31',                        -- periodoFin  
+  'spot',                              -- tipoServicio (spot, programa, contrato)  
+  'MASS PUBLICIDAD',                   -- agencia  
+  1001,                                -- ordenNo  
+  'EX-2025-001',                       -- ordenCompraExenta  
+  'SAG-12345',                         -- numeroRegistroSAG  
+  'CONST-2025-001',                    -- constanciaExonerado  
+  1,                                   -- idCliente (FK requerida)  
+  1,                                   -- idFormaPago (FK requerida)  
+  1,                                   -- idEmpleado (FK requerida)  
+  'factura_1.pdf',                     -- archivo_pdf  
+  'activa'                             -- estadoFactura (activa, anulada, cobrada, pendiente)  
 );
-
+INSERT INTO factura (  
+  idFactura,  
+  Fecha,  
+  Total_Facturado,  
+  Tipo_documento,  
+  productoCliente,  
+  mencion,  
+  periodoInicio,  
+  periodoFin,  
+  tipoServicio,  
+  agencia,  
+  ordenNo,  
+  ordenCompraExenta,  
+  numeroRegistroSAG,  
+  constanciaExonerado,  
+  idCliente,  
+  idFormaPago,  
+  idEmpleado,  
+  archivo_pdf,  
+  estadoFactura  
+) VALUES (  
+  3,                                    -- idFactura  
+  '2025-01-20 09:15:00',               -- Fecha  
+  4500.75,                             -- Total_Facturado  
+  'Factura',                           -- Tipo_documento  
+  'Banco Atlántida',                   -- productoCliente  
+  'Financiera',                        -- mencion  
+  '2025-02-01',                        -- periodoInicio  
+  '2025-02-28',                        -- periodoFin  
+  'contrato',                          -- tipoServicio  
+  'Publicidad Creativa S.A.',          -- agencia  
+  2025,                                -- ordenNo  
+  NULL,                                -- ordenCompraExenta  
+  NULL,                                -- numeroRegistroSAG  
+  NULL,                                -- constanciaExonerado  
+  3,                                   -- idCliente (FK requerida)  
+  2,                                   -- idFormaPago (FK requerida)  
+  2,                                   -- idEmpleado (FK requerida)  
+  'factura_3.pdf',                     -- archivo_pdf  
+  'activa'                             -- estadoFactura  
+);
+INSERT INTO factura (  
+  idFactura,  
+  Fecha,  
+  Total_Facturado,  
+  Tipo_documento,  
+  productoCliente,  
+  mencion,  
+  periodoInicio,  
+  periodoFin,  
+  tipoServicio,  
+  agencia,  
+  ordenNo,  
+  ordenCompraExenta,  
+  numeroRegistroSAG,  
+  constanciaExonerado,  
+  idCliente,  
+  idFormaPago,  
+  idEmpleado,  
+  archivo_pdf,  
+  estadoFactura  
+) VALUES (  
+  3,                                    -- idFactura  
+  '2025-01-20 09:15:00',               -- Fecha  
+  4500.75,                             -- Total_Facturado  
+  'Factura',                           -- Tipo_documento  
+  'Banco Atlántida',                   -- productoCliente  
+  'Financiera',                        -- mencion  
+  '2025-02-01',                        -- periodoInicio  
+  '2025-02-28',                        -- periodoFin  
+  'contrato',                          -- tipoServicio  
+  'Publicidad Creativa S.A.',          -- agencia  
+  2025,                                -- ordenNo  
+  NULL,                                -- ordenCompraExenta  
+  NULL,                                -- numeroRegistroSAG  
+  NULL,                                -- constanciaExonerado  
+  3,                                   -- idCliente (FK requerida)  
+  2,                                   -- idFormaPago (FK requerida)  
+  2,                                   -- idEmpleado (FK requerida)  
+  'factura_3.pdf',                     -- archivo_pdf  
+  'activa'                             -- estadoFactura  
+);
+INSERT INTO factura (  
+  idFactura,  
+  Fecha,  
+  Total_Facturado,  
+  Tipo_documento,  
+  productoCliente,  
+  mencion,  
+  periodoInicio,  
+  periodoFin,  
+  tipoServicio,  
+  agencia,  
+  ordenNo,  
+  ordenCompraExenta,  
+  numeroRegistroSAG,  
+  constanciaExonerado,  
+  idCliente,  
+  idFormaPago,  
+  idEmpleado,  
+  archivo_pdf,  
+  estadoFactura  
+) VALUES (  
+  4,                                    -- idFactura  
+  '2025-01-22 16:30:00',               -- Fecha  
+  3200.00,                             -- Total_Facturado  
+  'Factura',                           -- Tipo_documento  
+  'Ministerio de Educación',           -- productoCliente  
+  'Educativa',                         -- mencion  
+  '2025-01-15',                        -- periodoInicio  
+  '2025-01-22',                        -- periodoFin  
+  'programa',                          -- tipoServicio  
+  NULL,                                -- agencia (gobierno no usa agencia)  
+  NULL,                                -- ordenNo  
+  'GOB-2025-EDU-001',                  -- ordenCompraExenta  
+  'SAG-GOV-2025-001',                  -- numeroRegistroSAG  
+  'CONST-EDU-2025-001',                -- constanciaExonerado  
+  4,                                   -- idCliente (FK requerida)  
+  1,                                   -- idFormaPago (FK requerida)  
+  1,                                   -- idEmpleado (FK requerida)  
+  'factura_4.pdf',                     -- archivo_pdf  
+  'cobrada'                            -- estadoFactura  
+);
   
 -- Tabla: detalle_descuento  
 INSERT INTO detalle_descuento (idFactura, idDescuento, Monto) VALUES   

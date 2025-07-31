@@ -1,27 +1,27 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Chart from "chart.js";
-import { Line, Bar, Pie } from "react-chartjs-2";
+import { useState } from "react";
+import { Bar, Line, Pie } from "react-chartjs-2";
+import { useNavigate } from "react-router-dom";
 
 import {
   Button,
   Card,
-  CardHeader,
   CardBody,
-  Table,
-  Container,
-  Row,
+  CardHeader,
   Col,
+  Container,
+  Form,
   FormGroup,
   Input,
   Label,
-  Form,
+  Row,
+  Table,
 } from "reactstrap";
 
 import {
+  chartExample2,
   chartOptions,
   parseOptions,
-  chartExample2,
 } from "variables/charts.js";
 
 const Reportes = () => {
@@ -81,246 +81,212 @@ const Reportes = () => {
       tipoGrafica: "",
     });
   };
+  // Simulación de facturas 
+  const facturas = [
+  { id: 1, fecha: "2025-07-01", cliente: "Juan", total: 500 },
+  { id: 2, fecha: "2025-07-10", cliente: "Ana", total: 300 },
+  { id: 3, fecha: "2025-07-15", cliente: "Luis", total: 200 },
+  { id: 4, fecha: "2025-07-22", cliente: "María", total: 100 },
+  { id: 5, fecha: "2025-06-30", cliente: "Carlos", total: 800 },
+];
+
+  const hoy = new Date();
+  const mesActual = hoy.getMonth();
+  const añoActual = hoy.getFullYear();
+
+  const facturasDelMes = facturas.filter((factura) => {
+    const fecha = new Date(factura.fecha);
+    return fecha.getMonth() === mesActual && fecha.getFullYear() === añoActual;
+  });
+
+  const totalDelMes = facturasDelMes.reduce((sum, f) => sum + f.total, 0);
+
+  const datosPorDia = facturasDelMes.reduce((acc, factura) => {
+    const dia = new Date(factura.fecha).getDate();
+    acc[dia] = (acc[dia] || 0) + factura.total;
+    return acc;
+  }, {});
+
+  const chartDataFacturas = {
+    labels: Object.keys(datosPorDia).map((dia) => `Día ${dia}`),
+    datasets: [
+      {
+        label: "Total Diario",
+        data: Object.values(datosPorDia),
+        backgroundColor: "rgba(75,192,192,0.6)",
+      },
+    ],
+  };
 
   return (
     <>
+      {/* 🔵 Estilos personalizados */}
+      <style>
+        {`
+          .card-hover {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-radius: 10px;
+          }
+
+          .card-hover:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+          }
+          /* 🎨 Colores personalizados */
+          .bg-info {
+            background-color: #4a90e2 !important;
+          }
+          .bg-success {
+            background-color: #50e3c2 !important;
+          }
+          .btn-success {
+            background-color: #50e3c2 !important;
+            border-color: #50e3c2;
+          }
+          .btn-info {
+            background-color: #4a90e2 !important;
+            border-color: #4a90e2;
+          }
+          .btn-secondary {
+            background-color: #b2bec3 !important;
+            border-color: #b2bec3;
+          }
+          .thead-light th {
+            background-color: #eaf4fb;
+            color: #4a4a4a;
+          }
+
+          .table td, .table th {
+            border-top: 1px solid #dee2e6;
+          }
+        `}
+      </style>
+
       <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
         <Container fluid>
           <div className="header-body">
             <Row className="justify-content-center mb-4">
               <Col xl="10" className="text-center">
-                <h1 className="display-3 font-weight-bold text-white">
-                  Reportes Canal 40
-                </h1>
+                
               </Col>
             </Row>
           </div>
         </Container>
       </div>
-
       <Container className="mt--7" fluid>
-        <Row className="mb-4 justify-content-center">
-          <Col xl="10">
-            <Card className="shadow">
-              <CardHeader className="text-center d-flex justify-content-between align-items-center">
-                <h3 className="mb-0">Filtros de Reporte</h3>
-                <Button
-                  color="info"
-                  size="sm"
-                  onClick={() => navigate("/admin/historico")}
-                >
-                  Histórico de Reportes
-                </Button>
-              </CardHeader>
-              <CardBody>
-                <Form onSubmit={handleGenerateReport}>
-                  <Row className="justify-content-center">
-                    <Col md="4">
-                      <FormGroup>
-                        <Label for="fechaDesde">Fecha Inicio</Label>
-                        <Input
-                          type="date"
-                          name="fechaDesde"
-                          id="fechaDesde"
-                          value={filters.fechaDesde}
-                          onChange={handleFilterChange}
-                        />
-                      </FormGroup>
-                    </Col>
-                    <Col md="4">
-                      <FormGroup>
-                        <Label for="fechaHasta">Fecha Fin</Label>
-                        <Input
-                          type="date"
-                          name="fechaHasta"
-                          id="fechaHasta"
-                          value={filters.fechaHasta}
-                          onChange={handleFilterChange}
-                        />
-                      </FormGroup>
-                    </Col>
-                    <Col md="4">
-                      <FormGroup>
-                        <Label for="modulo">Módulo</Label>
-                        <Input
-                          type="select"
-                          name="modulo"
-                          id="modulo"
-                          value={filters.modulo}
-                          onChange={handleFilterChange}
-                        >
-                          <option value="">Seleccionar</option>
-                          <option value="Inventario">Inventario</option>
-                          <option value="Producción">Producción</option>
-                          <option value="Publicidad">Publicidad</option>
-                          <option value="Facturación">Facturación</option>
-                        </Input>
-                      </FormGroup>
-                    </Col>
-                  </Row>
-
-                  <Row className="justify-content-center">
-                    <Col md="4">
-                      <FormGroup>
-                        <Label for="tipoReporte">Tipo de Reporte</Label>
-                        <Input
-                          type="select"
-                          name="tipoReporte"
-                          id="tipoReporte"
-                          value={filters.tipoReporte}
-                          onChange={handleFilterChange}
-                        >
-                          <option value="">Seleccionar</option>
-                          <option value="Mensual">Mensual</option>
-                          <option value="Semanal">Semanal</option>
-                        </Input>
-                      </FormGroup>
-                    </Col>
-                    <Col md="4">
-                      <FormGroup>
-                        <Label for="estado">Estado</Label>
-                        <Input
-                          type="select"
-                          name="estado"
-                          id="estado"
-                          value={filters.estado}
-                          onChange={handleFilterChange}
-                        >
-                          <option value="">Seleccionar</option>
-                          <option value="Activo">Activo</option>
-                          <option value="Cancelado">Cancelado</option>
-                          <option value="Pendiente">Pendiente</option>
-                        </Input>
-                      </FormGroup>
-                    </Col>
-                    <Col md="4">
-                      <FormGroup>
-                        <Label for="tipoGrafica">Tipo de Gráfica</Label>
-                        <Input
-                          type="select"
-                          name="tipoGrafica"
-                          id="tipoGrafica"
-                          value={filters.tipoGrafica}
-                          onChange={handleFilterChange}
-                        >
-                          <option value="">Seleccionar</option>
-                          <option value="bar">Barras</option>
-                          <option value="line">Líneas</option>
-                          <option value="pie">Pastel</option>
-                        </Input>
-                      </FormGroup>
-                    </Col>
-                  </Row>
-
-                  <Row className="justify-content-center mt-3">
-                    <Col md="auto">
-                      <Button color="primary" type="submit">
-                        Generar Reporte
-                      </Button>{" "}
-                      <Button color="secondary" onClick={handleClearFilters}>
-                        Limpiar
-                      </Button>
-                    </Col>
-                  </Row>
-                </Form>
-              </CardBody>
-            </Card>
-          </Col>
+        {/* Cuadros de informes */}
+        <Row className="mt-4">
+          <Col lg="4" md="6" className="mb-4">
+              <Card className="shadow">
+                <CardBody className="text-center">
+                  <i className="ni ni-chart-bar-32 ni-3x text-success mb-3"></i>
+                    <CardHeader tag="h4" className="text-uppercase text-muted mb-0">
+                      Reporte de Inventario
+                    </CardHeader>
+                    <CardBody>
+                      <p>Consulta detallada sobre el estado actual del inventario.</p>
+                    </CardBody>
+                    <hr className="my-3" />
+                    <Button color="success" onClick={() => navigate("/admin/ReporteInventario")}>
+                      Ver
+                    </Button>
+                  </CardBody>
+              </Card>
+            </Col>
+            <Col lg="4" md="6" className="mb-4">
+              <Card className="shadow">
+                <CardBody className="text-center">
+                  <i className="ni ni-chart-bar-32 ni-3x text-success mb-3"></i>
+                    <CardHeader tag="h4" className="text-uppercase text-muted mb-0">
+                      Reporte de Pauta Publicitaria
+                    </CardHeader>
+                    <CardBody>
+                      <p>Informe sobre horarios de pautas publicitarias por cliente</p>
+                    </CardBody>
+                    <hr className="my-3" />
+                    <Button color="success" onClick={() => navigate("/admin/ReportePautaPorCliente")}>
+                      Ver
+                    </Button>
+                  </CardBody>
+              </Card>
+            </Col>
+            <Col lg="4" md="6" className="mb-4">
+              <Card className="shadow">
+                <CardBody className="text-center">
+                  <i className="ni ni-chart-bar-32 ni-3x text-success mb-3"></i>
+                    <CardHeader tag="h4" className="text-uppercase text-muted mb-0">
+                      Reporte de Clientes
+                    </CardHeader>
+                    <CardBody>
+                      <p>Informes sobre clientes vigentes</p>
+                    </CardBody>
+                    <hr className="my-3" />
+                    <Button color="success" onClick={() => navigate("/admin/ReporteCliente")}>
+                      Ver
+                    </Button>
+                  </CardBody>
+              </Card>
+            </Col>
         </Row>
+          <Row className="mb-5 justify-content-center">
+            <Col lg="4" md="6" className="mb-4">
+              <Card className="shadow">
+                <CardBody className="text-center">
+                  <CardHeader tag="h4" className="bg-info text-white">
+                    Facturas Emitidas este mes
+                  </CardHeader>
+                  <CardBody>
+                    <h2>{facturasDelMes.length}</h2>
+                    <p className="text-muted">Cantidad de facturas</p>
+                  </CardBody>
+                </CardBody>
+              </Card>
+            </Col>
+            <Col lg="4" md="6" className="mb-4">
+              <Card className="shadow">
+                <CardBody className="text-center">
+                  <CardHeader tag="h4" className="bg-info text-white">
+                    Total Facturado este mes
+                  </CardHeader>
+                  <CardBody>
+                    <h2>L {totalDelMes.toLocaleString()}</h2>
+                    <p className="text-muted">Lempiras</p>
+                  </CardBody>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
 
-        <Row>
-          <Col xl="4">
+          <Row className="mb-5">
+            <Col xl="4">
             <Card className="shadow">
               <CardHeader className="bg-transparent text-center">
                 <h6 className="text-uppercase text-muted ls-1 mb-1">
-                  Reporte Visual
+                  Resultados en Gráfico
                 </h6>
-                <h2 className="mb-0">Resultados en Gráfico</h2>
+                <h2 className="mb-0">Facturacion diaria del Mes Actual</h2>
               </CardHeader>
               <CardBody>
                 <div className="chart">
-                  {filters.tipoGrafica === "bar" && (
-                    <Bar data={chartExample2.data} options={chartExample2.options} />
-                  )}
-                  {filters.tipoGrafica === "line" && (
-                    <Line data={chartExample2.data} options={chartExample2.options} />
-                  )}
-                  {filters.tipoGrafica === "pie" && (
-                    <Pie data={chartExample2.data} options={chartExample2.options} />
-                  )}
-                  {filters.tipoGrafica === "" && (
-                    <div className="text-center text-muted">
-                      Seleccione el tipo de gráfica para visualizar el reporte.
-                    </div>
-                  )}
+                                    <Bar data={chartDataFacturas} options={{ responsive: true }} />
                 </div>
               </CardBody>
             </Card>
           </Col>
-
-          <Col xl="8">
+          <Col xl="4">
             <Card className="shadow">
-              <CardHeader className="border-0 text-center">
-                <Row className="align-items-center">
-                  <Col>
-                    <h3 className="mb-0">Resultados del Reporte</h3>
-                  </Col>
-                  <Col className="text-right">
-                    <Button color="success" size="sm">
-                      Exportar PDF
-                    </Button>{" "}
-                    <Button color="info" size="sm">
-                      Exportar Excel
-                    </Button>{" "}
-                    <Button color="secondary" size="sm">
-                      Imprimir
-                    </Button>
-                  </Col>
-                </Row>
+              <CardHeader className="bg-transparent text-center">
+                <h6 className="text-uppercase text-muted ls-1 mb-1">
+                  Resultados en Gráfico
+                </h6>
+                <h2 className="mb-0">Facturacion Mensual</h2>
               </CardHeader>
-
-              <Table className="align-items-center table-flush" responsive>
-                <thead className="thead-light">
-                  <tr>
-                    <th scope="col">Módulo</th>
-                    <th scope="col">Detalle</th>
-                    <th scope="col">Fecha</th>
-                    <th scope="col">Estado</th>
-                    <th scope="col">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {reportes.map((reporte) => (
-                    <tr key={reporte.id}>
-                      <td>{reporte.modulo}</td>
-                      <td>{reporte.detalle}</td>
-                      <td>{reporte.fecha}</td>
-                      <td>
-                        <span
-                          className={
-                            reporte.estado === "Activo"
-                              ? "text-success"
-                              : reporte.estado === "Pendiente"
-                              ? "text-warning"
-                              : "text-danger"
-                          }
-                        >
-                          {reporte.estado}
-                        </span>
-                      </td>
-                      <td>
-                        <Button
-                          color="primary"
-                          size="sm"
-                          onClick={() => handleVerDetalle(reporte.id)}
-                        >
-                          Ver Detalle
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+              <CardBody>
+                <div className="chart">
+                                    <Bar data={chartDataFacturas} options={{ responsive: true }} />
+                </div>
+              </CardBody>
             </Card>
           </Col>
         </Row>

@@ -44,6 +44,21 @@ exports.crearEmpleado = [
   }
 ];
 
+// Obtener todos los empleados sin filtros  
+exports.obtenerTodosLosEmpleados = async (req, res) => {  
+  try {  
+    const empleados = await Empleado.findAll({  
+      include: [{  
+        model: Persona,  
+        as: 'persona'  
+      }]  
+    });  
+    res.json(empleados);  
+  } catch (error) {  
+    res.status(500).json({ mensaje: 'Error al obtener todos los empleados', error: error.message });  
+  }  
+};
+
 // Obtener todos los empleados con búsqueda por nombre/apellido de Persona
 exports.obtenerEmpleados = async (req, res) => {
   try {
@@ -121,3 +136,4 @@ exports.eliminarEmpleado = async (req, res) => {
     res.status(500).json({ mensaje: 'Error al eliminar empleado', error: error.message });
   }
 };
+

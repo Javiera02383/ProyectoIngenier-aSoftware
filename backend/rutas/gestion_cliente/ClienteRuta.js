@@ -3,6 +3,8 @@ const { body, param, validationResult } = require('express-validator');
 const clienteController = require('../../controladores/gestion_cliente/ClienteController');
 const router = express.Router();
 const { verificarUsuario } = require('../../configuraciones/passport');
+
+router.get('/todos-clientes', verificarUsuario, clienteController.obtenerTodosLosClientes);
 /**
  * @swagger
  * /clientes/cliente:
