@@ -1,6 +1,5 @@
 // services/facturaService.js  
-const API_BASE = 'http://localhost:4051/api/optica';  
-  
+ 
 // Función para obtener el token del localStorage  
 const getAuthToken = () => {  
   return localStorage.getItem('token');  
@@ -9,101 +8,33 @@ const getAuthToken = () => {
 export const facturaService = {  
   // Obtener todas las facturas  
   obtenerFacturas: async () => {  
-    const token = getAuthToken();  
-    const response = await fetch(`${API_BASE}/facturas`, {  
-      method: 'GET',  
-      headers: {  
-        'Content-Type': 'application/json',  
-        'Authorization': `Bearer ${token}` // Token JWT en el header  
-      }  
-    });  
-      
-    if (!response.ok) {  
-      throw new Error(`HTTP error! status: ${response.status}`);  
-    }  
-    return response.json();  
+    const response = await axiosInstance.get('/facturas');
+    return response.data;  
   },  
     
   // Crear factura completa  
   crearFacturaCompleta: async (data) => {  
-    const token = getAuthToken();  
-    const response = await fetch(`${API_BASE}/factura-completa`, {  
-      method: 'POST',  
-      headers: {  
-        'Content-Type': 'application/json',  
-        'Authorization': `Bearer ${token}` // Token JWT en el header  
-      },  
-      body: JSON.stringify(data)  
-    });  
-      
-    if (!response.ok) {  
-      throw new Error(`HTTP error! status: ${response.status}`);  
-    }  
-    return response.json();  
+    const response = await axiosInstance.post('/factura-completa', data);
+    return response.data;
   },  
     
   // Obtener factura por ID  
   obtenerFacturaPorId: async (id) => {  
-    const token = getAuthToken();  
-    const response = await fetch(`${API_BASE}/factura/${id}`, {  
-      method: 'GET',  
-      headers: {  
-        'Content-Type': 'application/json',  
-        'Authorization': `Bearer ${token}`  
-      }  
-    });  
-      
-    if (!response.ok) {  
-      throw new Error(`HTTP error! status: ${response.status}`);  
-    }  
-    return response.json();  
+    const response = await axiosInstance.get(`/factura/${id}`);
+    return response.data;
   },  
     
-  // Anular factura - CORREGIDO  
-anularFactura: async (id) => {  
-  const token = getAuthToken();  
-  const response = await fetch(`${API_BASE}/facturas/${id}/anular`, { // URL corregida (plural)  
-    method: 'PATCH', // Método corregido  
-    headers: {  
-      'Content-Type': 'application/json',  
-      'Authorization': `Bearer ${token}`  
-    }  
-  });  
-    
-  if (!response.ok) {  
-    throw new Error(`HTTP error! status: ${response.status}`);  
-  }  
-  return response.json();  
-},    
+  // Anular factura  
+  anularFactura: async (id) => {  
+    const response = await axiosInstance.put(`/factura/${id}/anular`);
+    return response.data;
+  },  
     
   // Descargar PDF de factura  
-descargarPDF: async (id) => {  
-  const token = getAuthToken();  
-  try {  
-    const response = await fetch(`${API_BASE}/factura/${id}/pdf`, {  
-      method: 'GET',  
-      headers: {  
-        'Authorization': `Bearer ${token}`  
-      }  
-    });  
-      
-    if (!response.ok) {  
-      throw new Error(`HTTP error! status: ${response.status}`);  
-    }  
-      
-    const blob = await response.blob();  
-    const url = window.URL.createObjectURL(blob);  
-    const a = document.createElement('a');  
-    a.href = url;  
-    a.download = `factura_${id}.pdf`;  
-    document.body.appendChild(a);  
-    a.click();  
-    window.URL.revokeObjectURL(url);  
-    document.body.removeChild(a);  
-  } catch (error) {  
-    console.error('Error al descargar PDF:', error);  
+  descargarPDF: (id) => {  
+    const token = authService.getToken();
+    window.open(`${axiosInstance.defaults.baseURL}/factura/${id}/pdf?token=${token}`, '_blank');  
   }  
-} 
 };
 
 

@@ -1,12 +1,17 @@
 
 // Gestion Clientes
 import Clientes from "views/gestion_cliente/Clientes.js";
+import ClienteForm from "views/gestion_cliente/ClienteForm.js";
+import Empleados from "views/gestion_cliente/Empleados.js";
+import EmpleadoForm from "views/gestion_cliente/EmpleadoForm.js";
 
 import Index from "views/Index.js";
 // seguridad
-import Login from "views/seguridad/Login.js";
 import Profile from "views/seguridad/Profile.js";
 import Register from "views/seguridad/Register.js";
+import Login from "views/seguridad/Login.js";
+import Personas from "views/seguridad/Personas.js";
+import PersonaForm from "views/seguridad/PersonaForm.js";
 // Mapa
 import Maps from "views/examples/Maps.js";
 
@@ -40,6 +45,14 @@ import InventarioHub from "views/examples/InventarioHub.js";
 import ListaActivos from "views/examples/ListaActivos.js";
 import RegistrarActivo from "views/examples/RegistrarActivo.js";
 
+// Productos
+import Productos from "views/productos/Productos.js";
+import ProductoForm from "views/productos/ProductoForm.js";
+import Categorias from "views/productos/Categorias.js";
+import CategoriaForm from "views/productos/CategoriaForm.js";
+
+
+
 // Programación
 import ReportePautaPorCliente from "views/examples/ReportePautaPorCliente";
 import CrearPauta from "views/programacion/CrearPauta.js";
@@ -61,7 +74,7 @@ const routes = [
     layout: "/admin",
   },
 
-// Clientes
+// Gestion Clientes
   {
   path: "/clientes",
   name: "Clientes",
@@ -69,6 +82,86 @@ const routes = [
   component: Clientes,
   layout: "/admin"
   },
+  {
+    path: "/clientes/nuevo",
+    name: "Nuevo Cliente",
+    component: ClienteForm,
+    layout: "/admin",
+    hidden: true,
+  },
+  {
+    path: "/clientes/editar/:id",
+    name: "Editar Cliente",
+    component: ClienteForm,
+    layout: "/admin",
+    hidden: true,
+  },
+  {
+    path: "/empleados",
+    name: "Empleados",
+    icon: "ni ni-badge text-success",
+    component: Empleados,
+    layout: "/admin",
+  },
+  {
+    path: "/empleados/nuevo",
+    name: "Nuevo Empleado",
+    component: EmpleadoForm,
+    layout: "/admin",
+    hidden: true,
+  },
+  {
+    path: "/empleados/editar/:id",
+    name: "Editar Empleado",
+    component: EmpleadoForm,
+    layout: "/admin",
+    hidden: true,
+  },
+
+  // Productos
+  {
+    path: "/productos",
+    name: "Productos",
+    icon: "ni ni-shop text-info",
+    component: Productos,
+    layout: "/admin",
+  },
+  {
+    path: "/productos/nuevo",
+    name: "Nuevo Producto",
+    component: ProductoForm,
+    layout: "/admin",
+    hidden: true,
+  },
+  {
+    path: "/productos/editar/:id",
+    name: "Editar Producto",
+    component: ProductoForm,
+    layout: "/admin",
+    hidden: true,
+  },
+  {
+    path: "/categorias",
+    name: "Categorías",
+    icon: "ni ni-tag text-warning",
+    component: Categorias,
+    layout: "/admin",
+  },
+  {
+    path: "/categorias/nueva",
+    name: "Nueva Categoría",
+    component: CategoriaForm,
+    layout: "/admin",
+    hidden: true,
+  },
+  {
+    path: "/categorias/editar/:id",
+    name: "Editar Categoría",
+    component: CategoriaForm,
+    layout: "/admin",
+    hidden: true,
+  },
+
 
 
   // Inventario
@@ -282,6 +375,31 @@ const routes = [
     layout: "/admin",
     hidden: true,
   },
+
+  // Seguridad - Gestión de Personas
+  {
+    path: "/personas",
+    name: "Personas",
+    icon: "ni ni-circle-08 text-info",
+    component: Personas,
+    layout: "/admin",
+  },
+  {
+    path: "/personas/nueva",
+    name: "Nueva Persona",
+    component: PersonaForm,
+    layout: "/admin",
+    hidden: true,
+  },
+  {
+    path: "/personas/editar/:id",
+    name: "Editar Persona",
+    component: PersonaForm,
+    layout: "/admin",
+    hidden: true,
+  },
+
+  // ------------------- Parte----------------------------
   // Perfil de Usuario
     {
     path: "/user-profile",
@@ -291,14 +409,7 @@ const routes = [
     layout: "/admin",
     hidden: true,
   },
-// Mapa
-    {
-    path: "/mapas",
-    name: "Mapa",
-    icon: "ni ni-pin-3 text-orange",
-    component: Maps,
-    layout: "/admin",
-  },
+
 
   // Authentication Login/Register
   {
@@ -315,6 +426,15 @@ const routes = [
     component: Register,
     layout: "/auth",
   },
+  // Mapa
+    {
+    path: "/mapas",
+    name: "Mapa",
+    icon: "ni ni-pin-3 text-orange",
+    component: Maps,
+    layout: "/admin",
+  },
+
 ];
 
 export default routes;

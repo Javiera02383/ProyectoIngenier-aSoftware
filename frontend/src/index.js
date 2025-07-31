@@ -9,15 +9,21 @@ import "assets/scss/argon-dashboard-react.scss";
 
 import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
+import { AuthProvider } from "contexts/AuthContext";
+import AuthInterceptor from "components/AuthInterceptor";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/admin/*" element={<AdminLayout />} />
-      <Route path="/auth/*" element={<AuthLayout />} />
-      <Route path="*" element={<Navigate to="auth/login" replace />} />
-    </Routes>
-  </BrowserRouter>
+  <AuthProvider>
+    <BrowserRouter>
+      <AuthInterceptor>
+        <Routes>
+          <Route path="/admin/*" element={<AdminLayout />} />
+          <Route path="/auth/*" element={<AuthLayout />} />
+          <Route path="*" element={<Navigate to="/auth/login" replace />} />
+        </Routes>
+      </AuthInterceptor>
+    </BrowserRouter>
+  </AuthProvider>
 );

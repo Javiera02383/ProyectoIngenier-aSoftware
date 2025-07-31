@@ -1,7 +1,14 @@
 const { validationResult } = require('express-validator');
 const argon2 = require('argon2');
 const Usuario = require('../../modelos/seguridad/Usuario');
-const { getToken } = require('../../configuraciones/passport'); // Importar función para generar token
+const { getToken } = require('../../configuraciones/passport');
+const { EnviarCorreo } = require('../../configuraciones/correo');
+const Persona = require('../../modelos/seguridad/Persona');
+
+// Función para generar PIN de 6 dígitos
+const generarPin = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
 
 // REGISTRAR
 exports.registrar = async (req, res) => {
@@ -48,7 +55,11 @@ exports.iniciarSesion = async (req, res) => {
   const { Nombre_Usuario, contraseña } = req.body;
 
   try {
-    const usuario = await Usuario.findOne({ where: { Nombre_Usuario } });
+    const usuario = await Usuario.findOne({ 
+      where: { Nombre_Usuario },
+      include: [{ model: Persona, as: 'persona' }]
+    });
+
     if (!usuario) {
       return res.status(400).json({ mensaje: 'Usuario no encontrado' });
     }
@@ -58,14 +69,15 @@ exports.iniciarSesion = async (req, res) => {
       return res.status(400).json({ mensaje: 'Contraseña incorrecta' });
     }
 
+    // Generar token JWT directamente (sin PIN 2FA por ahora)
     const payload = {
       idUsuario: usuario.idUsuario,
       Nombre_Usuario: usuario.Nombre_Usuario
     };
 
-    const token = getToken(payload); // ← Aquí usas el token desde passport.js
+    const token = getToken(payload);
 
-    res.json({ mensaje: 'Inicio de sesión exitoso', token });
+    res.json({ mensaje: 'Inicio de sesión exitoso', token, user: { idUsuario: usuario.idUsuario, Nombre_Usuario: usuario.Nombre_Usuario } });
 
   } catch (error) {
     res.status(500).json({ mensaje: 'Error en el servidor', error: error.message });
@@ -81,6 +93,44 @@ exports.obtenerUsuarios = async (req, res) => {
     res.json(usuarios);
   } catch (error) {
     res.status(500).json({ mensaje: 'Error al obtener usuarios', error: error.message });
+  }
+};
+
+// VERIFICAR PIN 2FA - Temporalmente deshabilitado
+exports.verificarPin = async (req, res) => {
+  res.status(400).json({ mensaje: 'Funcionalidad de PIN 2FA temporalmente deshabilitada' });
+};
+
+// REGISTRAR PERSONA
+exports.registrarPersona = async (req, res) => {
+  const errores = validationResult(req);
+  if (!errores.isEmpty()) {
+    return res.status(400).json({ errores: errores.array() });
+  }
+
+  const { Pnombre, Snombre, Papellido, Sapellido, Direccion, DNI, correo, fechaNacimiento, genero } = req.body;
+
+  try {
+    const nuevaPersona = await Persona.create({
+      Pnombre,
+      Snombre,
+      Papellido,
+      Sapellido,
+      Direccion,
+      DNI,
+      correo,
+      fechaNacimiento,
+      genero
+    });
+
+    res.status(201).json({ mensaje: 'Persona registrada exitosamente', idPersona: nuevaPersona.idPersona });
+
+  } catch (error) {
+    res.status(500).json({
+      mensaje: 'Error al registrar persona',
+      error: error.message,
+      detalles: error.errors || null
+    });
   }
 };
 

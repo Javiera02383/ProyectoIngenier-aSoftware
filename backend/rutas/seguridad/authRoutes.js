@@ -166,6 +166,41 @@ router.post(
   ],
   authController.iniciarSesion
 );
+
+// Ruta: Verificar PIN 2FA
+router.post(
+  '/verificar-pin',
+  [
+    check('Nombre_Usuario', 'El nombre de usuario es obligatorio').notEmpty(),
+    check('pin', 'El PIN es obligatorio').notEmpty(),
+  ],
+  authController.verificarPin
+);
+
+// Ruta: Registrar Persona
+router.post(
+  '/registrar-persona',
+  [
+    check('Pnombre')
+      .notEmpty()
+      .withMessage('El primer nombre es obligatorio')
+      .isLength({ min: 2, max: 45 })
+      .withMessage('El primer nombre debe tener entre 2 y 45 caracteres'),
+    check('genero')
+      .isIn(['M', 'F'])
+      .withMessage('El género debe ser M o F'),
+    check('correo')
+      .optional()
+      .isEmail()
+      .withMessage('El correo electrónico debe tener un formato válido'),
+    check('fechaNacimiento')
+      .optional()
+      .isISO8601()
+      .withMessage('La fecha de nacimiento debe tener un formato válido')
+  ],
+  authController.registrarPersona
+);
+
 router.get('/listar', verificarUsuario, authController.obtenerUsuarios);
 router.get('/error', authController.error)
 

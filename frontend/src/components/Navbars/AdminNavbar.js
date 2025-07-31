@@ -18,10 +18,17 @@ import {
   Container,
   Media,
 } from "reactstrap";
+import { useAuth } from "../../contexts/AuthContext";
 
 
 const AdminNavbar = (props) => {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/auth/login");
+  };
   return (
     <>
     
@@ -57,7 +64,7 @@ const AdminNavbar = (props) => {
                   </span>
                   <Media className="ml-2 d-none d-lg-block">
                     <span className="mb-0 text-sm font-weight-bold">
-                      Alma Gámez
+                      {user?.nombre_usuario || 'Usuario'}
                     </span>
                   </Media>
                 </Media>
@@ -84,8 +91,7 @@ const AdminNavbar = (props) => {
                 </DropdownItem>
                 <DropdownItem divider />
                 <DropdownItem
-                
-                  onClick={() => navigate("/auth/login")}
+                  onClick={handleLogout}
                 >
                   <i className="ni ni-user-run" />
                   <span>Cerrar Sesión</span>

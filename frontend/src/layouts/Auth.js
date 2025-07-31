@@ -4,9 +4,10 @@ import { useLocation, Route, Routes, Navigate } from "react-router-dom";
 // reactstrap components
 import { Container, Row, Col } from "reactstrap";
 
-// coree components
+// core components
 import AuthNavbar from "components/Navbars/AuthNavbar.js";
 import AuthFooter from "components/Footers/AuthFooter.js";
+import PublicRoute from "components/PublicRoute.js";
 
 import routes from "routes.js";
 
@@ -23,7 +24,9 @@ const Auth = (props) => {
   React.useEffect(() => {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
-    mainContent.current.scrollTop = 0;
+    if (mainContent.current) {
+      mainContent.current.scrollTop = 0;
+    }
   }, [location]);
 
   const getRoutes = (routes) => {
@@ -43,7 +46,7 @@ const Auth = (props) => {
 };
 
   return (
-    <>
+    <PublicRoute>
       <div className="main-content" ref={mainContent}>
         <AuthNavbar />
         <div className="header bg-gradient-info py-7 py-lg-8">
@@ -76,7 +79,7 @@ const Auth = (props) => {
         </Container>
       </div>
       <AuthFooter />
-    </>
+    </PublicRoute>
   );
 };
 
