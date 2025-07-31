@@ -47,6 +47,8 @@ const atributoRutas = require('./rutas/productos/atributoRutas');
 const productoAtributoRutas = require('./rutas/productos/productoAtributoRutas');
 const imagenProductoRutas = require('./rutas/productos/imagenProductoRutas');
 
+/* ========== RUTAS DE INVENTARIO ========== */
+const inventarioRutas = require('./rutas/inventario/inventarioRutas');
 
 /* ========== RUTAS DE GESTIÓN CLIENTE ========== */
 const clienteRuta = require('./rutas/gestion_cliente/ClienteRuta');
@@ -112,6 +114,9 @@ app.use('/api/optica/atributos', atributoRutas);
 app.use('/api/optica/asignaciones', productoAtributoRutas);
 app.use('/api/optica/productos', imagenProductoRutas);
 
+// Usar rutas de inventario
+app.use('/api/optica/inventario', inventarioRutas);
+
 
 /* ========== MODELOS A SINCRONIZAR (si querés controlar uno a uno) ========== */
 const Persona = require('./modelos/seguridad/Persona');
@@ -148,6 +153,9 @@ const Producto = require('./modelos/productos/ProductoModel');
 const CategoriaProducto = require('./modelos/productos/CategoriaProducto');
 const ProductoAtributo = require('./modelos/productos/ProductoAtributo');
 
+// Modelo de inventario
+const Inventario = require('./modelos/inventario/Inventario');
+
 
 const startServer = async () => {
   try {
@@ -179,6 +187,7 @@ const startServer = async () => {
     await Producto.sync();
     await Atributo.sync();
     await ProductoAtributo.sync();
+    await Inventario.sync();
     
     console.log('✅ Modelos de productos/inventario sincronizados.');
 

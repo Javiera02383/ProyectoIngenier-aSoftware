@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-  Badge, 
+  Badge,
   Card,
   CardHeader,
   DropdownMenu,
@@ -14,57 +14,70 @@ import {
   FormGroup,
   Input,
   Label,
-  Col
+  Col,
+  Spinner,
 } from "reactstrap";
 
+import axios from "axios";
 import HeaderBlanco from "components/Headers/HeaderBlanco.js";
-import productosDePrueba from 'data/productosDePrueba'; 
 
-const ListaActivos = () => { 
-  const [inventarioOriginal, setInventarioOriginal] = useState([]); 
+const ListaActivos = () => {
+  const [inventarioOriginal, setInventarioOriginal] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [uniqueCategories, setUniqueCategories] = useState([]); 
+  const [uniqueCategories, setUniqueCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [cargando, setCargando] = useState(true);
 
-  
   useEffect(() => {
-    setInventarioOriginal(productosDePrueba);
+    const obtenerDatos = async () => {
+      try {
+        const token = localStorage.getItem("token"); // o como estés guardando tu JWT
 
-    if (productosDePrueba && productosDePrueba.length > 0) {
-      const categories = [...new Set(productosDePrueba.map(asset => asset.categoria))];
-      setUniqueCategories(["all", ...categories]);
-    } else {
-      setUniqueCategories(["all"]);
-    }
-  }, []); 
+        const res = await axios.get("http://localhost:4051/api/optica/inventario/todos", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
 
-  const filteredAssets = inventarioOriginal.filter(asset => { 
-    
-    const matchesCategory = selectedCategory === "all" || asset.categoria === selectedCategory; 
-    
-    const matchesSearch = asset.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          asset.codigo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          (asset.descripcion && asset.descripcion.toLowerCase().includes(searchQuery.toLowerCase())) || 
-                          (asset.ubicacion && asset.ubicacion.toLowerCase().includes(searchQuery.toLowerCase())) ||   
-                          (asset.asignado && asset.asignado.toLowerCase().includes(searchQuery.toLowerCase())) ||     
-                          (asset.observacion && asset.observacion.toLowerCase().includes(searchQuery.toLowerCase())); 
-    return matchesCategory && matchesSearch; 
+        const data = res.data;
+
+        setInventarioOriginal(data);
+        setCargando(false);
+
+        const categorias = [...new Set(data.map(item => item.nombre))]; // o usa otra propiedad si tienes una categoría real
+        setUniqueCategories(["all", ...categorias]);
+      } catch (error) {
+        console.error("Error al obtener el inventario:", error);
+        setCargando(false);
+      }
+    };
+
+    obtenerDatos();
+  }, []);
+
+  const filteredAssets = inventarioOriginal.filter(asset => {
+    const matchesCategory = selectedCategory === "all" || asset.Nombre === selectedCategory;
+    const matchesSearch =
+      asset.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      asset.codigo?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      asset.descripcion?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      asset.ubicacion?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      asset?.Empleado?.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      asset.observacion?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesCategory && matchesSearch;
   });
 
   return (
     <>
       <HeaderBlanco />
-      {}
       <Container className="mt--7" fluid>
-        {}
         <Row className="mb-4">
-          {}
           <Col md="4">
             <FormGroup>
-              <Label htmlFor="category-filter">Filtrar por Categoría:</Label>
+              <Label>Filtrar por Categoría:</Label>
               <Input
                 type="select"
-                id="category-filter"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="form-control-alternative"
@@ -77,13 +90,12 @@ const ListaActivos = () => {
               </Input>
             </FormGroup>
           </Col>
-          <Col md="5"> 
+          <Col md="5">
             <FormGroup>
-              <Label htmlFor="search-input">Buscar por Nombre, Código o Detalles:</Label>
+              <Label>Buscar por Nombre, Código o Detalles:</Label>
               <Input
                 type="text"
-                id="search-input"
-                placeholder="Ej. Laptop, INV001, PC de escritorio, Juan Pérez, En uso"
+                placeholder="Ej. Laptop, INV001, oficina"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="form-control-alternative"
@@ -91,7 +103,7 @@ const ListaActivos = () => {
             </FormGroup>
           </Col>
         </Row>
-        {}
+
         <Row>
           <div className="col">
             <Card className="shadow">
@@ -101,66 +113,38 @@ const ListaActivos = () => {
               <Table className="align-items-center table-flush" responsive>
                 <thead className="thead-light">
                   <tr>
-                    <th scope="col">CÓDIGO</th>
-                    <th scope="col">NOMBRE</th>
-                    <th scope="col">DESCRIPCIÓN</th>
-                    <th scope="col">CANTIDAD</th>
-                    <th scope="col">UBICACIÓN</th>
-                    <th scope="col">ASIGNADO</th>
-                    <th scope="col">OBSERVACIÓN</th>
-                    <th scope="col" /> 
+                    <th>CÓDIGO</th>
+                    <th>NOMBRE</th>
+                    <th>DESCRIPCIÓN</th>
+                    <th>CANTIDAD</th>
+                    <th>UBICACIÓN</th>
+                    <th>ASIGNADO</th>
+                    <th>OBSERVACIÓN</th>
+                    <th />
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredAssets.length > 0 ? (
+                  {cargando ? (
+                    <tr><td colSpan="8" className="text-center"><Spinner /> Cargando...</td></tr>
+                  ) : filteredAssets.length > 0 ? (
                     filteredAssets.map((asset) => (
                       <tr key={asset.codigo}>
-                        <th scope="row">
-                          <Media className="align-items-center">
-                            <Media>
-                              <span className="mb-0 text-sm">
-                                {asset.codigo}
-                              </span>
-                            </Media>
-                          </Media>
-                        </th>
+                        <td>{asset.codigo}</td>
                         <td>{asset.nombre}</td>
                         <td>{asset.descripcion}</td>
                         <td>{asset.cantidad}</td>
                         <td>{asset.ubicacion}</td>
-                        <td>{asset.asignado}</td>
+                        <td>{asset.Empleado?.nombre || "No asignado"}</td>
                         <td>{asset.observacion}</td>
                         <td className="text-right">
                           <UncontrolledDropdown>
-                            <DropdownToggle
-                              className="btn-icon-only text-light"
-                              href="#pablo"
-                              role="button"
-                              size="sm"
-                              color=""
-                              onClick={(e) => e.preventDefault()}
-                            >
+                            <DropdownToggle className="btn-icon-only text-light" href="#" size="sm">
                               <i className="fas fa-ellipsis-v" />
                             </DropdownToggle>
                             <DropdownMenu className="dropdown-menu-arrow" right>
-                              <DropdownItem
-                                href="#pablo"
-                                onClick={(e) => e.preventDefault()}
-                              >
-                                Ver Detalles
-                              </DropdownItem>
-                              <DropdownItem
-                                href="#pablo"
-                                onClick={(e) => e.preventDefault()}
-                              >
-                                Editar
-                              </DropdownItem>
-                              <DropdownItem
-                                href="#pablo"
-                                onClick={(e) => e.preventDefault()}
-                              >
-                                Eliminar
-                              </DropdownItem>
+                              <DropdownItem href="#">Ver Detalles</DropdownItem>
+                              <DropdownItem href="#">Editar</DropdownItem>
+                              <DropdownItem href="#">Eliminar</DropdownItem>
                             </DropdownMenu>
                           </UncontrolledDropdown>
                         </td>
@@ -168,7 +152,7 @@ const ListaActivos = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="8" className="text-center">No hay activos registrados o que coincidan con los filtros.</td> 
+                      <td colSpan="8" className="text-center">No hay activos registrados o que coincidan con los filtros.</td>
                     </tr>
                   )}
                 </tbody>

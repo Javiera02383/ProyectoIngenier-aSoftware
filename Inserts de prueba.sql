@@ -248,67 +248,28 @@ INSERT INTO factura (
   archivo_pdf,  
   estadoFactura  
 ) VALUES (  
-  3,                                    -- idFactura  
-  '2025-01-20 09:15:00',               -- Fecha  
-  4500.75,                             -- Total_Facturado  
-  'Factura',                           -- Tipo_documento  
-  'Banco Atlántida',                   -- productoCliente  
-  'Financiera',                        -- mencion  
-  '2025-02-01',                        -- periodoInicio  
-  '2025-02-28',                        -- periodoFin  
-  'contrato',                          -- tipoServicio  
-  'Publicidad Creativa S.A.',          -- agencia  
-  2025,                                -- ordenNo  
-  NULL,                                -- ordenCompraExenta  
-  NULL,                                -- numeroRegistroSAG  
-  NULL,                                -- constanciaExonerado  
-  3,                                   -- idCliente (FK requerida)  
-  2,                                   -- idFormaPago (FK requerida)  
-  2,                                   -- idEmpleado (FK requerida)  
-  'factura_3.pdf',                     -- archivo_pdf  
-  'activa'                             -- estadoFactura  
+  2,                                   -- idFactura  
+  '2025-01-15 14:45:00',              -- Fecha  
+  1800.50,                            -- Total_Facturado  
+  'Factura',                          -- Tipo_documento  
+  NULL,                               -- productoCliente (opcional)  
+  NULL,                               -- mencion (opcional)  
+  NULL,                               -- periodoInicio (opcional)  
+  NULL,                               -- periodoFin (opcional)  
+  'programa',                         -- tipoServicio  
+  NULL,                               -- agencia (opcional)  
+  NULL,                               -- ordenNo (opcional)  
+  NULL,                               -- ordenCompraExenta (opcional)  
+  NULL,                               -- numeroRegistroSAG (opcional)  
+  NULL,                               -- constanciaExonerado (opcional)  
+  2,                                  -- idCliente (FK requerida)  
+  2,                                  -- idFormaPago (FK requerida)  
+  1,                                  -- idEmpleado (FK requerida)  
+  NULL,                               -- archivo_pdf (opcional)  
+  'activa'                            -- estadoFactura (valor por defecto)  
 );
-INSERT INTO factura (  
-  idFactura,  
-  Fecha,  
-  Total_Facturado,  
-  Tipo_documento,  
-  productoCliente,  
-  mencion,  
-  periodoInicio,  
-  periodoFin,  
-  tipoServicio,  
-  agencia,  
-  ordenNo,  
-  ordenCompraExenta,  
-  numeroRegistroSAG,  
-  constanciaExonerado,  
-  idCliente,  
-  idFormaPago,  
-  idEmpleado,  
-  archivo_pdf,  
-  estadoFactura  
-) VALUES (  
-  4,                                    -- idFactura  
-  '2025-01-22 16:30:00',               -- Fecha  
-  3200.00,                             -- Total_Facturado  
-  'Factura',                           -- Tipo_documento  
-  'Ministerio de Educación',           -- productoCliente  
-  'Educativa',                         -- mencion  
-  '2025-01-15',                        -- periodoInicio  
-  '2025-01-22',                        -- periodoFin  
-  'programa',                          -- tipoServicio  
-  NULL,                                -- agencia (gobierno no usa agencia)  
-  NULL,                                -- ordenNo  
-  'GOB-2025-EDU-001',                  -- ordenCompraExenta  
-  'SAG-GOV-2025-001',                  -- numeroRegistroSAG  
-  'CONST-EDU-2025-001',                -- constanciaExonerado  
-  4,                                   -- idCliente (FK requerida)  
-  1,                                   -- idFormaPago (FK requerida)  
-  1,                                   -- idEmpleado (FK requerida)  
-  'factura_4.pdf',                     -- archivo_pdf  
-  'cobrada'                            -- estadoFactura  
-);
+
+
   
 -- Tabla: detalle_descuento  
 INSERT INTO detalle_descuento (idFactura, idDescuento, Monto) VALUES   
@@ -324,6 +285,16 @@ INSERT INTO facturadetalle (idConsulta, Cantidad, idFactura, idProductoAtributo)
 (2, '1', 2, 4),  -- 1 programa nocturno  
 (3, '20', 3, 1), -- 20 spots de 30s  
 (3, '5', 3, 5);  -- 5 menciones en noticiero  
+  
+  
+INSERT INTO inventario (codigo, nombre, descripcion, cantidad, ubicacion, idEmpleado, valor, estado, observacion)
+VALUES
+('INV001', 'Laptop Dell Latitude', 'Laptop empresarial con 16GB RAM y SSD 512GB', 5, 'Oficina Principal', 1, 950.00, 'Disponible', 'Listas para asignar'),
+('INV002', 'Proyector Epson X10', 'Proyector HD para salas de reuniones', 2, 'Sala de Juntas', 2, 450.00, 'Asignado', 'Usado en capacitaciones'),
+('INV003', 'Silla Ergonómica', 'Silla con soporte lumbar para oficina', 10, 'Bodega 1', 3, 120.00, 'Disponible', NULL),
+('INV004', 'Router MikroTik RB3011', 'Router de alta capacidad para red interna', 1, 'Centro de Datos', 4, 180.50, 'En Mantenimiento', 'Pendiente de revisión'),
+('INV005', 'Monitor HP 24"', 'Monitor LED de 24 pulgadas Full HD', 4, 'Oficina Soporte Técnico', 4, 160.00, 'Baja', 'Pantallas defectuosas');
+  
   
 -- ============================================  
 -- FIN DEL SCRIPT DE INSERCIÓN  
