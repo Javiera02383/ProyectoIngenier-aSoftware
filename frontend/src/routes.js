@@ -390,14 +390,14 @@ const routes = [
     name: "Nueva Persona",
     component: PersonaForm,
     layout: "/admin",
-    hidden: true,
+    
   },
   {
     path: "/personas/editar/:id",
     name: "Editar Persona",
     component: PersonaForm,
     layout: "/admin",
-    hidden: true,
+    
   },
 
   // ------------------- Parte----------------------------
