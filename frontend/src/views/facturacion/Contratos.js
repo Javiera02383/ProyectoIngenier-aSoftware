@@ -10,11 +10,14 @@ const Contratos = () => {
   const [contratos, setContratos] = useState([]);
   const [nuevoContrato, setNuevoContrato] = useState({
     cliente: "",
+    categoria:"",
+    estadoPago: "Pendiente", 
     tipoPublicidad: "",
     descripcion: "",
     fechaInicio: "",
     fechaFin: "",
-    monto: "",
+    montoContrato: "",
+    SaldoContrato: "",
     renovable: false,
     activo: true,
   });
