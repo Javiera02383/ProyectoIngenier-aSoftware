@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Card,
@@ -28,7 +28,28 @@ const RegistrarActivo = () => {
     observacion: "",
   });
 
+  const [empleados, setEmpleados] = useState([]);
   const navigate = useNavigate();
+
+  // Cargar empleados al montar el componente
+  useEffect(() => {
+    const fetchEmpleados = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:4051/api/optica/empleados/todos-empleados", {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) throw new Error("Error al cargar empleados");
+        const data = await res.json();
+        setEmpleados(data);
+      } catch (error) {
+        console.error("Error cargando empleados", error);
+      }
+    };
+    fetchEmpleados();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,23 +61,17 @@ const RegistrarActivo = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      // Envía los datos al backend a la URL correcta
-      const response = await fetch("/inventario", {
-  // ...
+      const response = await fetch("http://localhost:4051/api/optica/inventario/nuevoInventario", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Puedes añadir un token de autorización si lo usas
-          // 'Authorization': 'Bearer ' + localStorage.getItem('token')
         },
         body: JSON.stringify(formData),
       });
 
       if (response.ok) {
         alert("Activo registrado con éxito!");
-        // Limpia el formulario después de un registro exitoso
         setFormData({
           codigo: "",
           nombre: "",
@@ -68,22 +83,20 @@ const RegistrarActivo = () => {
           estado: "Disponible",
           observacion: "",
         });
-        // Opcional: Redirigir a la lista de activos después del registro
-        // navigate("/admin/inventario");
+        // Opcional: navigate("/admin/inventario");
       } else {
         const errorData = await response.json();
         alert(`Error al registrar el activo: ${errorData.message}`);
       }
     } catch (error) {
       console.error("Error de red:", error);
-      alert("No se pudo conectar con el servidor para registrar el activo.");
+      alert("No se pudo conectar con el servidor.");
     }
   };
 
   return (
     <>
       <HeaderBlanco />
-      {/* Page content */}
       <Container className="mt--7" fluid>
         <Row>
           <Col className="order-xl-1" xl="12">
@@ -97,17 +110,13 @@ const RegistrarActivo = () => {
               </CardHeader>
               <CardBody>
                 <Form onSubmit={handleSubmit}>
-                  <h6 className="heading-small text-muted mb-4">
-                    Información del Activo
-                  </h6>
+                  <h6 className="heading-small text-muted mb-4">Información del Activo</h6>
                   <div className="pl-lg-4">
                     <Row>
                       <Col lg="6">
                         <FormGroup>
-                          <Label htmlFor="input-codigo">Código</Label>
+                          <Label>Código</Label>
                           <Input
-                            className="form-control-alternative"
-                            id="input-codigo"
                             name="codigo"
                             placeholder="Ej. LAP-001"
                             type="text"
@@ -119,10 +128,8 @@ const RegistrarActivo = () => {
                       </Col>
                       <Col lg="6">
                         <FormGroup>
-                          <Label htmlFor="input-nombre">Nombre</Label>
+                          <Label>Nombre</Label>
                           <Input
-                            className="form-control-alternative"
-                            id="input-nombre"
                             name="nombre"
                             placeholder="Ej. Laptop Dell"
                             type="text"
@@ -136,10 +143,8 @@ const RegistrarActivo = () => {
                     <Row>
                       <Col lg="6">
                         <FormGroup>
-                          <Label htmlFor="input-descripcion">Descripción</Label>
+                          <Label>Descripción</Label>
                           <Input
-                            className="form-control-alternative"
-                            id="input-descripcion"
                             name="descripcion"
                             placeholder="Ej. Laptop empresarial con 16GB RAM"
                             type="text"
@@ -150,10 +155,8 @@ const RegistrarActivo = () => {
                       </Col>
                       <Col lg="6">
                         <FormGroup>
-                          <Label htmlFor="input-cantidad">Cantidad</Label>
+                          <Label>Cantidad</Label>
                           <Input
-                            className="form-control-alternative"
-                            id="input-cantidad"
                             name="cantidad"
                             type="number"
                             min="1"
@@ -167,10 +170,8 @@ const RegistrarActivo = () => {
                     <Row>
                       <Col lg="6">
                         <FormGroup>
-                          <Label htmlFor="input-ubicacion">Ubicación</Label>
+                          <Label>Ubicación</Label>
                           <Input
-                            className="form-control-alternative"
-                            id="input-ubicacion"
                             name="ubicacion"
                             placeholder="Ej. Oficina 101"
                             type="text"
@@ -181,27 +182,29 @@ const RegistrarActivo = () => {
                       </Col>
                       <Col lg="6">
                         <FormGroup>
-                          <Label htmlFor="input-idEmpleado">ID Empleado Asignado</Label>
+                          <Label>Empleado Asignado</Label>
                           <Input
-                            className="form-control-alternative"
-                            id="input-idEmpleado"
+                            type="select"
                             name="idEmpleado"
-                            placeholder="Ej. 1"
-                            type="number"
                             value={formData.idEmpleado}
                             onChange={handleChange}
                             required
-                          />
+                          >
+                            <option value="">Seleccione un empleado</option>
+                            {empleados.map((emp) => (
+                              <option key={emp.idEmpleado} value={emp.idEmpleado}>
+                                {emp.persona?.Pnombre} {emp.persona?.Snombre} {emp.persona?.Papellido} {emp.persona?.Sapellido}
+                              </option>
+                            ))}
+                          </Input>
                         </FormGroup>
                       </Col>
                     </Row>
                     <Row>
                       <Col lg="6">
                         <FormGroup>
-                          <Label htmlFor="input-valor">Valor</Label>
+                          <Label>Valor</Label>
                           <Input
-                            className="form-control-alternative"
-                            id="input-valor"
                             name="valor"
                             placeholder="Ej. 950.00"
                             type="number"
@@ -213,12 +216,10 @@ const RegistrarActivo = () => {
                       </Col>
                       <Col lg="6">
                         <FormGroup>
-                          <Label htmlFor="input-estado">Estado</Label>
+                          <Label>Estado</Label>
                           <Input
                             type="select"
-                            id="input-estado"
                             name="estado"
-                            className="form-control-alternative"
                             value={formData.estado}
                             onChange={handleChange}
                           >
@@ -233,10 +234,8 @@ const RegistrarActivo = () => {
                     <Row>
                       <Col lg="12">
                         <FormGroup>
-                          <Label htmlFor="input-observacion">Observación</Label>
+                          <Label>Observación</Label>
                           <Input
-                            className="form-control-alternative"
-                            id="input-observacion"
                             name="observacion"
                             placeholder="Notas o comentarios adicionales"
                             rows="4"

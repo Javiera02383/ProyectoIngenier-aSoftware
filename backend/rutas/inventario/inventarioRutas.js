@@ -32,7 +32,7 @@ router.get(
 
 // Crear nuevo inventario
 router.post(
-  '/',
+  '/nuevoInventario',
   verificarUsuario,
   body('codigo').notEmpty().withMessage('Código es obligatorio'),
   body('nombre').notEmpty().withMessage('Nombre es obligatorio'),
