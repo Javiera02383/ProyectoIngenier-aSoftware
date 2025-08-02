@@ -1,8 +1,9 @@
-// modelos/inventario/InventarioModel.js
+// modelos/inventario/Inventario.js
 const { DataTypes } = require('sequelize');
 const db = require('../../configuraciones/db');
 
 const Empleado = require("../../modelos/gestion_cliente/Empleado");
+const Proveedor = require('../../modelos/inventario/Proveedor'); 
 
 const InventarioModel = db.define('Inventario', {
   idInventario: {
@@ -36,6 +37,10 @@ const InventarioModel = db.define('Inventario', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
+  idProveedor: {  
+    type: DataTypes.INTEGER,  
+    allowNull: true  
+  },
   valor: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: true
@@ -47,7 +52,20 @@ const InventarioModel = db.define('Inventario', {
   observacion: {
     type: DataTypes.STRING(100),
     allowNull: true
-  }
+  },
+   marca: {  
+    type: DataTypes.STRING(100),  
+    allowNull: true  
+  },  
+  fechaCompra: {  
+    type: DataTypes.DATEONLY,  
+    allowNull: true  
+  },
+  fechaRegistro: {  
+    type: DataTypes.DATE,  
+    allowNull: false,  
+    defaultValue: DataTypes.NOW  
+  } 
 }, {
   tableName: 'inventario',
   timestamps: false
@@ -56,5 +74,7 @@ const InventarioModel = db.define('Inventario', {
 // Relaciones
 InventarioModel.belongsTo(Empleado, { foreignKey: 'idEmpleado' });
 Empleado.hasMany(InventarioModel, { foreignKey: 'idEmpleado', sourceKey: 'idEmpleado' });
+InventarioModel.belongsTo(Proveedor, { foreignKey: 'idProveedor' });  
+Proveedor.hasMany(InventarioModel, { foreignKey: 'idProveedor', sourceKey: 'idProveedor' });
 
 module.exports = InventarioModel;

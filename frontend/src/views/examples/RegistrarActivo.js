@@ -61,14 +61,16 @@ const RegistrarActivo = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await fetch("http://localhost:4051/api/optica/inventario/nuevoInventario", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+    try {  
+    const token = localStorage.getItem("token");  
+    const response = await fetch("http://localhost:4051/api/optica/inventario/nuevoInventario", {  
+      method: "POST",  
+      headers: {  
+        "Content-Type": "application/json",  
+        "Authorization": `Bearer ${token}`,  
+      },  
+      body: JSON.stringify(formData),  
+    }); 
 
       if (response.ok) {
         alert("Activo registrado con éxito!");
