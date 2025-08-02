@@ -49,6 +49,17 @@ const imagenProductoRutas = require('./rutas/productos/imagenProductoRutas');
 
 /* ========== RUTAS DE INVENTARIO ========== */
 const inventarioRutas = require('./rutas/inventario/inventarioRutas');
+const mantenimientoRutas = require('./rutas/inventario/mantenimientoRutas');
+const movimientoRutas = require('./rutas/inventario/movimientosRutas.js');
+const proveedorRutas = require('./rutas/inventario/proveedorRutas.js');
+
+/* ========== RUTAS DE PROGRAMACION-PUBLICIDAD ========== */
+const programaRuta = require('./rutas/programacion/programaRutas');  
+const bloquePublicitarioRuta = require('./rutas/programacion/bloquePublicitarioRutas');  
+const anuncioBloqueRuta = require('./rutas/programacion/anuncioBloqueRutas');  
+const ordenPublicidadRuta = require('./rutas/programacion/ordenPublicidadRutas');  
+const ordenProgramacionRuta = require('./rutas/programacion/ordenProgramacionRutas');
+
 
 /* ========== RUTAS DE GESTIÓN CLIENTE ========== */
 const clienteRuta = require('./rutas/gestion_cliente/ClienteRuta');
@@ -72,6 +83,8 @@ const descuentoRoutes = require('./rutas/facturacion/descuentoRoutes');
 const formaPagoRoutes = require('./rutas/facturacion/formaPagoRoutes');
 
 const caiRoutes = require('./rutas/facturacion/caiRoutes.js');
+
+
 
 // rutas de documentación Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -108,6 +121,7 @@ app.use('/api/optica/auth', authRoutes);
 app.use('/api/optica/personas', personaRutas);
 app.use('/api/optica/roles', rolRutas);
 
+// Usar producto
 app.use('/api/optica/productos', productoRutas);
 app.use('/api/optica/categorias', categoriaProductoRutas);
 app.use('/api/optica/atributos', atributoRutas);
@@ -116,6 +130,17 @@ app.use('/api/optica/productos', imagenProductoRutas);
 
 // Usar rutas de inventario
 app.use('/api/optica/inventario', inventarioRutas);
+app.use('/api/optica/inventario', proveedorRutas);  
+app.use('/api/optica/inventario', movimientoRutas);  
+app.use('/api/optica/inventario', mantenimientoRutas);
+
+// Usar rutas de Programacion Publicidad 
+app.use('/api/optica/programacion', programaRuta);  
+app.use('/api/optica/programacion', bloquePublicitarioRuta);  
+app.use('/api/optica/programacion', anuncioBloqueRuta);  
+app.use('/api/optica/programacion', ordenPublicidadRuta);  
+app.use('/api/optica/programacion', ordenProgramacionRuta);
+
 
 
 /* ========== MODELOS A SINCRONIZAR (si querés controlar uno a uno) ========== */
@@ -144,7 +169,7 @@ const Factura = require('./modelos/facturacion/Factura'); // <-- CORREGIDO
 const FacturaDetalle = require('./modelos/facturacion/FacturaDetalle');
 const Descuento = require('./modelos/facturacion/Descuento');
 const DetalleDescuento = require('./modelos/facturacion/DetalleDescuento');
-const Atributo = require('./modelos/productos/Atributo');
+
 
 const Cai = require('./modelos/facturacion/Cai'); 
 
@@ -152,10 +177,20 @@ const Cai = require('./modelos/facturacion/Cai');
 const Producto = require('./modelos/productos/ProductoModel');
 const CategoriaProducto = require('./modelos/productos/CategoriaProducto');
 const ProductoAtributo = require('./modelos/productos/ProductoAtributo');
+const Atributo = require('./modelos/productos/Atributo');
 
 // Modelo de inventario
 const Inventario = require('./modelos/inventario/Inventario');
+const Mantenimiento = require('./modelos/inventario/Mantenimiento.js');
+const Movimiento = require('./modelos/inventario/Movimiento');
+const Proveedor = require('./modelos/inventario/Proveedor.js');
 
+// Modelo de Programacion - Publicidad
+const Programa = require('./modelos/programacion/Programa');  
+const BloquePublicitario = require('./modelos/programacion/BloquePublicitario');  
+const AnuncioBloque = require('./modelos/programacion/AnuncioBloque');  
+const OrdenPublicidad = require('./modelos/programacion/OrdenPublicidad');  
+const OrdenProgramacion = require('./modelos/programacion/OrdenProgramacion'); 
 
 const startServer = async () => {
   try {
@@ -187,9 +222,16 @@ const startServer = async () => {
     await Producto.sync();
     await Atributo.sync();
     await ProductoAtributo.sync();
-    await Inventario.sync();
     
-    console.log('✅ Modelos de productos/inventario sincronizados.');
+    console.log('✅ Modelos de productos sincronizados.');
+
+    await Inventario.sync();
+    await Proveedor.sync();  
+    await Movimiento.sync();  
+    await Mantenimiento.sync();  
+    
+    console.log('✅ Modelos de Inventario sincronizados.');
+
 
         // Sincronizar modelos de Facturacion
     await FormaPago.sync();
@@ -200,6 +242,13 @@ const startServer = async () => {
     await Factura.sync();
     await Cai.sync();
     console.log('✅ Modelos de Facturacion sincronizados.');
+
+    await Programa.sync();  
+    await BloquePublicitario.sync();  
+    await AnuncioBloque.sync();  
+    await OrdenPublicidad.sync();  
+    await OrdenProgramacion.sync();  
+    console.log('✅ Modelos de programación-publicidad sincronizados.');
 
     // Iniciar servidor
     const PORT = process.env.puerto || 3000;
