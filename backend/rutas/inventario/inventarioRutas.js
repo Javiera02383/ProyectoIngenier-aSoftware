@@ -40,6 +40,18 @@ router.post(
   body('ubicacion').notEmpty().withMessage('Ubicación es obligatoria'),
   body('idEmpleado').isInt().withMessage('ID de empleado debe ser un número entero'),
   body('estado').isIn(['Disponible', 'Asignado', 'En Mantenimiento', 'Baja']).withMessage('Estado inválido'),
+
+  // Nuevos campos
+  body('idProveedor')
+    .optional({ checkFalsy: true })
+    .isInt().withMessage('ID de proveedor debe ser un número entero'),
+  body('marca')
+    .optional({ checkFalsy: true })
+    .isLength({ max: 100 }).withMessage('Marca no debe superar los 100 caracteres'),
+  body('fechaCompra')
+    .optional({ checkFalsy: true })
+    .isISO8601().withMessage('Fecha de compra no es válida'),
+
   manejarErrores,
   inventarioController.crearInventario
 );

@@ -16,40 +16,52 @@ import HeaderBlanco from "components/Headers/HeaderBlanco.js";
 import { useNavigate } from "react-router-dom";
 
 const RegistrarActivo = () => {
-  const [formData, setFormData] = useState({
-    codigo: "",
-    nombre: "",
-    descripcion: "",
-    cantidad: 1,
-    ubicacion: "",
-    idEmpleado: "",
-    valor: "",
-    estado: "Disponible",
-    observacion: "",
-  });
-
+const [formData, setFormData] = useState({
+  codigo: "",
+  nombre: "",
+  descripcion: "",
+  cantidad: 1,
+  ubicacion: "",
+  idEmpleado: "",
+  idProveedor: "",  // nuevo
+  valor: "",
+  estado: "Disponible",
+  observacion: "",
+  marca: "",         // nuevo
+  fechaCompra: "",   // nuevo
+});
+// Cambios: Agrega esto en la parte de estados
+  const [proveedores, setProveedores] = useState([]);
   const [empleados, setEmpleados] = useState([]);
   const navigate = useNavigate();
 
   // Cargar empleados al montar el componente
   useEffect(() => {
-    const fetchEmpleados = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:4051/api/optica/empleados/todos-empleados", {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-          },
-        });
-        if (!res.ok) throw new Error("Error al cargar empleados");
-        const data = await res.json();
-        setEmpleados(data);
-      } catch (error) {
-        console.error("Error cargando empleados", error);
-      }
-    };
-    fetchEmpleados();
-  }, []);
+  const fetchEmpleadosYProveedores = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      // Obtener empleados
+      const resEmp = await fetch("http://localhost:4051/api/optica/empleados/todos-empleados", {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (!resEmp.ok) throw new Error("Error al cargar empleados");
+      const dataEmp = await resEmp.json();
+      setEmpleados(dataEmp);
+
+      // Obtener proveedores
+      const resProv = await fetch("http://localhost:4051/api/optica/inventario/todos-proveedor", {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (!resProv.ok) throw new Error("Error al cargar proveedores");
+      const dataProv = await resProv.json();
+      setProveedores(dataProv);
+    } catch (error) {
+      console.error("Error cargando datos:", error);
+    }
+  };
+  fetchEmpleadosYProveedores();
+}, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -233,6 +245,55 @@ const RegistrarActivo = () => {
                         </FormGroup>
                       </Col>
                     </Row>
+                    <Row>
+                      <Col lg="6">
+                        <FormGroup>
+                          <Label>Marca</Label>
+                          <Input
+                            name="marca"
+                            type="text"
+                            placeholder="Ej. Dell, HP, Samsung"
+                            value={formData.marca}
+                            onChange={handleChange}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col lg="6">
+                        <FormGroup>
+                          <Label>Fecha de Compra</Label>
+                          <Input
+                            name="fechaCompra"
+                            type="date"
+                            value={formData.fechaCompra}
+                            onChange={handleChange}
+                          />
+                        </FormGroup>
+                      </Col>
+                    </Row>
+
+                    <Row>
+                      <Col lg="6">
+                        <FormGroup>
+                          <Label>Proveedor</Label>
+                          <Input
+                            type="select"
+                            name="idProveedor"
+                            value={formData.idProveedor}
+                            onChange={handleChange}
+                          >
+                            <option value="">Seleccione un proveedor</option>
+                            {proveedores.length > 0 &&
+                              proveedores.map((prov) => (
+                                <option key={prov.idProveedor} value={prov.idProveedor}>
+                                  {prov.persona?.Pnombre || 'Sin nombre'} {prov.persona?.Papellido || ''}
+                                </option>
+                              ))}
+
+                          </Input>
+                        </FormGroup>
+                      </Col>
+                    </Row>
+
                     <Row>
                       <Col lg="12">
                         <FormGroup>

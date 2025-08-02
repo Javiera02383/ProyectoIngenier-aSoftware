@@ -58,6 +58,21 @@ const crearProveedor = [
     }  
   }  
 ];  
+
+// Obtener todos los proveedores sin filtros  
+const obtenerTodosLosProveedores = async (req, res) => {
+  try {  
+    const proveedores = await Proveedor.findAll({  
+      include: [{  
+        model: Persona,  
+        as: 'persona'  
+      }]  
+    });  
+    res.json(proveedores);  
+  } catch (error) {  
+    res.status(500).json({ mensaje: 'Error al obtener todos los proveedores', error: error.message });  
+  }  
+};
   
 // Obtener todos los proveedores con búsqueda  
 const obtenerProveedores = async (req, res) => {  
@@ -146,7 +161,8 @@ const eliminarProveedor = async (req, res) => {
   
 module.exports = {  
   crearProveedor,  
-  obtenerProveedores,  
+  obtenerProveedores, 
+  obtenerTodosLosProveedores, 
   obtenerProveedorPorId,  
   editarProveedor,  
   eliminarProveedor  

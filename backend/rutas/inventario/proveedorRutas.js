@@ -24,15 +24,9 @@ router.post('/proveedor',
 );  
   
 // Obtener todos los proveedores con filtros  
-router.get('/proveedor',  
-  verificarUsuario,  
-  [  
-    query('nombre').optional().isLength({ min: 3 }).withMessage('El nombre debe tener al menos 3 caracteres'),  
-    query('apellido').optional().isLength({ min: 3 }).withMessage('El apellido debe tener al menos 3 caracteres'),  
-    query('tipoProveedor').optional().isIn(['Nacional', 'Internacional']).withMessage('Tipo de proveedor inválido'),  
-    query('estado').optional().isIn(['Activo', 'Inactivo']).withMessage('Estado inválido')  
-  ],  
-  proveedorController.obtenerProveedores  
+router.get('/todos-proveedor',  
+  verificarUsuario,   
+  proveedorController.obtenerTodosLosProveedores 
 );  
   
 // Obtener proveedor por ID  
