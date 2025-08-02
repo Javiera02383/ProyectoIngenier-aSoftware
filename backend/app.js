@@ -225,10 +225,9 @@ const startServer = async () => {
     
     console.log('✅ Modelos de productos sincronizados.');
 
-    
+    await Proveedor.sync();  
     await Inventario.sync();  
-    await Proveedor.sync();       
-    await Movimiento.sync();  // Mover al final
+    await Movimiento.sync();  
     await Mantenimiento.sync();
 
     console.log('✅ Modelos de Inventario sincronizados.');
@@ -240,7 +239,6 @@ const startServer = async () => {
     await Descuento.sync();
     await DetalleDescuento.sync();
     await FacturaDetalle.sync();
-    await Factura.sync();
     await Cai.sync();
     console.log('✅ Modelos de Facturacion sincronizados.');
 

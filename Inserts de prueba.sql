@@ -15,15 +15,44 @@ INSERT INTO atributo (nombre, tipo) VALUES
 ('Horario', 'texto');  
   
 -- Tabla: persona  
-INSERT INTO persona (Pnombre, Snombre, Papellido, Sapellido, Direccion, DNI, correo, fechaNacimiento, genero) VALUES   
-('José', 'Dolores', 'Gámez', 'Suazo', 'Colonia San Miguel N°2', '12171961001526', 'jose.gamez@televisioncomayagua.com', '1961-07-12', 'M'),  
-('Luisa', 'María', 'Gómez', 'Hernández', 'Boulevard del Sur', '0801198505678', 'luisa.gomez@televisioncomayagua.com', '1985-03-15', 'F'),  
-('Carlos', 'Eduardo', 'Martínez', 'López', 'Col. Kennedy', '0801199001234', 'carlos.martinez@massPublicidad.com', '1990-01-15', 'M'),  
-('Laura', 'Beatriz', 'Castro', 'Gómez', 'Col. Trejo', '0801199505678', 'laura.castro@creativosunidos.com', '1995-06-22', 'F'),  
-('Juan', 'Antonio', 'Pérez', 'Rodríguez', 'Centro Comayagua', '0801198801234', 'juan.perez@empresa.com', '1988-08-10', 'M');  
+INSERT INTO persona (Pnombre, Snombre, Papellido, Sapellido, Direccion, DNI, correo, fechaNacimiento, genero) VALUES
+-- Empleados
+('José', 'Dolores', 'Gámez', 'Suazo', 'Colonia San Miguel N°2', '12171961001526', 'jose.gamez@televisioncomayagua.com', '1961-07-12', 'M'),
+('Luisa', 'María', 'Gómez', 'Hernández', 'Boulevard del Sur', '0801198505678', 'luisa.gomez@televisioncomayagua.com', '1985-03-15', 'F'),
+('Carlos', 'Eduardo', 'Martínez', 'López', 'Col. Kennedy', '0801199001234', 'carlos.martinez@massPublicidad.com', '1990-01-15', 'M'),
+('Laura', 'Beatriz', 'Castro', 'Gómez', 'Col. Trejo', '0801199505678', 'laura.castro@creativosunidos.com', '1995-06-22', 'F'),
+('Juan', 'Antonio', 'Pérez', 'Rodríguez', 'Centro Comayagua', '0801198801234', 'juan.perez@empresa.com', '1988-08-10', 'M'),
+('Juana', 'A', 'Pérez', 'Rodríguez', 'Centro Comayagua', '0801198801235', 'juana.perez@empresa.com', '1988-08-10', 'F'),
+
+-- Proveedores (valores NULL en campos no aplicables)
+('Distribuidora', NULL, 'TecnoHonduras', NULL, 'Tegucigalpa, Honduras', '0801199876543', 'ventas@tecnohonduras.hn', NULL, 'M'),
+('Sony', NULL, 'Professional', NULL, 'Miami, FL, USA', '0000000000001', 'sales@sonypro.com', NULL, 'M'),
+('Canon', NULL, 'Honduras', NULL, 'San Pedro Sula, Honduras', '0801199876544', 'info@canonhn.com', NULL, 'M'),
+('Shure', NULL, 'Incorporated', NULL, 'Illinois, USA', '0000000000002', 'sales@shure.com', NULL, 'M');
   
+-- Personas para empresas anunciantes  
+INSERT INTO persona (Pnombre, Papellido, Direccion, DNI, correo, genero) VALUES  
+('CLARO', 'Honduras', 'Tegucigalpa, Honduras', '0801199000001', 'publicidad@claro.hn', 'M'),  
+('SECOPV', 'Seguros', 'Comayagua, Honduras', '0801199000002', 'marketing@secopv.hn', 'M'),  
+('MUNICOM', 'Comunicaciones', 'Comayagua, Honduras', '0801199000003', 'ventas@municom.hn', 'M'),  
+('MACONSA', 'Constructora', 'Comayagua, Honduras', '0801199000004', 'publicidad@maconsa.hn', 'M'),  
+('UNAH', 'Universidad', 'Tegucigalpa, Honduras', '0801199000005', 'comunicacion@unah.edu.hn', 'M'),  
+('MOTOMUNDO', 'Concesionario', 'Comayagua, Honduras', '0801199000006', 'ventas@motomundo.hn', 'M'),  
+('SINET', 'Telecomunicaciones', 'San Pedro Sula, Honduras', '0801199000007', 'marketing@sinet.hn', 'M'),  
+('SANMARQUEÑA COOP', 'Cooperativa', 'La Esperanza, Honduras', '0801199000008', 'publicidad@sanmarquena.hn', 'M'),  
+('SONRÍA', 'Dental', 'Comayagua, Honduras', '0801199000009', 'info@sonria.hn', 'M'),  
+('COFICESA', 'Financiera', 'Tegucigalpa, Honduras', '0801199000010', 'marketing@coficesa.hn', 'M'),  
+('VILLAMIX', 'Construcción', 'Comayagua, Honduras', '0801199000011', 'ventas@villamix.hn', 'M'),  
+('LACOLONIA', 'Seguros', 'Tegucigalpa, Honduras', '0801199000012', 'publicidad@lacolonia.hn', 'M'),  
+('TIENDAERFA', 'Retail', 'Comayagua, Honduras', '0801199000013', 'marketing@tiendaerfa.hn', 'M'),  
+('CABLECOLOR', 'Televisión', 'Tegucigalpa, Honduras', '0801199000014', 'ventas@cablecolor.hn', 'M'),  
+('PROMODJFLECHA', 'Promociones', 'Comayagua, Honduras', '0801199000015', 'info@promodjflecha.hn', 'M'),  
+('CHAVERYASOCIADO', 'Servicios', 'Comayagua, Honduras', '0801199000016', 'contacto@chaveryasociado.hn', 'M');  
+  
+
 -- Tabla: rol  
-INSERT INTO rol (nombre, descripcion) VALUES   
+INSERT INTO rol (nombre, descripcion) VALUES 
+('Gerente', 'Gerencia General'),   
 ('Administrador', 'Control total del sistema'),  
 ('Vendedor', 'Gestión de ventas y clientes'),  
 ('Operador', 'Operación de equipos de transmisión'),  
@@ -83,15 +112,44 @@ INSERT INTO usuario (Nombre_Usuario, contraseña, estado, idPersona, idrol) VALU
 INSERT INTO empleado (idPersona, Fecha_Registro) VALUES   
 (1, NOW()),  
 (2, NOW()),  
-(3, NOW()),  
-(4, NOW());  
+(3, NOW());  
+
+
+-- Tabla: Proveedores  
+INSERT INTO proveedor (idPersona, codigoProveedor, tipoProveedor, estado, fechaRegistro) VALUES
+-- idPersona debe coincidir con los registros en la tabla persona
+(7, 'PROV001', 'Nacional', 'Activo', NOW()),
+(8, 'PROV002', 'Internacional', 'Activo', NOW()),
+(9, 'PROV003', 'Nacional', 'Activo', NOW()),
+(10, 'PROV004', 'Internacional', 'Activo', NOW());
   
 -- Tabla: cliente  
 INSERT INTO cliente (fechaRegistro, idPersona) VALUES   
-(NOW(), 3),  
 (NOW(), 4),  
-(NOW(), 5);  
+(NOW(), 5),  
+(NOW(), 6);  
+
+-- Clientes para Modulo de Anuncio
+INSERT INTO cliente (fechaRegistro, idPersona) VALUES    
+(NOW(), 11),    
+(NOW(), 12),    
+(NOW(), 13),    
+(NOW(), 14),    
+(NOW(), 15),    
+(NOW(), 16),    
+(NOW(), 17),    
+(NOW(), 18),    
+(NOW(), 19),    
+(NOW(), 20),    
+(NOW(), 21),    
+(NOW(), 22),    
+(NOW(), 23),    
+(NOW(), 24),    
+(NOW(), 25),    
+(NOW(), 26); 
   
+
+
 -- 3. TABLAS DE PRODUCTOS/SERVICIOS  
   
 -- Tabla: producto  
@@ -286,16 +344,341 @@ INSERT INTO facturadetalle (idConsulta, Cantidad, idFactura, idProductoAtributo)
 (3, '20', 3, 1), -- 20 spots de 30s  
 (3, '5', 3, 5);  -- 5 menciones en noticiero  
   
+
+
+-- Tabla: inventario
+INSERT INTO inventario (codigo, nombre, descripcion, cantidad, ubicacion, idEmpleado, idProveedor, valor, estado, observacion, marca, fechaCompra, fechaRegistro) VALUES  
+('CAM001', 'Cámara Sony PXW-X70', 'Cámara profesional para grabación de noticias y reportajes', 3, 'Estudio Principal', 2, 2, 85000.00, 'Disponible', 'Excelente estado, uso diario', 'Sony', '2023-01-15', '2023-01-16 09:30:00'),  
   
-INSERT INTO inventario (codigo, nombre, descripcion, cantidad, ubicacion, idEmpleado, valor, estado, observacion)
-VALUES
-('INV001', 'Laptop Dell Latitude', 'Laptop empresarial con 16GB RAM y SSD 512GB', 5, 'Oficina Principal', 1, 950.00, 'Disponible', 'Listas para asignar'),
-('INV002', 'Proyector Epson X10', 'Proyector HD para salas de reuniones', 2, 'Sala de Juntas', 2, 450.00, 'Asignado', 'Usado en capacitaciones'),
-('INV003', 'Silla Ergonómica', 'Silla con soporte lumbar para oficina', 10, 'Bodega 1', 3, 120.00, 'Disponible', NULL),
-('INV004', 'Router MikroTik RB3011', 'Router de alta capacidad para red interna', 1, 'Centro de Datos', 4, 180.50, 'En Mantenimiento', 'Pendiente de revisión'),
-('INV005', 'Monitor HP 24"', 'Monitor LED de 24 pulgadas Full HD', 4, 'Oficina Soporte Técnico', 4, 160.00, 'Baja', 'Pantallas defectuosas');
+('CAM002', 'Cámara Canon XF405', 'Cámara 4K para producciones especiales y documentales', 2, 'Estudio Secundario', 2, 3, 95000.00, 'Disponible', 'Nueva adquisición 2023', 'Canon', '2023-03-20', '2023-03-21 10:15:00'),  
   
+('MIC001', 'Micrófono Shure SM58', 'Micrófono dinámico para presentadores de noticias', 10, 'Estudio Principal', 1, 4, 3500.00, 'Disponible', 'Resistente y confiable', 'Shure', '2022-11-10', '2022-11-11 14:20:00'),  
   
+('MIC002', 'Sistema Inalámbrico Sennheiser EW 100', 'Sistema completo para reporteros móviles', 5, 'Equipos Móviles', 1, 4, 12000.00, 'Disponible', 'Incluye receptor y transmisor', 'Sennheiser', '2023-02-05', '2023-02-06 11:45:00'),  
+  
+('LUZ001', 'Kit LED Aputure AL-M9', 'Panel LED compacto para iluminación de estudio', 4, 'Estudio Principal', 3, 1, 25000.00, 'Disponible', 'Luz fría y cálida ajustable', 'Aputure', '2023-04-12', '2023-04-13 16:00:00'),  
+  
+('LUZ002', 'Reflector Fresnel 2000W', 'Reflector profesional para exteriores y eventos', 6, 'Almacén de Equipos', 3, 1, 15000.00, 'Disponible', 'Para uso en exteriores', 'Arri', '2022-08-30', '2022-08-31 13:30:00'),  
+  
+('COMP001', 'Workstation Dell Precision 7760', 'Computadora para edición de video 4K', 4, 'Sala de Edición', 2, 1, 75000.00, 'Disponible', 'Intel i9, 32GB RAM, RTX 3080', 'Dell', '2023-05-18', '2023-05-19 08:45:00'),  
+  
+('COMP002', 'Servidor HP ProLiant DL380', 'Servidor para almacenamiento de contenido multimedia', 1, 'Cuarto de Servidores', 2, 1, 120000.00, 'Disponible', 'Almacenamiento 10TB RAID', 'HP', '2023-01-08', '2023-01-09 12:00:00'),  
+  
+('TRANS001', 'Transmisor Harris Flexstar', 'Transmisor principal FM de 5KW', 1, 'Torre de Transmisión', 1, 2, 450000.00, 'Asignado', 'Equipo crítico en operación', 'Harris', '2020-06-15', '2020-06-16 07:00:00'),  
+  
+('ANT001', 'Antena Dielectric TFU-25J', 'Antena de transmisión UHF banda IV-V', 1, 'Torre de Transmisión', 1, 2, 85000.00, 'Asignado', 'Instalada en torre principal', 'Dielectric', '2020-06-15', '2020-06-16 07:30:00'),  
+  
+('TRIP001', 'Trípode Manfrotto 546B', 'Trípode profesional de fibra de carbono', 8, 'Estudio Principal', 1, 1, 8500.00, 'Disponible', 'Ligero y resistente', 'Manfrotto', '2022-12-03', '2022-12-04 15:20:00'),  
+  
+('CABLE001', 'Cable HDMI 4K Belkin', 'Cable HDMI 2.1 de 10 metros', 20, 'Almacén de Cables', 3, 1, 1200.00, 'Disponible', 'Soporte 4K@120Hz', 'Belkin', '2023-06-01', '2023-06-02 09:15:00');
+  
+-- Equipos en mantenimiento  
+INSERT INTO inventario (codigo, nombre, descripcion, cantidad, ubicacion, idEmpleado, idProveedor, valor, estado, observacion, marca, fechaCompra, fechaRegistro) VALUES  
+('CAM003', 'Cámara Panasonic AG-CX350', 'Cámara con falla en sistema de zoom', 1, 'Taller de Reparación', 3, 3, 65000.00, 'En Mantenimiento', 'Requiere reparación de zoom', 'Panasonic', '2021-09-12', '2021-09-13 10:30:00'),  
+  
+('MIC003', 'Micrófono Audio-Technica AT2020', 'Micrófono condensador con ruido de fondo', 1, 'Taller de Reparación', 3, 4, 4500.00, 'En Mantenimiento', 'Posible problema en cápsula', 'Audio-Technica', '2022-04-18', '2022-04-19 14:45:00');  
+  
+-- Equipos dados de baja  
+INSERT INTO inventario (codigo, nombre, descripcion, cantidad, ubicacion, idEmpleado, idProveedor, valor, estado, observacion, marca, fechaCompra, fechaRegistro) VALUES  
+('COMP003', 'Computadora Dell Optiplex 7010', 'Equipo obsoleto para tareas básicas', 1, 'Bodega de Desechos', 2, 1, 35000.00, 'Baja', 'Obsoleto, reemplazado por nuevos equipos', 'Dell', '2015-03-10', '2015-03-11 11:00:00'),  
+  
+('CAM004', 'Cámara Sony HDR-FX1000', 'Cámara dañada por caída accidental', 1, 'Bodega de Desechos', 2, 2, 45000.00, 'Baja', 'Daño irreparable en lente y sensor', 'Sony', '2018-07-22', '2018-07-23 16:30:00');
+
+  
+-- Tabla: Movimientos
+
+-- Movimientos de Asignación  
+INSERT INTO movimiento (idInventario, tipoMovimiento, idEmpleado, observaciones, fechaMovimiento) VALUES  
+(1, 'Asignacion', 1, 'Cámara asignada para cobertura de eventos municipales de enero', '2024-01-15 09:00:00'),  
+(2, 'Asignacion', 2, 'Cámara Canon asignada para grabación de documentales especiales', '2024-01-20 10:30:00'),  
+(7, 'Asignacion', 2, 'Workstation asignada para nueva sala de edición principal', '2024-02-05 08:15:00'),  
+(11, 'Asignacion', 1, 'Trípodes asignados para equipo móvil de noticias', '2024-02-10 14:45:00'),  
+(5, 'Asignacion', 3, 'Kit de iluminación LED para set de noticias matutinas', '2024-01-25 16:20:00');  
+  
+-- Movimientos de Mantenimiento  
+INSERT INTO movimiento (idInventario, tipoMovimiento, idEmpleado, observaciones, fechaMovimiento) VALUES  
+(3, 'Mantenimiento', 3, 'Revisión preventiva mensual de micrófonos Shure - limpieza y calibración', '2024-02-01 14:30:00'),  
+(9, 'Mantenimiento', 3, 'Mantenimiento crítico del transmisor - calibración y ajuste de potencia RF', '2024-01-10 16:00:00'),  
+(13, 'Mantenimiento', 3, 'Cámara Panasonic requiere reparación del sistema de zoom automático', '2024-02-15 11:20:00'),  
+(6, 'Mantenimiento', 3, 'Mantenimiento preventivo de reflectores - reemplazo de lámparas', '2024-01-30 13:45:00'),  
+(8, 'Mantenimiento', 2, 'Actualización de firmware y limpieza interna del servidor HP', '2024-02-08 09:30:00');  
+  
+-- Movimientos de Baja  
+INSERT INTO movimiento (idInventario, tipoMovimiento, idEmpleado, observaciones, fechaMovimiento) VALUES  
+(15, 'Baja', 2, 'Computadora Dell Optiplex declarada obsoleta - reemplazada por equipos más modernos', '2024-01-05 10:00:00'),  
+(16, 'Baja', 2, 'Cámara Sony HDR-FX1000 dada de baja por daños irreparables tras caída accidental', '2024-01-12 15:30:00');  
+  
+-- Movimientos adicionales para historial completo  
+INSERT INTO movimiento (idInventario, tipoMovimiento, idEmpleado, observaciones, fechaMovimiento) VALUES  
+(4, 'Asignacion', 1, 'Sistema inalámbrico Sennheiser para reporteros en campo', '2024-02-12 07:45:00'),  
+(10, 'Mantenimiento', 3, 'Revisión anual de antena UHF - inspección de conectores y cables', '2024-01-18 12:15:00'),  
+(12, 'Asignacion', 3, 'Cables HDMI 4K asignados para nueva configuración de estudios', '2024-02-20 11:00:00'),  
+(14, 'Mantenimiento', 3, 'Micrófono Audio-Technica en reparación por ruido de fondo persistente', '2024-02-18 14:20:00');  
+  
+-- Movimientos sin empleado asignado (casos especiales)  
+INSERT INTO movimiento (idInventario, tipoMovimiento, idEmpleado, observaciones, fechaMovimiento) VALUES  
+(1, 'Asignacion', NULL, 'Mesa de mezclas Yamaha asignada automáticamente al estudio de audio', '2024-02-22 08:00:00'),  
+(12, 'Mantenimiento', NULL, 'Monitor LG programado para calibración automática mensual', '2024-02-25 06:30:00');
+
+-- Tabla: Mantenimiento
+INSERT INTO mantenimiento (
+  idInventario,
+  descripcionMantenimiento,
+  costoMantenimiento,
+  fechaInicio,
+  fechaFin,
+  idMovimiento,
+  nombreImagen
+) VALUES
+(1, 'Mantenimiento preventivo: limpieza interna y cambio de filtros.', 1500.00, '2025-07-01', '2025-07-03', NULL, 'filtros-limpieza.jpg'),
+(2, 'Reparación de fuente de poder dañada.', 3200.00, '2025-07-15', '2025-07-17', 5, 'fuente-pc-reparada.jpg'),
+(3, 'Actualización de firmware y revisión de conectores.', 0.00, '2025-07-25', NULL, NULL, NULL);
+
+
+-- *****************************************************************************
+-- Modulo de Programacion - Publicidad
+-- Programas de Noticias  
+INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
+('NOTICIAS 60 MINUTOS', 'Lunes_Sabado', '07:00:00', 60, 'Noticias', 'Activo', 1, '2023-01-15 10:00:00'),  
+('TV NOTICIAS 40', 'Lunes_Sabado', '12:00:00', 60, 'Noticias', 'Activo', 1, '2023-01-15 10:30:00'),  
+('TV NOTICIAS 40 ESTELAR', 'Lunes_Sabado', '18:00:00', 60, 'Noticias', 'Activo', 1, '2023-01-15 11:00:00'),  
+('RESUMEN SEMANAL', 'Domingo', '19:00:00', 30, 'Noticias', 'Activo', 1, '2023-02-01 09:00:00');  
+  
+-- Programas de Entretenimiento  
+INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
+('PELÍCULA MATUTINA', 'Lunes_Sabado', '09:00:00', 120, 'Entretenimiento', 'Activo', 2, '2023-01-20 14:00:00'),  
+('CINE ESTRENO', 'Lunes_Sabado', '19:00:00', 120, 'Entretenimiento', 'Activo', 2, '2023-01-20 14:30:00'),  
+('PELÍCULA ESTELAR', 'Lunes_Sabado', '21:00:00', 120, 'Entretenimiento', 'Activo', 2, '2023-01-20 15:00:00'),  
+('SERIE CÓMICA', 'Lunes_Sabado', '08:30:00', 30, 'Entretenimiento', 'Activo', 2, '2023-02-10 16:00:00'),  
+('VIVA LA MÚSICA', 'Lunes_Sabado', '14:00:00', 120, 'Entretenimiento', 'Activo', 2, '2023-02-15 11:30:00');  
+  
+-- Programas Educativos y Culturales  
+INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
+('USTED Y SU MÉDICO', 'Lunes_Sabado', '11:00:00', 60, 'Educativo', 'Activo', 3, '2023-03-01 13:00:00'),  
+('DOCUMENTAL', 'Domingo', '18:00:00', 120, 'Cultural', 'Activo', 3, '2023-03-05 15:30:00'),  
+('CULTURA Y TRADICIÓN', 'Domingo', '16:00:00', 60, 'Cultural', 'Activo', 3, '2023-03-10 12:00:00'),  
+('APRENDE CON NOSOTROS', 'Lunes_Sabado', '10:00:00', 30, 'Educativo', 'Activo', 3, '2023-03-15 09:45:00');  
+  
+-- Programas Infantiles  
+INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
+('INFANTILES', 'Lunes_Sabado', '13:00:00', 60, 'Infantil', 'Activo', 3, '2023-04-01 10:15:00'),  
+('MUNDO INFANTIL', 'Domingo', '09:00:00', 120, 'Infantil', 'Activo', 3, '2023-04-05 11:20:00'),  
+('CARICATURAS MATUTINAS', 'Domingo', '07:00:00', 120, 'Infantil', 'Activo', 3, '2023-04-10 08:30:00');  
+  
+-- Programas de Deportes  
+INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
+('DEPORTES HOY', 'Lunes_Sabado', '17:00:00', 30, 'Deportes', 'Activo', 3, '2023-05-01 16:45:00'),  
+('FÚTBOL NACIONAL', 'Domingo', '15:00:00', 180, 'Deportes', 'Activo', 3, '2023-05-05 14:20:00'),  
+('MERIDIANO DEPORTIVO', 'Lunes_Sabado', '12:30:00', 30, 'Deportes', 'Activo', 3, '2023-05-10 13:15:00');  
+  
+-- Programas Especiales y de Temporada  
+INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
+('FIESTA NAVIDEÑA', 'Lunes_Sabado', '17:00:00', 60, 'Entretenimiento', 'Inactivo', 2, '2023-12-01 10:00:00'),  
+('ESPECIAL DE AÑO NUEVO', 'Domingo', '20:00:00', 180, 'Entretenimiento', 'Inactivo', 2, '2023-12-20 15:30:00');  
+  
+-- Programas de Madrugada  
+INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
+('MÚSICA DE MADRUGADA', 'Lunes_Sabado', '01:00:00', 300, 'Entretenimiento', 'Activo', 2, '2023-06-01 12:00:00'),  
+('CINE TRASNOCHE', 'Domingo', '23:00:00', 180, 'Entretenimiento', 'Activo', 2, '2023-06-05 13:30:00');
+
+
+-- Tabla: Bloque publicitario
+
+-- Bloques publicitarios adicionales para programas existentes  
+-- Usando clientes con IDs del 11 al 26  
+  
+-- Bloques para NOTICIAS 60 MINUTOS (programa 1) - horarios adicionales  
+INSERT INTO bloque_publicitario (idPrograma, horaBloque, ordenBloque, duracionTotal, fechaVigencia, estado) VALUES  
+(1, '07:10:00', 6, 240, '2024-03-01', 'Activo'),  
+(1, '07:40:00', 7, 300, '2024-03-01', 'Activo'),  
+(1, '08:05:00', 8, 180, '2024-03-01', 'Activo'),  
+(1, '08:25:00', 9, 240, '2024-03-01', 'Activo');  
+  
+-- Bloques para PELÍCULA MATUTINA (programa 5) - horarios adicionales    
+INSERT INTO bloque_publicitario (idPrograma, horaBloque, ordenBloque, duracionTotal, fechaVigencia, estado) VALUES  
+(5, '09:15:00', 6, 180, '2024-03-01', 'Activo'),  
+(5, '09:45:00', 7, 240, '2024-03-01', 'Activo'),  
+(5, '10:15:00', 8, 180, '2024-03-01', 'Activo'),  
+(5, '10:45:00', 9, 180, '2024-03-01', 'Activo');  
+  
+-- Bloques para TV NOTICIAS 40 (programa 2) - horarios del mediodía  
+INSERT INTO bloque_publicitario (idPrograma, horaBloque, ordenBloque, duracionTotal, fechaVigencia, estado) VALUES  
+(2, '12:05:00', 1, 180, '2024-03-01', 'Activo'),  
+(2, '12:20:00', 2, 240, '2024-03-01', 'Activo'),  
+(2, '12:40:00', 3, 180, '2024-03-01', 'Activo'),  
+(2, '12:50:00', 4, 120, '2024-03-01', 'Activo');  
+  
+-- Bloques para VIVA LA MÚSICA (programa 9) - horarios adicionales  
+INSERT INTO bloque_publicitario (idPrograma, horaBloque, ordenBloque, duracionTotal, fechaVigencia, estado) VALUES  
+(9, '14:15:00', 6, 180, '2024-03-01', 'Activo'),  
+(9, '14:45:00', 7, 240, '2024-03-01', 'Activo'),  
+(9, '15:15:00', 8, 180, '2024-03-01', 'Activo'),  
+(9, '15:45:00', 9, 120, '2024-03-01', 'Activo');
+
+-- **************************************************************************************
+
+-- Anuncios para los nuevos bloques usando clientes 11-26
+
+-- Bloque 1 (NOTICIAS 60 MINUTOS - 7:10)
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
+(1, 11, 1, 60, 'EMPRESA_11', 'Programado'),
+(1, 12, 2, 60, 'EMPRESA_12', 'Programado'),
+(1, 13, 3, 60, 'EMPRESA_13', 'Programado'),
+(1, 14, 4, 60, 'EMPRESA_14', 'Programado');
+
+-- Bloque 2 (NOTICIAS 60 MINUTOS - 7:40)
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
+(2, 15, 1, 60, 'EMPRESA_15', 'Programado'),
+(2, 16, 2, 60, 'EMPRESA_16', 'Programado'),
+(2, 17, 3, 60, 'EMPRESA_17', 'Programado'),
+(2, 18, 4, 60, 'EMPRESA_18', 'Programado'),
+(2, 19, 5, 60, 'EMPRESA_19', 'Programado');
+
+-- Bloque 3 (NOTICIAS 60 MINUTOS - 8:05)
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
+(3, 17, 1, 60, 'EMPRESA_20', 'Programado'),
+(3, 18, 2, 60, 'EMPRESA_21', 'Programado'),
+(3, 2, 3, 60, 'EMPRESA_22', 'Programado');
+
+-- Bloque 4 (NOTICIAS 60 MINUTOS - 8:25)
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
+(4, 3, 1, 60, 'EMPRESA_23', 'Programado'),
+(4, 4, 2, 60, 'EMPRESA_24', 'Programado'),
+(4, 5, 3, 60, 'EMPRESA_25', 'Programado'),
+(4, 6, 4, 60, 'EMPRESA_26', 'Programado');
+
+-- Bloques para PELÍCULA MATUTINA usando clientes 11-26 (distribución rotativa)
+
+-- Bloque 5 (PELÍCULA MATUTINA - 9:15)
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
+(5, 11, 1, 60, 'EMPRESA_11', 'Programado'),
+(5, 15, 2, 60, 'EMPRESA_15', 'Programado'),
+(5, 15, 3, 60, 'EMPRESA_19', 'Programado');
+
+-- Bloque 6 (PELÍCULA MATUTINA - 9:45)
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
+(6, 12, 1, 60, 'EMPRESA_12', 'Programado'),
+(6, 11, 2, 60, 'EMPRESA_16', 'Programado'),
+(6, 4, 3, 60, 'EMPRESA_20', 'Programado'),
+(6, 8, 4, 60, 'EMPRESA_24', 'Programado');
+
+-- Bloque 7 (PELÍCULA MATUTINA - 10:15)
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
+(7, 13, 1, 60, 'EMPRESA_13', 'Programado'),
+(7, 13, 2, 60, 'EMPRESA_17', 'Programado'),
+(7, 9, 3, 60, 'EMPRESA_21', 'Programado');
+
+-- Bloque 8 (PELÍCULA MATUTINA - 10:45)
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
+(8, 14, 1, 60, 'EMPRESA_14', 'Programado'),
+(8, 12, 2, 60, 'EMPRESA_18', 'Programado'),
+(8, 2, 3, 60, 'EMPRESA_22', 'Programado');
+
+-- ***************************************************************************************************
+
+-- *******************************************************************
+-- Tabla: Orden Publicidad
+-- Órdenes de publicidad para empresas principales de Canal 40  
+INSERT INTO orden_publicidad (numeroOrden, idCliente, producto, periodoInicio, periodoFin, valorSinImpuesto, impuesto, costoTotal, costoPeriodo, fechaAlAire, estado, idEmpleado, fechaCreacion, observaciones) VALUES  
+('0001', 1, 'Servicios de Telecomunicaciones CLARO', '2024-03-01', '2024-03-31', 50000.00, 7500.00, 57500.00, 57500.00, '2024-03-01', 'Aprobada', 1, '2024-02-15 10:00:00', 'Campaña principal de marzo - horarios prime time'),  
+  
+('0002', 3, 'Servicios Municipales MUNICOM', '2024-03-01', '2024-03-31', 25000.00, 3750.00, 28750.00, 28750.00, '2024-03-01', 'Aprobada', 1, '2024-02-16 11:00:00', 'Promoción de servicios municipales'),  
+  
+('0003', 2, 'Seguros Vehiculares SECOPV', '2024-03-01', '2024-03-31', 18000.00, 2700.00, 20700.00, 20700.00, '2024-03-01', 'Aprobada', 2, '2024-02-17 09:30:00', 'Campaña de seguros para temporada alta'),  
+  
+('0004', 6, 'Venta de Motocicletas MOTOMUNDO', '2024-03-01', '2024-03-31', 22000.00, 3300.00, 25300.00, 25300.00, '2024-03-01', 'Aprobada', 2, '2024-02-18 14:15:00', 'Promoción de nuevos modelos 2024'),  
+  
+('0005', 4, 'Construcción y Materiales MACONSA', '2024-03-01', '2024-03-31', 30000.00, 4500.00, 34500.00, 34500.00, '2024-03-01', 'Aprobada', 1, '2024-02-19 16:20:00', 'Campaña de temporada de construcción'),  
+  
+('0006', 5, 'Servicios Educativos UNAH', '2024-03-01', '2024-03-31', 15000.00, 2250.00, 17250.00, 17250.00, '2024-03-01', 'Aprobada', 3, '2024-02-20 08:45:00', 'Promoción de inscripciones universitarias'),  
+  
+('0007', 7, 'Servicios de Internet SINET', '2024-03-01', '2024-03-31', 20000.00, 3000.00, 23000.00, 23000.00, '2024-03-01', 'Aprobada', 2, '2024-02-21 13:30:00', 'Campaña de fibra óptica residencial'),  
+  
+('0008', 8, 'Servicios Financieros SANMARQUEÑA COOP', '2024-03-01', '2024-03-31', 28000.00, 4200.00, 32200.00, 32200.00, '2024-03-01', 'Aprobada', 1, '2024-02-22 11:15:00', 'Promoción de créditos y ahorros'),  
+  
+('0009', 9, 'Servicios Dentales SONRÍA', '2024-03-01', '2024-03-31', 12000.00, 1800.00, 13800.00, 13800.00, '2024-03-01', 'Aprobada', 3, '2024-02-23 15:45:00', 'Campaña de salud dental familiar'),  
+  
+('0010', 10, 'Servicios Financieros COFICESA', '2024-03-01', '2024-03-31', 35000.00, 5250.00, 40250.00, 40250.00, '2024-03-01', 'Aprobada', 1, '2024-02-24 09:00:00', 'Promoción de préstamos personales');
+
+
+-- Órdenes en diferentes estados del flujo de trabajo  
+INSERT INTO orden_publicidad (numeroOrden, idCliente, producto, periodoInicio, periodoFin, valorSinImpuesto, impuesto, costoTotal, costoPeriodo, estado, idEmpleado, fechaCreacion, observaciones) VALUES  
+('0011', 11, 'Materiales de Construcción VILLAMIX', '2024-04-01', '2024-04-30', 25000.00, 3750.00, 28750.00, 28750.00, 'Pendiente', 2, '2024-03-01 10:30:00', 'Orden pendiente de aprobación gerencial'),  
+  
+('0012', 12, 'Seguros LA COLONIA', '2024-04-01', '2024-04-30', 32000.00, 4800.00, 36800.00, 36800.00, 'En_Emision', 1, '2024-03-02 14:20:00', 'Actualmente en emisión - horarios nocturnos'),  
+  
+('0013', 13, 'Retail TIENDA ERFA', '2024-04-01', '2024-04-30', 18000.00, 2700.00, 20700.00, 20700.00, 'Finalizada', 3, '2024-02-01 16:45:00', 'Campaña completada exitosamente'),  
+  
+('0014', 14, 'Televisión CABLECOLOR', '2024-04-01', '2024-04-30', 40000.00, 6000.00, 46000.00, 46000.00, 'Cancelada', 2, '2024-03-03 12:10:00', 'Cancelada por solicitud del cliente'),  
+  
+('0015', 15, 'Promociones PROMO DJ FLECHA', '2024-04-01', '2024-04-30', 8000.00, 1200.00, 9200.00, 9200.00, 'Pendiente', 3, '2024-03-04 08:30:00', 'Orden para eventos especiales');
+
+
+
+-- Tabla: Orden Programacion
+-- Programación para NOTICIAS 60 MINUTOS (idPrograma: 1)
+INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
+(1, 1, 1, 5, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
+(1, 1, 2, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
+(1, 1, 3, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
+(1, 1, 4, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes');
+
+-- Programación para PELÍCULA MATUTINA (idPrograma: 5)
+INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
+(2, 5, 5, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
+(2, 5, 6, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
+(2, 5, 7, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
+(2, 5, 8, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado');
+
+-- Programación para TV NOTICIAS 40 (idPrograma: 2)
+-- Asumiendo que los bloques 29-32 no existen, usando bloques existentes (1-8)
+INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
+(3, 2, 1, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
+(3, 2, 2, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
+(3, 2, 3, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
+(3, 2, 4, 2, 'Lunes,Martes,Miércoles,Jueves,Viernes');
+
+-- Programación para VIVA LA MÚSICA (idPrograma: 9)
+-- Asumiendo que los bloques 21-25 no existen, usando bloques existentes (1-8)
+INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
+(4, 9, 5, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
+(4, 9, 6, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
+(4, 9, 7, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
+(4, 9, 8, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado');
+
+-- Programación para INFANTILES (idPrograma: 14)
+INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
+(5, 14, 5, 2, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
+(5, 14, 6, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado');
+
+-- Programación para MERIDIANO DEPORTIVO (idPrograma: 18)
+INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
+(6, 18, 1, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
+(6, 18, 2, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
+(6, 18, 3, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
+(6, 18, 4, 2, 'Lunes,Martes,Miércoles,Jueves,Viernes');
+
+-- Programación especial para domingos
+-- Asumiendo que existe al menos un bloque para domingos (crear primero si no existe)
+INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
+(7, 4, 1, 3, 'Domingo'),  -- RESUMEN SEMANAL
+(8, 15, 2, 2, 'Domingo'), -- MUNDO INFANTIL
+(9, 16, 3, 2, 'Domingo'), -- CARICATURAS MATUTINAS
+(10, 17, 4, 3, 'Domingo'); -- FÚTBOL NACIONAL
+
+-- Empresas con presencia en múltiples programas
+INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
+-- CLARO en diferentes horarios
+(1, 5, 5, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
+(1, 2, 2, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
+(1, 9, 5, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
+
+-- MUNICOM en horarios estratégicos
+(3, 1, 1, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
+(3, 1, 3, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
+(3, 18, 3, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes');
+
+
 -- ============================================  
 -- FIN DEL SCRIPT DE INSERCIÓN  
--- ============================================
+-- =============================================
