@@ -225,11 +225,12 @@ const startServer = async () => {
     
     console.log('✅ Modelos de productos sincronizados.');
 
-    await Inventario.sync();
-    await Proveedor.sync();  
-    await Movimiento.sync();  
-    await Mantenimiento.sync();  
     
+    await Inventario.sync();  
+    await Proveedor.sync();       
+    await Movimiento.sync();  // Mover al final
+    await Mantenimiento.sync();
+
     console.log('✅ Modelos de Inventario sincronizados.');
 
 
