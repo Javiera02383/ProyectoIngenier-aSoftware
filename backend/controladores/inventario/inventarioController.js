@@ -27,13 +27,18 @@ const obtenerInventarioPorId = async (req, res) => {
 };
 
 // Crear inventario
-const crearInventario = async (req, res) => {
-  try {
-    const nuevo = await Inventario.create(req.body);
-    res.status(201).json(nuevo);
-  } catch (error) {
-    res.status(500).json({ mensaje: 'Error al crear el inventario', error });
-  }
+const crearInventario = async (req, res) => {  
+  try {  
+    // Si no se proporciona idProveedor, usar un proveedor por defecto  
+    if (!req.body.idProveedor || req.body.idProveedor === "") {  
+      req.body.idProveedor = 1; // ID del proveedor por defecto  
+    }  
+      
+    const nuevo = await Inventario.create(req.body);  
+    res.status(201).json(nuevo);  
+  } catch (error) {  
+    res.status(500).json({ mensaje: 'Error al crear el inventario', error });  
+  }  
 };
 
 // Actualizar inventario

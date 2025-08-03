@@ -12,6 +12,7 @@ import {
   Row,
   Col,
 } from "reactstrap";
+import axios from "axios";
 import HeaderBlanco from "components/Headers/HeaderBlanco.js";
 import { useNavigate } from "react-router-dom";
 
@@ -49,13 +50,12 @@ const [formData, setFormData] = useState({
       const dataEmp = await resEmp.json();
       setEmpleados(dataEmp);
 
+      
       // Obtener proveedores
-      const resProv = await fetch("http://localhost:4051/api/optica/inventario/todos-proveedor", {
+      const resProv = await axios.get("http://localhost:4051/api/optica/inventario/todos-proveedor", {
         headers: { "Authorization": `Bearer ${token}` }
       });
-      if (!resProv.ok) throw new Error("Error al cargar proveedores");
-      const dataProv = await resProv.json();
-      setProveedores(dataProv);
+      setProveedores(resProv.data);
     } catch (error) {
       console.error("Error cargando datos:", error);
     }
@@ -63,12 +63,14 @@ const [formData, setFormData] = useState({
   fetchEmpleadosYProveedores();
 }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const handleChange = (e) => {  
+  const { name, value } = e.target;  
+  setFormData((prevData) => ({  
+    ...prevData,  
+    [name]: name === "idProveedor" || name === "idEmpleado"   
+      ? (value === "" ? null : parseInt(value))   
+      : value,  
+    }));  
   };
 
   const handleSubmit = async (e) => {
@@ -93,9 +95,12 @@ const [formData, setFormData] = useState({
           cantidad: 1,
           ubicacion: "",
           idEmpleado: "",
-          valor: "",
+          idProveedor: "",
+          valor: 0,
           estado: "Disponible",
           observacion: "",
+          marca: "",
+          fechaCompra: "",
         });
         // Opcional: navigate("/admin/inventario");
       } else {
@@ -196,7 +201,7 @@ const [formData, setFormData] = useState({
                       </Col>
                       <Col lg="6">
                         <FormGroup>
-                          <Label>Empleado Asignado</Label>
+                          <Label>Asignado a:</Label>
                           <Input
                             type="select"
                             name="idEmpleado"
@@ -276,17 +281,18 @@ const [formData, setFormData] = useState({
                         <FormGroup>
                           <Label>Proveedor</Label>
                           <Input
-                            type="select"
-                            name="idProveedor"
-                            value={formData.idProveedor}
-                            onChange={handleChange}
+                              type="select"
+                              name="idProveedor"
+                              value={formData.idProveedor}
+                              onChange={handleChange}
+                              
                           >
                             <option value="">Seleccione un proveedor</option>
-                            {proveedores.length > 0 &&
-                              proveedores.map((prov) => (
+                            {proveedores.map((prov) => (
                                 <option key={prov.idProveedor} value={prov.idProveedor}>
-                                  {prov.persona?.Pnombre || 'Sin nombre'} {prov.persona?.Papellido || ''}
+                                  {prov.persona?.Pnombre} {prov.persona?.Papellido}
                                 </option>
+
                               ))}
 
                           </Input>

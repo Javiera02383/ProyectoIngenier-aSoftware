@@ -35,10 +35,8 @@ const reglasEditar = [
     .isIn(['Activo', 'Inactivo']).withMessage('Estado inválido')  
 ];  
   
-// === CONTROLADORES ===  
-  
 // Crear proveedor  
-const crearProveedor = [  
+exports.crearProveedor = [  
   ...reglasCrear,  
   async (req, res) => {  
     const errores = validationResult(req);  
@@ -59,30 +57,30 @@ const crearProveedor = [
   }  
 ];  
 
-// Obtener todos los proveedores sin filtros  
-const obtenerTodosLosProveedores = async (req, res) => {
-  try {  
-    const proveedores = await Proveedor.findAll({  
-      include: [{  
-        model: Persona,  
-        as: 'persona'  
-      }]  
-    });  
-    res.json(proveedores);  
-  } catch (error) {  
-    res.status(500).json({ mensaje: 'Error al obtener todos los proveedores', error: error.message });  
-  }  
+// Obtener todos los proveedores sin filtros    
+exports.obtenerTodosLosProveedores = async (req, res) => {    
+  try {    
+    const proveedores = await Proveedor.findAll({    
+      include: [{    
+        model: Persona,    
+        as: 'persona'    
+      }]    
+    });    
+    res.json(proveedores);    
+  } catch (error) {    
+    res.status(500).json({ mensaje: 'Error al obtener todos los proveedores', error: error.message });    
+  }    
 };
   
-// Obtener todos los proveedores con búsqueda  
-const obtenerProveedores = async (req, res) => {  
+// Obtener todos los proveedores con búsqueda por nombre/apellido de Persona  
+exports.obtenerProveedores = async (req, res) => {  
   try {  
-    const { nombre, apellido, tipoProveedor, estado } = req.query;  
+    const { Pnombre, Papellido, tipoProveedor, estado } = req.query;  
     const wherePersona = {};  
     const whereProveedor = {};  
       
-    if (nombre && nombre.length >= 3) wherePersona.Pnombre = { [Op.like]: `%${nombre}%` };  
-    if (apellido && apellido.length >= 3) wherePersona.Papellido = { [Op.like]: `%${apellido}%` };  
+    if (Pnombre) wherePersona.Pnombre = { [Op.like]: `%${Pnombre}%` };  
+    if (Papellido) wherePersona.Papellido = { [Op.like]: `%${Papellido}%` };  
     if (tipoProveedor) whereProveedor.tipoProveedor = tipoProveedor;  
     if (estado) whereProveedor.estado = estado;  
   
@@ -100,8 +98,8 @@ const obtenerProveedores = async (req, res) => {
   }  
 };  
   
-// Obtener proveedor por ID  
-const obtenerProveedorPorId = async (req, res) => {  
+// Obtener proveedor por ID, incluyendo datos de Persona  
+exports.obtenerProveedorPorId = async (req, res) => {  
   const { id } = req.params;  
   try {  
     const proveedor = await Proveedor.findByPk(id, {  
@@ -118,7 +116,7 @@ const obtenerProveedorPorId = async (req, res) => {
 };  
   
 // Editar proveedor  
-const editarProveedor = [  
+exports.editarProveedor = [  
   ...reglasEditar,  
   async (req, res) => {  
     const errores = validationResult(req);  
@@ -127,16 +125,15 @@ const editarProveedor = [
     }  
     const { id } = req.params;  
     try {  
-      const proveedor = await Proveedor.findByPk(id);  
-      if (!proveedor) return res.status(404).json({ mensaje: 'Proveedor no encontrado' });  
-  
+      // Si se envía idPersona, validar que exista  
       if (req.body.idPersona) {  
         const persona = await Persona.findByPk(req.body.idPersona);  
         if (!persona) {  
-          return res.status(400).json({ mensaje: 'La persona asociada no existe' });  
+          return res.status(400).json({ mensaje: 'La persona asociada (idPersona) no existe' });  
         }  
       }  
-  
+      const proveedor = await Proveedor.findByPk(id);  
+      if (!proveedor) return res.status(404).json({ mensaje: 'Proveedor no encontrado' });  
       await proveedor.update(req.body);  
       res.json({ mensaje: 'Proveedor actualizado', proveedor });  
     } catch (error) {  
@@ -146,24 +143,14 @@ const editarProveedor = [
 ];  
   
 // Eliminar proveedor  
-const eliminarProveedor = async (req, res) => {  
+exports.eliminarProveedor = async (req, res) => {  
   const { id } = req.params;  
   try {  
     const proveedor = await Proveedor.findByPk(id);  
     if (!proveedor) return res.status(404).json({ mensaje: 'Proveedor no encontrado' });  
-  
     await proveedor.destroy();  
     res.json({ mensaje: 'Proveedor eliminado' });  
   } catch (error) {  
     res.status(500).json({ mensaje: 'Error al eliminar proveedor', error: error.message });  
   }  
-};  
-  
-module.exports = {  
-  crearProveedor,  
-  obtenerProveedores, 
-  obtenerTodosLosProveedores, 
-  obtenerProveedorPorId,  
-  editarProveedor,  
-  eliminarProveedor  
 };

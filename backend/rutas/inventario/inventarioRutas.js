@@ -42,9 +42,9 @@ router.post(
   body('estado').isIn(['Disponible', 'Asignado', 'En Mantenimiento', 'Baja']).withMessage('Estado inválido'),
 
   // Nuevos campos
-  body('idProveedor')
-    .optional({ checkFalsy: true })
-    .isInt().withMessage('ID de proveedor debe ser un número entero'),
+  body('idProveedor')  
+  .optional({ checkFalsy: true, nullable: true })  
+  .isInt().withMessage('ID de proveedor debe ser un número entero'),
   body('marca')
     .optional({ checkFalsy: true })
     .isLength({ max: 100 }).withMessage('Marca no debe superar los 100 caracteres'),
