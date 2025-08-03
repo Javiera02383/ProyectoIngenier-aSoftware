@@ -580,7 +580,7 @@ INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, 
 -- Tabla: Orden Publicidad
 -- Órdenes de publicidad para empresas principales de Canal 40  
 INSERT INTO orden_publicidad (numeroOrden, idCliente, producto, periodoInicio, periodoFin, valorSinImpuesto, impuesto, costoTotal, costoPeriodo, fechaAlAire, estado, idEmpleado, fechaCreacion, observaciones) VALUES  
-('0001', 1, 'Servicios de Telecomunicaciones CLARO', '2024-03-01', '2024-03-31', 50000.00, 7500.00, 57500.00, 57500.00, '2024-03-01', 'Aprobada', 1, '2024-02-15 10:00:00', 'Campaña principal de marzo - horarios prime time'),  
+('0001', 7, 'Servicios de Telecomunicaciones CLARO', '2024-03-01', '2024-03-31', 50000.00, 7500.00, 57500.00, 57500.00, '2024-03-01', 'Aprobada', 1, '2024-02-15 10:00:00', 'Campaña principal de marzo - horarios prime time'),  
   
 ('0002', 3, 'Servicios Municipales MUNICOM', '2024-03-01', '2024-03-31', 25000.00, 3750.00, 28750.00, 28750.00, '2024-03-01', 'Aprobada', 1, '2024-02-16 11:00:00', 'Promoción de servicios municipales'),  
   
