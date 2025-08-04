@@ -4,6 +4,8 @@ const FacturaDetalle = require('../../modelos/facturacion/FacturaDetalle');
 const DetalleDescuento = require('../../modelos/facturacion/DetalleDescuento');
 const Cliente = require('../../modelos/gestion_cliente/Cliente');
 const CAI = require('../../modelos/facturacion/Cai'); 
+const OrdenPublicidad = require('../../modelos/programacion/OrdenPublicidad'); // Importar aquí para evitar dependencia circular
+
 const PDFDocument = require('pdfkit');
 const path = require('path');
 const fs = require('fs');
@@ -112,30 +114,31 @@ exports.crearFactura = async (req, res) => {
 };
 
 // Obtener todas las facturas
-exports.obtenerFacturas = async (req, res) => {
-  try {
-    const facturas = await Factura.findAll({  
-        include: [  
-      {    
-        model: Cliente,    
-        include: [{    
-          model: Persona,    
-          as: 'persona'    
-        }]    
-      },  
-      {  
-        model: OrdenPublicidad,  
-        as: 'ordenPublicidad',  
-        attributes: ['numeroOrden', 'producto', 'estado']  
-      }  
-    ]    
-    }); 
-     
-    res.json({ facturas });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ mensaje: 'Error al obtener facturas', error: error.message });
-  }
+exports.obtenerFacturas = async (req, res) => {  
+  try {  
+    const facturas = await Factura.findAll({    
+      include: [  
+        {    
+          model: Cliente,    
+          include: [{    
+            model: Persona,    
+            as: 'persona'    
+          }]    
+        },  
+        {  
+          model: OrdenPublicidad,  
+          as: 'ordenPublicidad',  
+          required: false, // LEFT JOIN para facturas sin orden  
+          attributes: ['numeroOrden', 'producto', 'estado', 'costoTotal']  
+        }  
+      ]    
+    });   
+       
+    res.json({ facturas });  
+  } catch (error) {  
+    console.error(error);  
+    res.status(500).json({ mensaje: 'Error al obtener facturas', error: error.message });  
+  }  
 };
 
 // Obtener factura por ID

@@ -129,6 +129,11 @@ const handleAnularFactura = async () => {
       
     // Búsqueda por monto (convertir a string)  
     factura.Total_Facturado.toString().includes(filtro) ||  
+
+    // NUEVO: Búsqueda por orden de publicidad  
+    (factura.ordenPublicidad?.numeroOrden || '').toLowerCase().includes(filtroLower) ||  
+    (factura.ordenPublicidad?.producto || '').toLowerCase().includes(filtroLower) ||  
+    (factura.ordenPublicidad?.estado || '').toLowerCase().includes(filtroLower)  ||
       
     // Búsqueda por fecha (formato legible)  
     new Date(factura.Fecha).toLocaleDateString('es-HN').includes(filtro)  
@@ -239,43 +244,66 @@ const handleAnularFactura = async () => {
                   </div>  
                 ) : (  
                   <Table className="align-items-center table-flush" responsive>  
-                    <thead className="thead-light">  
-                      <tr>  
-                        <th scope="col">No. Factura</th>  
-                        <th scope="col">Fecha</th>  
+                    <thead className="thead-light">    
+                      <tr>    
+                        <th scope="col">No. Factura</th>    
+                        <th scope="col">Fecha</th>    
                         <th scope="col">Cliente</th>  
-                        <th scope="col">Total</th>  
-                        <th scope="col">Estado</th>  
-                        <th scope="col">Acciones</th>  
-                      </tr>  
+                        <th scope="col">Orden Publicidad</th> {/* NUEVA COLUMNA */}  
+                        <th scope="col">Total</th>    
+                        <th scope="col">Estado</th>    
+                        <th scope="col"></th>    
+                      </tr>    
                     </thead>  
                     <tbody>  
-                      {facturasFiltradas.map((factura) => (  
-                        <tr key={factura.idFactura}>  
-                          <td>  
-                            <span className="mb-0 text-sm font-weight-bold">  
-                              {factura.idFactura.toString().padStart(8, '0')}  
-                            </span>  
+                      {facturasFiltradas.map((factura) => (    
+                        <tr key={factura.idFactura}>    
+                          <td>    
+                            <span className="mb-0 text-sm font-weight-bold">    
+                              {factura.idFactura.toString().padStart(8, '0')}    
+                            </span>    
+                          </td>    
+                          <td>    
+                            <span className="mb-0 text-sm">    
+                              {formatearFecha(factura.Fecha)}    
+                            </span>    
+                          </td>    
+                          <td>    
+                            <span className="mb-0 text-sm">    
+                              {factura.Cliente?.persona ?     
+                              `${factura.Cliente.persona.Pnombre} ${factura.Cliente.persona.Snombre || ''} ${factura.Cliente.persona.Papellido} ${factura.Cliente.persona.Sapellido || ''}`.trim() :     
+                              'Cliente no disponible'    
+                            }  
+                            </span>   
                           </td>  
+                          {/* NUEVA CELDA PARA ORDEN DE PUBLICIDAD */}  
                           <td>  
                             <span className="mb-0 text-sm">  
-                              {formatearFecha(factura.Fecha)}  
+                              {factura.ordenPublicidad ? (  
+                                <div>  
+                                  <div className="font-weight-bold">  
+                                    {factura.ordenPublicidad.numeroOrden}  
+                                  </div>  
+                                  <small className="text-muted">  
+                                    {factura.ordenPublicidad.producto}  
+                                  </small>  
+                                  <br />  
+                                  <Badge   
+                                    color={factura.ordenPublicidad.estado === 'Aprobada' ? 'success' : 'warning'}   
+                                    size="sm"  
+                                  >  
+                                    {factura.ordenPublicidad.estado}  
+                                  </Badge>  
+                                </div>  
+                              ) : (  
+                                <span className="text-muted">Sin orden asociada</span>  
+                              )}  
                             </span>  
                           </td>  
-                          <td>  
-                            <span className="mb-0 text-sm">  
-                                                      
-
-                            {factura.Cliente?.persona ?   
-                            `${factura.Cliente.persona.Pnombre} ${factura.Cliente.persona.Snombre || ''} ${factura.Cliente.persona.Papellido} ${factura.Cliente.persona.Sapellido || ''}`.trim() :   
-                            'Cliente no disponible'  
-                           }
-                          </span> 
-                          </td>  
-                          <td>  
-                            <span className="mb-0 text-sm font-weight-bold">  
-                              {formatearMoneda(factura.Total_Facturado)}  
-                            </span>  
+                          <td>    
+                            <span className="mb-0 text-sm font-weight-bold">    
+                              {formatearMoneda(factura.Total_Facturado)}    
+                            </span>    
                           </td>  
                           <td>  
                             <Badge  
@@ -329,8 +357,14 @@ const handleAnularFactura = async () => {
                     
                     <strong>Factura No:</strong> {facturaSeleccionada.idFactura.toString().padStart(8, '0')}<br/>  
                     <strong>Cliente:</strong> {facturaSeleccionada.Cliente?.persona ?   
-  `${facturaSeleccionada.Cliente.persona.Pnombre} ${facturaSeleccionada.Cliente.persona.Snombre || ''} ${facturaSeleccionada.Cliente.persona.Papellido} ${facturaSeleccionada.Cliente.persona.Sapellido || ''}`.trim()   
-  : 'N/A'}<br/>  
+                      `${facturaSeleccionada.Cliente.persona.Pnombre} ${facturaSeleccionada.Cliente.persona.Snombre || ''} ${facturaSeleccionada.Cliente.persona.Papellido} ${facturaSeleccionada.Cliente.persona.Sapellido || ''}`.trim()   
+                      : 'N/A'}<br/>  
+                      {/* NUEVA LÍNEA PARA ORDEN */}  
+                      {facturaSeleccionada.ordenPublicidad && (  
+                        <>  
+                          <strong>Orden de Publicidad:</strong> {facturaSeleccionada.ordenPublicidad.numeroOrden} - {facturaSeleccionada.ordenPublicidad.producto}<br/>  
+                        </>  
+                      )} 
                     <strong>Total:</strong> {formatearMoneda(facturaSeleccionada.Total_Facturado)}<br/>  
                     <strong>Fecha:</strong> {formatearFecha(facturaSeleccionada.Fecha)}  
                   </div>  

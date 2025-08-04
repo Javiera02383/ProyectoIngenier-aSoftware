@@ -232,6 +232,12 @@ const startServer = async () => {
 
     console.log('✅ Modelos de Inventario sincronizados.');
 
+    await Programa.sync();  
+    await BloquePublicitario.sync();  
+    await AnuncioBloque.sync();  
+    await OrdenPublicidad.sync();  
+    await OrdenProgramacion.sync();  
+    console.log('✅ Modelos de programación-publicidad sincronizados.');
 
         // Sincronizar modelos de Facturacion
     await FormaPago.sync();
@@ -241,13 +247,6 @@ const startServer = async () => {
     await FacturaDetalle.sync();
     await Cai.sync();
     console.log('✅ Modelos de Facturacion sincronizados.');
-
-    await Programa.sync();  
-    await BloquePublicitario.sync();  
-    await AnuncioBloque.sync();  
-    await OrdenPublicidad.sync();  
-    await OrdenProgramacion.sync();  
-    console.log('✅ Modelos de programación-publicidad sincronizados.');
 
     // Iniciar servidor
     const PORT = process.env.puerto || 3000;

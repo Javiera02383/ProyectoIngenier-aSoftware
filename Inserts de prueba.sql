@@ -69,26 +69,7 @@ INSERT INTO tipo_enfermedad (Nombre, Descripcion) VALUES
 ('N/A', 'No aplica para sistema televisivo'),  
 ('Otro', 'Otros casos especiales');  
   
--- Tabla: descuento  
-INSERT INTO descuento (Tipo, Estado, Porcentaje) VALUES   
-('Sin descuento', 'Activo', 0),  
-('Cliente Frecuente', 'Activo', 5),  
-('Contrato Anual', 'Activo', 10),  
-('Pago Anticipado', 'Activo', 8),  
-('Volumen Alto', 'Activo', 15);  
-  
--- Tabla: formapago  
-INSERT INTO formapago (idFormaPago, Formapago, Estado, validacionRequerida, cuentaBancaria, nombreBeneficiario) VALUES   
-(1, 'Contado', 'A', false, NULL, 'Televisión Comayagua Canal 40'),  
-(2, 'Transferencia Bancaria', 'A', true, '1234567890', 'Televisión Comayagua Canal 40'),  
-(3, 'Cheque', 'A', true, '1234567890', 'Televisión Comayagua Canal 40'),  
-(4, 'Tarjeta de Crédito', 'A', false, NULL, 'Televisión Comayagua Canal 40');  
-  
--- Tabla: cai (Código de Autorización de Impresión)  
-INSERT INTO cai (codigoCAI, numeroFacturaInicio, numeroFacturaFin, fechaEmision, fechaVencimiento, resolucionSAR, nombreEmpresa, rtnEmpresa, activo, facturasEmitidas, createdAt, updatedAt) VALUES   
-('254F8-612F1-8A0E0-6E8B3-0099B876', '000-001-01-00000001', '000-001-01-99999999', '2025-01-01', '2025-12-31', 'SAR No. 45145', 'Televisión Comayagua Canal 40', '12171961001526', true, 0, NOW(), NOW()),  
-('123A4-567B8-9C0D1-2E3F4-5678G901', '000-002-01-00000001', '000-002-01-99999999', '2024-01-01', '2024-12-31', 'SAR No. 44123', 'Televisión Comayagua Canal 40', '12171961001526', false, 1250, NOW(), NOW());  
-  
+--  *************************************************************************************************************************************************
 -- 2. TABLAS CON FOREIGN KEYS A PERSONA  
   
 -- Tabla: telefono  
@@ -148,7 +129,7 @@ INSERT INTO cliente (fechaRegistro, idPersona) VALUES
 (NOW(), 25),    
 (NOW(), 26); 
   
-
+-- ********************************************************************************************************************************************
 
 -- 3. TABLAS DE PRODUCTOS/SERVICIOS  
   
@@ -174,6 +155,7 @@ INSERT INTO producto_has_atributo (idProducto, idAtributo, stockActual) VALUES
 (5, 5, 999), -- Mención - Duración  
 (6, 5, 999); -- Patrocinio - Duración  
   
+  -- *******************************************************************************************************************************************
 -- 4. TABLAS DE CONSULTAS (adaptadas para TV)  
   
 -- Tabla: consulta (adaptada para reuniones comerciales)  
@@ -202,240 +184,10 @@ INSERT INTO reparacion_de_lentes (Tipo_Reparacion, idConsulta, Descripcion, Cost
 ('Ajuste de horario', 1, 'Cambio de horario de transmisión', 0),  
 ('Modificación de contenido', 2, 'Actualización de spot publicitario', 50);  
   
--- 5. TABLAS DE FACTURACIÓN  
- INSERT INTO factura (  
-  idFactura,  
-  Fecha,  
-  Total_Facturado,  
-  Tipo_documento,  
-  productoCliente,  
-  mencion,  
-  periodoInicio,  
-  periodoFin,  
-  tipoServicio,  
-  agencia,  
-  ordenNo,  
-  ordenCompraExenta,  
-  numeroRegistroSAG,  
-  constanciaExonerado,  
-  idCliente,  
-  idFormaPago,  
-  idEmpleado,  
-  archivo_pdf,  
-  estadoFactura  
-) VALUES (  
-  1,                                    -- idFactura  
-  '2025-01-15 10:30:00',               -- Fecha  
-  2500.00,                             -- Total_Facturado  
-  'Factura',                           -- Tipo_documento  
-  'Supermercados La Colonia',          -- productoCliente  
-  'Comercial',                         -- mencion  
-  '2025-01-01',                        -- periodoInicio  
-  '2025-01-31',                        -- periodoFin  
-  'spot',                              -- tipoServicio (spot, programa, contrato)  
-  'MASS PUBLICIDAD',                   -- agencia  
-  1001,                                -- ordenNo  
-  'EX-2025-001',                       -- ordenCompraExenta  
-  'SAG-12345',                         -- numeroRegistroSAG  
-  'CONST-2025-001',                    -- constanciaExonerado  
-  1,                                   -- idCliente (FK requerida)  
-  1,                                   -- idFormaPago (FK requerida)  
-  1,                                   -- idEmpleado (FK requerida)  
-  'factura_1.pdf',                     -- archivo_pdf  
-  'activa'                             -- estadoFactura (activa, anulada, cobrada, pendiente)  
-);
-INSERT INTO factura (  
-  idFactura,  
-  Fecha,  
-  Total_Facturado,  
-  Tipo_documento,  
-  productoCliente,  
-  mencion,  
-  periodoInicio,  
-  periodoFin,  
-  tipoServicio,  
-  agencia,  
-  ordenNo,  
-  ordenCompraExenta,  
-  numeroRegistroSAG,  
-  constanciaExonerado,  
-  idCliente,  
-  idFormaPago,  
-  idEmpleado,  
-  archivo_pdf,  
-  estadoFactura  
-) VALUES (  
-  3,                                    -- idFactura  
-  '2025-01-20 09:15:00',               -- Fecha  
-  4500.75,                             -- Total_Facturado  
-  'Factura',                           -- Tipo_documento  
-  'Banco Atlántida',                   -- productoCliente  
-  'Financiera',                        -- mencion  
-  '2025-02-01',                        -- periodoInicio  
-  '2025-02-28',                        -- periodoFin  
-  'contrato',                          -- tipoServicio  
-  'Publicidad Creativa S.A.',          -- agencia  
-  2025,                                -- ordenNo  
-  NULL,                                -- ordenCompraExenta  
-  NULL,                                -- numeroRegistroSAG  
-  NULL,                                -- constanciaExonerado  
-  3,                                   -- idCliente (FK requerida)  
-  2,                                   -- idFormaPago (FK requerida)  
-  2,                                   -- idEmpleado (FK requerida)  
-  'factura_3.pdf',                     -- archivo_pdf  
-  'activa'                             -- estadoFactura  
-);
-INSERT INTO factura (  
-  idFactura,  
-  Fecha,  
-  Total_Facturado,  
-  Tipo_documento,  
-  productoCliente,  
-  mencion,  
-  periodoInicio,  
-  periodoFin,  
-  tipoServicio,  
-  agencia,  
-  ordenNo,  
-  ordenCompraExenta,  
-  numeroRegistroSAG,  
-  constanciaExonerado,  
-  idCliente,  
-  idFormaPago,  
-  idEmpleado,  
-  archivo_pdf,  
-  estadoFactura  
-) VALUES (  
-  2,                                   -- idFactura  
-  '2025-01-15 14:45:00',              -- Fecha  
-  1800.50,                            -- Total_Facturado  
-  'Factura',                          -- Tipo_documento  
-  NULL,                               -- productoCliente (opcional)  
-  NULL,                               -- mencion (opcional)  
-  NULL,                               -- periodoInicio (opcional)  
-  NULL,                               -- periodoFin (opcional)  
-  'programa',                         -- tipoServicio  
-  NULL,                               -- agencia (opcional)  
-  NULL,                               -- ordenNo (opcional)  
-  NULL,                               -- ordenCompraExenta (opcional)  
-  NULL,                               -- numeroRegistroSAG (opcional)  
-  NULL,                               -- constanciaExonerado (opcional)  
-  2,                                  -- idCliente (FK requerida)  
-  2,                                  -- idFormaPago (FK requerida)  
-  1,                                  -- idEmpleado (FK requerida)  
-  NULL,                               -- archivo_pdf (opcional)  
-  'activa'                            -- estadoFactura (valor por defecto)  
-);
-
-
   
--- Tabla: detalle_descuento  
-INSERT INTO detalle_descuento (idFactura, idDescuento, Monto) VALUES   
-(1, 2, 75.00),  -- Cliente frecuente 5%  
-(2, 3, 230.00), -- Contrato anual 10%  
-(3, 4, 120.00); -- Pago anticipado 8%  
-  
--- Tabla: facturadetalle  
-INSERT INTO facturadetalle (idConsulta, Cantidad, idFactura, idProductoAtributo) VALUES   
-(1, '10', 1, 1), -- 10 spots de 30s  
-(1, '5', 1, 2),  -- 5 spots de 60s  
-(2, '1', 2, 3),  -- 1 programa matutino  
-(2, '1', 2, 4),  -- 1 programa nocturno  
-(3, '20', 3, 1), -- 20 spots de 30s  
-(3, '5', 3, 5);  -- 5 menciones en noticiero  
   
 
-
--- Tabla: inventario
-INSERT INTO inventario (codigo, nombre, descripcion, cantidad, ubicacion, idEmpleado, idProveedor, valor, estado, observacion, marca, fechaCompra, fechaRegistro) VALUES  
-('CAM001', 'Cámara Sony PXW-X70', 'Cámara profesional para grabación de noticias y reportajes', 3, 'Estudio Principal', 2, 2, 85000.00, 'Disponible', 'Excelente estado, uso diario', 'Sony', '2023-01-15', '2023-01-16 09:30:00'),  
-  
-('CAM002', 'Cámara Canon XF405', 'Cámara 4K para producciones especiales y documentales', 2, 'Estudio Secundario', 2, 3, 95000.00, 'Disponible', 'Nueva adquisición 2023', 'Canon', '2023-03-20', '2023-03-21 10:15:00'),  
-  
-('MIC001', 'Micrófono Shure SM58', 'Micrófono dinámico para presentadores de noticias', 10, 'Estudio Principal', 1, 4, 3500.00, 'Disponible', 'Resistente y confiable', 'Shure', '2022-11-10', '2022-11-11 14:20:00'),  
-  
-('MIC002', 'Sistema Inalámbrico Sennheiser EW 100', 'Sistema completo para reporteros móviles', 5, 'Equipos Móviles', 1, 4, 12000.00, 'Disponible', 'Incluye receptor y transmisor', 'Sennheiser', '2023-02-05', '2023-02-06 11:45:00'),  
-  
-('LUZ001', 'Kit LED Aputure AL-M9', 'Panel LED compacto para iluminación de estudio', 4, 'Estudio Principal', 3, 1, 25000.00, 'Disponible', 'Luz fría y cálida ajustable', 'Aputure', '2023-04-12', '2023-04-13 16:00:00'),  
-  
-('LUZ002', 'Reflector Fresnel 2000W', 'Reflector profesional para exteriores y eventos', 6, 'Almacén de Equipos', 3, 1, 15000.00, 'Disponible', 'Para uso en exteriores', 'Arri', '2022-08-30', '2022-08-31 13:30:00'),  
-  
-('COMP001', 'Workstation Dell Precision 7760', 'Computadora para edición de video 4K', 4, 'Sala de Edición', 2, 1, 75000.00, 'Disponible', 'Intel i9, 32GB RAM, RTX 3080', 'Dell', '2023-05-18', '2023-05-19 08:45:00'),  
-  
-('COMP002', 'Servidor HP ProLiant DL380', 'Servidor para almacenamiento de contenido multimedia', 1, 'Cuarto de Servidores', 2, 1, 120000.00, 'Disponible', 'Almacenamiento 10TB RAID', 'HP', '2023-01-08', '2023-01-09 12:00:00'),  
-  
-('TRANS001', 'Transmisor Harris Flexstar', 'Transmisor principal FM de 5KW', 1, 'Torre de Transmisión', 1, 2, 450000.00, 'Asignado', 'Equipo crítico en operación', 'Harris', '2020-06-15', '2020-06-16 07:00:00'),  
-  
-('ANT001', 'Antena Dielectric TFU-25J', 'Antena de transmisión UHF banda IV-V', 1, 'Torre de Transmisión', 1, 2, 85000.00, 'Asignado', 'Instalada en torre principal', 'Dielectric', '2020-06-15', '2020-06-16 07:30:00'),  
-  
-('TRIP001', 'Trípode Manfrotto 546B', 'Trípode profesional de fibra de carbono', 8, 'Estudio Principal', 1, 1, 8500.00, 'Disponible', 'Ligero y resistente', 'Manfrotto', '2022-12-03', '2022-12-04 15:20:00'),  
-  
-('CABLE001', 'Cable HDMI 4K Belkin', 'Cable HDMI 2.1 de 10 metros', 20, 'Almacén de Cables', 3, 1, 1200.00, 'Disponible', 'Soporte 4K@120Hz', 'Belkin', '2023-06-01', '2023-06-02 09:15:00');
-  
--- Equipos en mantenimiento  
-INSERT INTO inventario (codigo, nombre, descripcion, cantidad, ubicacion, idEmpleado, idProveedor, valor, estado, observacion, marca, fechaCompra, fechaRegistro) VALUES  
-('CAM003', 'Cámara Panasonic AG-CX350', 'Cámara con falla en sistema de zoom', 1, 'Taller de Reparación', 3, 3, 65000.00, 'En Mantenimiento', 'Requiere reparación de zoom', 'Panasonic', '2021-09-12', '2021-09-13 10:30:00'),  
-  
-('MIC003', 'Micrófono Audio-Technica AT2020', 'Micrófono condensador con ruido de fondo', 1, 'Taller de Reparación', 3, 4, 4500.00, 'En Mantenimiento', 'Posible problema en cápsula', 'Audio-Technica', '2022-04-18', '2022-04-19 14:45:00');  
-  
--- Equipos dados de baja  
-INSERT INTO inventario (codigo, nombre, descripcion, cantidad, ubicacion, idEmpleado, idProveedor, valor, estado, observacion, marca, fechaCompra, fechaRegistro) VALUES  
-('COMP003', 'Computadora Dell Optiplex 7010', 'Equipo obsoleto para tareas básicas', 1, 'Bodega de Desechos', 2, 1, 35000.00, 'Baja', 'Obsoleto, reemplazado por nuevos equipos', 'Dell', '2015-03-10', '2015-03-11 11:00:00'),  
-  
-('CAM004', 'Cámara Sony HDR-FX1000', 'Cámara dañada por caída accidental', 1, 'Bodega de Desechos', 2, 2, 45000.00, 'Baja', 'Daño irreparable en lente y sensor', 'Sony', '2018-07-22', '2018-07-23 16:30:00');
-
-  
--- Tabla: Movimientos
-
--- Movimientos de Asignación  
-INSERT INTO movimiento (idInventario, tipoMovimiento, idEmpleado, observaciones, fechaMovimiento) VALUES  
-(1, 'Asignacion', 1, 'Cámara asignada para cobertura de eventos municipales de enero', '2024-01-15 09:00:00'),  
-(2, 'Asignacion', 2, 'Cámara Canon asignada para grabación de documentales especiales', '2024-01-20 10:30:00'),  
-(7, 'Asignacion', 2, 'Workstation asignada para nueva sala de edición principal', '2024-02-05 08:15:00'),  
-(11, 'Asignacion', 1, 'Trípodes asignados para equipo móvil de noticias', '2024-02-10 14:45:00'),  
-(5, 'Asignacion', 3, 'Kit de iluminación LED para set de noticias matutinas', '2024-01-25 16:20:00');  
-  
--- Movimientos de Mantenimiento  
-INSERT INTO movimiento (idInventario, tipoMovimiento, idEmpleado, observaciones, fechaMovimiento) VALUES  
-(3, 'Mantenimiento', 3, 'Revisión preventiva mensual de micrófonos Shure - limpieza y calibración', '2024-02-01 14:30:00'),  
-(9, 'Mantenimiento', 3, 'Mantenimiento crítico del transmisor - calibración y ajuste de potencia RF', '2024-01-10 16:00:00'),  
-(13, 'Mantenimiento', 3, 'Cámara Panasonic requiere reparación del sistema de zoom automático', '2024-02-15 11:20:00'),  
-(6, 'Mantenimiento', 3, 'Mantenimiento preventivo de reflectores - reemplazo de lámparas', '2024-01-30 13:45:00'),  
-(8, 'Mantenimiento', 2, 'Actualización de firmware y limpieza interna del servidor HP', '2024-02-08 09:30:00');  
-  
--- Movimientos de Baja  
-INSERT INTO movimiento (idInventario, tipoMovimiento, idEmpleado, observaciones, fechaMovimiento) VALUES  
-(15, 'Baja', 2, 'Computadora Dell Optiplex declarada obsoleta - reemplazada por equipos más modernos', '2024-01-05 10:00:00'),  
-(16, 'Baja', 2, 'Cámara Sony HDR-FX1000 dada de baja por daños irreparables tras caída accidental', '2024-01-12 15:30:00');  
-  
--- Movimientos adicionales para historial completo  
-INSERT INTO movimiento (idInventario, tipoMovimiento, idEmpleado, observaciones, fechaMovimiento) VALUES  
-(4, 'Asignacion', 1, 'Sistema inalámbrico Sennheiser para reporteros en campo', '2024-02-12 07:45:00'),  
-(10, 'Mantenimiento', 3, 'Revisión anual de antena UHF - inspección de conectores y cables', '2024-01-18 12:15:00'),  
-(12, 'Asignacion', 3, 'Cables HDMI 4K asignados para nueva configuración de estudios', '2024-02-20 11:00:00'),  
-(14, 'Mantenimiento', 3, 'Micrófono Audio-Technica en reparación por ruido de fondo persistente', '2024-02-18 14:20:00');  
-  
--- Movimientos sin empleado asignado (casos especiales)  
-INSERT INTO movimiento (idInventario, tipoMovimiento, idEmpleado, observaciones, fechaMovimiento) VALUES  
-(1, 'Asignacion', NULL, 'Mesa de mezclas Yamaha asignada automáticamente al estudio de audio', '2024-02-22 08:00:00'),  
-(12, 'Mantenimiento', NULL, 'Monitor LG programado para calibración automática mensual', '2024-02-25 06:30:00');
-
--- Tabla: Mantenimiento
-INSERT INTO mantenimiento (
-  idInventario,
-  descripcionMantenimiento,
-  costoMantenimiento,
-  fechaInicio,
-  fechaFin,
-  idMovimiento,
-  nombreImagen
-) VALUES
-(1, 'Mantenimiento preventivo: limpieza interna y cambio de filtros.', 1500.00, '2025-07-01', '2025-07-03', NULL, 'filtros-limpieza.jpg'),
-(2, 'Reparación de fuente de poder dañada.', 3200.00, '2025-07-15', '2025-07-17', 5, 'fuente-pc-reparada.jpg'),
-(3, 'Actualización de firmware y revisión de conectores.', 0.00, '2025-07-25', NULL, NULL, NULL);
-
-
--- *****************************************************************************
+-- ***********************************************************************************************************************************************
 -- Modulo de Programacion - Publicidad
 -- Programas de Noticias  
 INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
@@ -677,6 +429,231 @@ INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, di
 (3, 1, 1, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
 (3, 1, 3, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
 (3, 18, 3, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes');
+
+
+-- ********************************************************************************
+-- Modulo de Facturacion  
+  
+-- Tabla: descuento  
+INSERT INTO descuento (Tipo, Estado, Porcentaje) VALUES   
+('Sin descuento', 'Activo', 0),  
+('Cliente Frecuente', 'Activo', 5),  
+('Contrato Anual', 'Activo', 10),  
+('Pago Anticipado', 'Activo', 8),  
+('Volumen Alto', 'Activo', 15);  
+  
+-- Tabla: formapago  
+INSERT INTO formapago (idFormaPago, Formapago, Estado, validacionRequerida, cuentaBancaria, nombreBeneficiario) VALUES   
+(1, 'Contado', 'A', false, NULL, 'Televisión Comayagua Canal 40'),  
+(2, 'Transferencia Bancaria', 'A', true, '1234567890', 'Televisión Comayagua Canal 40'),  
+(3, 'Cheque', 'A', true, '1234567890', 'Televisión Comayagua Canal 40'),  
+(4, 'Tarjeta de Crédito', 'A', false, NULL, 'Televisión Comayagua Canal 40');  
+  
+-- Tabla: cai (Código de Autorización de Impresión)  
+INSERT INTO cai (codigoCAI, numeroFacturaInicio, numeroFacturaFin, fechaEmision, fechaVencimiento, resolucionSAR, nombreEmpresa, rtnEmpresa, activo, facturasEmitidas, createdAt, updatedAt) VALUES   
+('254F8-612F1-8A0E0-6E8B3-0099B876', '000-001-01-00000001', '000-001-01-99999999', '2025-01-01', '2025-12-31', 'SAR No. 45145', 'Televisión Comayagua Canal 40', '12171961001526', true, 0, NOW(), NOW()),  
+('123A4-567B8-9C0D1-2E3F4-5678G901', '000-002-01-00000001', '000-002-01-99999999', '2024-01-01', '2024-12-31', 'SAR No. 44123', 'Televisión Comayagua Canal 40', '12171961001526', false, 1250, NOW(), NOW());  
+  
+ 
+  
+-- Tabla: Factura
+
+INSERT INTO factura (    
+  idFactura,    
+  Fecha,    
+  Total_Facturado,    
+  Tipo_documento,    
+  productoCliente,    
+  mencion,    
+  periodoInicio,    
+  periodoFin,    
+  tipoServicio,    
+  agencia,    
+  ordenNo,    
+  idOrdenPublicidad,  -- NUEVO CAMPO  
+  ordenCompraExenta,    
+  numeroRegistroSAG,    
+  constanciaExonerado,    
+  idCliente,    
+  idFormaPago,    
+  idEmpleado,    
+  archivo_pdf,    
+  estadoFactura    
+) VALUES (    
+  1,                                    -- idFactura    
+  '2025-01-15 10:30:00',               -- Fecha    
+  2500.00,                             -- Total_Facturado    
+  'Factura',                           -- Tipo_documento    
+  'Supermercados La Colonia',          -- productoCliente    
+  'Comercial',                         -- mencion    
+  '2025-01-01',                        -- periodoInicio    
+  '2025-01-31',                        -- periodoFin    
+  'spot',                              -- tipoServicio    
+  'MASS PUBLICIDAD',                   -- agencia    
+  '0001',                              -- ordenNo (ahora STRING)  
+  1,                                   -- idOrdenPublicidad (FK a orden_publicidad)  
+  'EX-2025-001',                       -- ordenCompraExenta    
+  'SAG-12345',                         -- numeroRegistroSAG    
+  'CONST-2025-001',                    -- constanciaExonerado    
+  1,                                   -- idCliente    
+  1,                                   -- idFormaPago    
+  1,                                   -- idEmpleado    
+  'factura_1.pdf',                     -- archivo_pdf    
+  'activa'                             -- estadoFactura    
+),  
+(    
+  2,                                   -- idFactura    
+  '2025-01-20 09:15:00',              -- Fecha    
+  4500.75,                            -- Total_Facturado    
+  'Factura',                          -- Tipo_documento    
+  'Banco Atlántida',                  -- productoCliente    
+  'Financiera',                       -- mencion    
+  '2025-02-01',                       -- periodoInicio    
+  '2025-02-28',                       -- periodoFin    
+  'contrato',                         -- tipoServicio    
+  'Publicidad Creativa S.A.',         -- agencia    
+  '0002',                             -- ordenNo (STRING)  
+  2,                                  -- idOrdenPublicidad (FK)  
+  NULL,                               -- ordenCompraExenta    
+  NULL,                               -- numeroRegistroSAG    
+  NULL,                               -- constanciaExonerado    
+  3,                                  -- idCliente    
+  2,                                  -- idFormaPago    
+  2,                                  -- idEmpleado    
+  'factura_2.pdf',                    -- archivo_pdf    
+  'activa'                            -- estadoFactura    
+),  
+(    
+  3,                                  -- idFactura    
+  '2025-01-15 14:45:00',             -- Fecha    
+  1800.50,                           -- Total_Facturado    
+  'Factura',                         -- Tipo_documento    
+  'Servicios Varios',                -- productoCliente    
+  'Comercial',                       -- mencion    
+  NULL,                              -- periodoInicio    
+  NULL,                              -- periodoFin    
+  'programa',                        -- tipoServicio    
+  NULL,                              -- agencia    
+  NULL,                              -- ordenNo (sin orden asociada)  
+  NULL,                              -- idOrdenPublicidad (sin orden)  
+  NULL,                              -- ordenCompraExenta    
+  NULL,                              -- numeroRegistroSAG    
+  NULL,                              -- constanciaExonerado    
+  2,                                 -- idCliente    
+  2,                                 -- idFormaPago    
+  1,                                 -- idEmpleado    
+  NULL,                              -- archivo_pdf    
+  'activa'                           -- estadoFactura    
+);
+
+ 
+-- Tabla: detalle_descuento  
+INSERT INTO detalle_descuento (idFactura, idDescuento, Monto) VALUES   
+(1, 2, 75.00),  -- Cliente frecuente 5%  
+(2, 3, 230.00), -- Contrato anual 10%  
+(3, 4, 120.00); -- Pago anticipado 8%  
+  
+-- Tabla: facturadetalle  
+INSERT INTO facturadetalle (idConsulta, Cantidad, idFactura, idProductoAtributo) VALUES   
+(1, '10', 1, 1), -- 10 spots de 30s  
+(1, '5', 1, 2),  -- 5 spots de 60s  
+(2, '1', 2, 3),  -- 1 programa matutino  
+(2, '1', 2, 4),  -- 1 programa nocturno  
+(3, '20', 3, 1), -- 20 spots de 30s  
+(3, '5', 3, 5);  -- 5 menciones en noticiero  
+
+-- *******************************************************************************************************************************************
+-- Modulo de INVentario
+
+-- Tabla: inventario
+INSERT INTO inventario (codigo, nombre, descripcion, cantidad, ubicacion, idEmpleado, idProveedor, valor, estado, observacion, marca, fechaCompra, fechaRegistro) VALUES  
+('CAM001', 'Cámara Sony PXW-X70', 'Cámara profesional para grabación de noticias y reportajes', 3, 'Estudio Principal', 2, 2, 85000.00, 'Disponible', 'Excelente estado, uso diario', 'Sony', '2023-01-15', '2023-01-16 09:30:00'),  
+  
+('CAM002', 'Cámara Canon XF405', 'Cámara 4K para producciones especiales y documentales', 2, 'Estudio Secundario', 2, 3, 95000.00, 'Disponible', 'Nueva adquisición 2023', 'Canon', '2023-03-20', '2023-03-21 10:15:00'),  
+  
+('MIC001', 'Micrófono Shure SM58', 'Micrófono dinámico para presentadores de noticias', 10, 'Estudio Principal', 1, 4, 3500.00, 'Disponible', 'Resistente y confiable', 'Shure', '2022-11-10', '2022-11-11 14:20:00'),  
+  
+('MIC002', 'Sistema Inalámbrico Sennheiser EW 100', 'Sistema completo para reporteros móviles', 5, 'Equipos Móviles', 1, 4, 12000.00, 'Disponible', 'Incluye receptor y transmisor', 'Sennheiser', '2023-02-05', '2023-02-06 11:45:00'),  
+  
+('LUZ001', 'Kit LED Aputure AL-M9', 'Panel LED compacto para iluminación de estudio', 4, 'Estudio Principal', 3, 1, 25000.00, 'Disponible', 'Luz fría y cálida ajustable', 'Aputure', '2023-04-12', '2023-04-13 16:00:00'),  
+  
+('LUZ002', 'Reflector Fresnel 2000W', 'Reflector profesional para exteriores y eventos', 6, 'Almacén de Equipos', 3, 1, 15000.00, 'Disponible', 'Para uso en exteriores', 'Arri', '2022-08-30', '2022-08-31 13:30:00'),  
+  
+('COMP001', 'Workstation Dell Precision 7760', 'Computadora para edición de video 4K', 4, 'Sala de Edición', 2, 1, 75000.00, 'Disponible', 'Intel i9, 32GB RAM, RTX 3080', 'Dell', '2023-05-18', '2023-05-19 08:45:00'),  
+  
+('COMP002', 'Servidor HP ProLiant DL380', 'Servidor para almacenamiento de contenido multimedia', 1, 'Cuarto de Servidores', 2, 1, 120000.00, 'Disponible', 'Almacenamiento 10TB RAID', 'HP', '2023-01-08', '2023-01-09 12:00:00'),  
+  
+('TRANS001', 'Transmisor Harris Flexstar', 'Transmisor principal FM de 5KW', 1, 'Torre de Transmisión', 1, 2, 450000.00, 'Asignado', 'Equipo crítico en operación', 'Harris', '2020-06-15', '2020-06-16 07:00:00'),  
+  
+('ANT001', 'Antena Dielectric TFU-25J', 'Antena de transmisión UHF banda IV-V', 1, 'Torre de Transmisión', 1, 2, 85000.00, 'Asignado', 'Instalada en torre principal', 'Dielectric', '2020-06-15', '2020-06-16 07:30:00'),  
+  
+('TRIP001', 'Trípode Manfrotto 546B', 'Trípode profesional de fibra de carbono', 8, 'Estudio Principal', 1, 1, 8500.00, 'Disponible', 'Ligero y resistente', 'Manfrotto', '2022-12-03', '2022-12-04 15:20:00'),  
+  
+('CABLE001', 'Cable HDMI 4K Belkin', 'Cable HDMI 2.1 de 10 metros', 20, 'Almacén de Cables', 3, 1, 1200.00, 'Disponible', 'Soporte 4K@120Hz', 'Belkin', '2023-06-01', '2023-06-02 09:15:00');
+  
+-- Equipos en mantenimiento  
+INSERT INTO inventario (codigo, nombre, descripcion, cantidad, ubicacion, idEmpleado, idProveedor, valor, estado, observacion, marca, fechaCompra, fechaRegistro) VALUES  
+('CAM003', 'Cámara Panasonic AG-CX350', 'Cámara con falla en sistema de zoom', 1, 'Taller de Reparación', 3, 3, 65000.00, 'En Mantenimiento', 'Requiere reparación de zoom', 'Panasonic', '2021-09-12', '2021-09-13 10:30:00'),  
+  
+('MIC003', 'Micrófono Audio-Technica AT2020', 'Micrófono condensador con ruido de fondo', 1, 'Taller de Reparación', 3, 4, 4500.00, 'En Mantenimiento', 'Posible problema en cápsula', 'Audio-Technica', '2022-04-18', '2022-04-19 14:45:00');  
+  
+-- Equipos dados de baja  
+INSERT INTO inventario (codigo, nombre, descripcion, cantidad, ubicacion, idEmpleado, idProveedor, valor, estado, observacion, marca, fechaCompra, fechaRegistro) VALUES  
+('COMP003', 'Computadora Dell Optiplex 7010', 'Equipo obsoleto para tareas básicas', 1, 'Bodega de Desechos', 2, 1, 35000.00, 'Baja', 'Obsoleto, reemplazado por nuevos equipos', 'Dell', '2015-03-10', '2015-03-11 11:00:00'),  
+  
+('CAM004', 'Cámara Sony HDR-FX1000', 'Cámara dañada por caída accidental', 1, 'Bodega de Desechos', 2, 2, 45000.00, 'Baja', 'Daño irreparable en lente y sensor', 'Sony', '2018-07-22', '2018-07-23 16:30:00');
+
+  
+-- Tabla: Movimientos
+
+-- Movimientos de Asignación  
+INSERT INTO movimiento (idInventario, tipoMovimiento, idEmpleado, observaciones, fechaMovimiento) VALUES  
+(1, 'Asignacion', 1, 'Cámara asignada para cobertura de eventos municipales de enero', '2024-01-15 09:00:00'),  
+(2, 'Asignacion', 2, 'Cámara Canon asignada para grabación de documentales especiales', '2024-01-20 10:30:00'),  
+(7, 'Asignacion', 2, 'Workstation asignada para nueva sala de edición principal', '2024-02-05 08:15:00'),  
+(11, 'Asignacion', 1, 'Trípodes asignados para equipo móvil de noticias', '2024-02-10 14:45:00'),  
+(5, 'Asignacion', 3, 'Kit de iluminación LED para set de noticias matutinas', '2024-01-25 16:20:00');  
+  
+-- Movimientos de Mantenimiento  
+INSERT INTO movimiento (idInventario, tipoMovimiento, idEmpleado, observaciones, fechaMovimiento) VALUES  
+(3, 'Mantenimiento', 3, 'Revisión preventiva mensual de micrófonos Shure - limpieza y calibración', '2024-02-01 14:30:00'),  
+(9, 'Mantenimiento', 3, 'Mantenimiento crítico del transmisor - calibración y ajuste de potencia RF', '2024-01-10 16:00:00'),  
+(13, 'Mantenimiento', 3, 'Cámara Panasonic requiere reparación del sistema de zoom automático', '2024-02-15 11:20:00'),  
+(6, 'Mantenimiento', 3, 'Mantenimiento preventivo de reflectores - reemplazo de lámparas', '2024-01-30 13:45:00'),  
+(8, 'Mantenimiento', 2, 'Actualización de firmware y limpieza interna del servidor HP', '2024-02-08 09:30:00');  
+  
+-- Movimientos de Baja  
+INSERT INTO movimiento (idInventario, tipoMovimiento, idEmpleado, observaciones, fechaMovimiento) VALUES  
+(15, 'Baja', 2, 'Computadora Dell Optiplex declarada obsoleta - reemplazada por equipos más modernos', '2024-01-05 10:00:00'),  
+(16, 'Baja', 2, 'Cámara Sony HDR-FX1000 dada de baja por daños irreparables tras caída accidental', '2024-01-12 15:30:00');  
+  
+-- Movimientos adicionales para historial completo  
+INSERT INTO movimiento (idInventario, tipoMovimiento, idEmpleado, observaciones, fechaMovimiento) VALUES  
+(4, 'Asignacion', 1, 'Sistema inalámbrico Sennheiser para reporteros en campo', '2024-02-12 07:45:00'),  
+(10, 'Mantenimiento', 3, 'Revisión anual de antena UHF - inspección de conectores y cables', '2024-01-18 12:15:00'),  
+(12, 'Asignacion', 3, 'Cables HDMI 4K asignados para nueva configuración de estudios', '2024-02-20 11:00:00'),  
+(14, 'Mantenimiento', 3, 'Micrófono Audio-Technica en reparación por ruido de fondo persistente', '2024-02-18 14:20:00');  
+  
+-- Movimientos sin empleado asignado (casos especiales)  
+INSERT INTO movimiento (idInventario, tipoMovimiento, idEmpleado, observaciones, fechaMovimiento) VALUES  
+(1, 'Asignacion', NULL, 'Mesa de mezclas Yamaha asignada automáticamente al estudio de audio', '2024-02-22 08:00:00'),  
+(12, 'Mantenimiento', NULL, 'Monitor LG programado para calibración automática mensual', '2024-02-25 06:30:00');
+
+-- Tabla: Mantenimiento
+INSERT INTO mantenimiento (
+  idInventario,
+  descripcionMantenimiento,
+  costoMantenimiento,
+  fechaInicio,
+  fechaFin,
+  idMovimiento,
+  nombreImagen
+) VALUES
+(1, 'Mantenimiento preventivo: limpieza interna y cambio de filtros.', 1500.00, '2025-07-01', '2025-07-03', NULL, 'filtros-limpieza.jpg'),
+(2, 'Reparación de fuente de poder dañada.', 3200.00, '2025-07-15', '2025-07-17', 5, 'fuente-pc-reparada.jpg'),
+(3, 'Actualización de firmware y revisión de conectores.', 0.00, '2025-07-25', NULL, NULL, NULL);
+
+
 
 
 -- ============================================  
