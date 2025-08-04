@@ -3,7 +3,8 @@ const { DataTypes } = require('sequelize');
 const db = require('../../configuraciones/db');  
 const Cliente = require('../gestion_cliente/Cliente');  
 const Empleado = require('../gestion_cliente/Empleado');  
-  
+const Factura = require('../facturacion/Factura');    
+
 const OrdenPublicidad = db.define('OrdenPublicidad', {  
   idOrden: {  
     type: DataTypes.INTEGER,  
@@ -85,5 +86,10 @@ OrdenPublicidad.belongsTo(Empleado, { foreignKey: 'idEmpleado' });
 Cliente.hasMany(OrdenPublicidad, { foreignKey: 'idCliente', sourceKey: 'idCliente' });  
 Empleado.hasMany(OrdenPublicidad, { foreignKey: 'idEmpleado', sourceKey: 'idEmpleado' }); 
 
-  
+// Relación: Una orden puede tener múltiples facturas  
+OrdenPublicidad.hasMany(Factura, {   
+  foreignKey: 'idOrdenPublicidad',  
+  as: 'facturas'  
+});  
+
 module.exports = OrdenPublicidad;

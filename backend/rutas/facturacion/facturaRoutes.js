@@ -8,7 +8,7 @@ const { verificarUsuario } = require('../../configuraciones/passport');
 
 const { body, param, validationResult, query } = require('express-validator');
 
-
+router.get('/siguiente-numero', verificarUsuario, facturaController.obtenerSiguienteNumeroFactura);
 /**
  * @swagger
  * tags:

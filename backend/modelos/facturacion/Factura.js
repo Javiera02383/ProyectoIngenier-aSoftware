@@ -3,7 +3,8 @@ const db = require('../../configuraciones/db');
 const Cliente = require("../../modelos/gestion_cliente/Cliente")
 const Empleado = require("../../modelos/gestion_cliente/Empleado")
 const FormaPago = require('../../modelos/facturacion/FormaPago');
-
+const OrdenPublicidad = require('../programacion/OrdenPublicidad');  
+ 
 const Factura = db.define('Factura', {
   idFactura: {
     type: DataTypes.INTEGER,
@@ -48,9 +49,18 @@ const Factura = db.define('Factura', {
     type: DataTypes.STRING(100),  
     allowNull: true  
   },
+  idOrdenPublicidad: {  
+    type: DataTypes.INTEGER,  
+    allowNull: true, // Opcional porque no todas las facturas son de publicidad  
+    references: {  
+      model: 'orden_publicidad',  
+      key: 'idOrden'  
+    }  
+  },  
+  // Mantener ordenNo para compatibilidad si es necesario  
   ordenNo: {  
-    type: DataTypes.INTEGER, 
-    allowNull: true
+    type: DataTypes.STRING(20), // Cambiar a STRING para almacenar numeroOrden  
+    allowNull: true  
   },
   ordenCompraExenta: {  
     type: DataTypes.STRING(50),  
@@ -95,7 +105,10 @@ const Factura = db.define('Factura', {
 Factura.belongsTo(Cliente, { foreignKey: 'idCliente' });
 Factura.belongsTo(FormaPago, { foreignKey: 'idFormaPago' });
 Factura.belongsTo(Empleado, { foreignKey: 'idEmpleado' });
-
+Factura.belongsTo(OrdenPublicidad, {   
+  foreignKey: 'idOrdenPublicidad',  
+  as: 'ordenPublicidad'  
+});  
 
 Cliente.hasMany(Factura, { foreignKey: 'idCliente', sourceKey: 'idCliente'});
 FormaPago.hasMany(Factura, { foreignKey: 'idFormaPago', sourceKey: 'idFormaPago'  });

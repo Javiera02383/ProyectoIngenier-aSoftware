@@ -13,18 +13,19 @@ const Empleados = () => {
   const navigate = useNavigate();
   const { toast, showSuccess, showError, hideToast } = useToast();
 
-  useEffect(() => {
-    const fetchEmpleados = async () => {
-      try {
-        const data = await empleadoService.obtenerEmpleados();
-        setEmpleados(data);
-      } catch (error) {
-        showError('Error al cargar los empleados');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEmpleados();
+  useEffect(() => {  
+    const fetchEmpleados = async () => {  
+      try {  
+        // Cambiar de obtenerEmpleados() a obtenerTodosLosEmpleados()  
+        const data = await empleadoService.obtenerTodosLosEmpleados();  
+        setEmpleados(data);  
+      } catch (error) {  
+        showError('Error al cargar los empleados');  
+      } finally {  
+        setLoading(false);  
+      }  
+    };  
+    fetchEmpleados();  
   }, [showError]);
 
   const toggleDropdown = (id) => {

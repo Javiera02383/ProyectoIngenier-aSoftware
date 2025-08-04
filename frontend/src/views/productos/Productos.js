@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Card, CardHeader, CardBody, Container, Row, Col, Table, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import { productoService } from '../../services/productos/productoService';
 import { useToast } from '../../hooks/useToast';
-import Header from 'components/Headers/Header.js';
+import HeaderBlanco from 'components/Headers/HeaderBlanco';
 import Toast from 'components/Toast/Toast';
 
 const Productos = () => {
@@ -49,7 +49,7 @@ const Productos = () => {
 
   return (
     <>
-      <Header />
+      <HeaderBlanco />
       <Container className="mt--7" fluid>
         <Toast show={toast.show} message={toast.message} type={toast.type} onClose={hideToast} />
         <Row>
@@ -58,11 +58,11 @@ const Productos = () => {
               <CardHeader className="border-0">
                 <Row className="align-items-center">
                   <Col xs="8">
-                    <h3 className="mb-0">Gestión de Productos</h3>
+                    <h3 className="mb-0">Gestión de Servicios</h3>
                   </Col>
                   <Col className="text-right" xs="4">
                     <Button color="primary" onClick={() => navigate('/admin/productos/nuevo')}>
-                      Nuevo Producto
+                      Nuevo Servicio
                     </Button>
                   </Col>
                 </Row>
@@ -74,9 +74,8 @@ const Productos = () => {
                       <th scope="col">ID</th>
                       <th scope="col">Nombre</th>
                       <th scope="col">Categoría</th>
-                      <th scope="col">Marca</th>
                       <th scope="col">Precio Venta</th>
-                      <th scope="col">Stock</th>
+                      
                       <th scope="col">Acciones</th>
                     </tr>
                   </thead>
@@ -86,9 +85,9 @@ const Productos = () => {
                         <td>{producto.idProducto}</td>
                         <td>{producto.Nombre}</td>
                         <td>{producto.CategoriaProducto?.Nombre || 'N/A'}</td>
-                        <td>{producto.marca}</td>
+                        
                         <td>{producto.precioVenta}</td>
-                        <td>{producto.stockInicial}</td>
+                        
                         <td>
                           <Dropdown isOpen={dropdownOpen[producto.idProducto]} toggle={() => toggleDropdown(producto.idProducto)}>
                             <DropdownToggle>

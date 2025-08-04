@@ -65,6 +65,21 @@ exports.manejarErrores = (req, res, next) => {
   next();
 };
 
+exports.obtenerSiguienteNumeroFactura = async (req, res) => {  
+  try {  
+    const ultimaFactura = await Factura.findOne({  
+      order: [['idFactura', 'DESC']],  
+      attributes: ['idFactura']  
+    });  
+      
+    const siguienteNumero = ultimaFactura ? ultimaFactura.idFactura + 1 : 1;  
+      
+    res.json({ siguienteNumero });  
+  } catch (error) {  
+    console.error(error);  
+    res.status(500).json({ mensaje: 'Error al obtener siguiente número de factura', error: error.message });  
+  }  
+};
 
 
 // Crear una factura simple
@@ -100,13 +115,20 @@ exports.crearFactura = async (req, res) => {
 exports.obtenerFacturas = async (req, res) => {
   try {
     const facturas = await Factura.findAll({  
-      include: [{  
-        model: Cliente,  
-        include: [{  
-          model: Persona,  
-          as: 'persona'  
-        }]  
-      }]  
+        include: [  
+      {    
+        model: Cliente,    
+        include: [{    
+          model: Persona,    
+          as: 'persona'    
+        }]    
+      },  
+      {  
+        model: OrdenPublicidad,  
+        as: 'ordenPublicidad',  
+        attributes: ['numeroOrden', 'producto', 'estado']  
+      }  
+    ]    
     }); 
      
     res.json({ facturas });

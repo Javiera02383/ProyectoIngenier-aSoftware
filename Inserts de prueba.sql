@@ -79,7 +79,7 @@ INSERT INTO descuento (Tipo, Estado, Porcentaje) VALUES
   
 -- Tabla: formapago  
 INSERT INTO formapago (idFormaPago, Formapago, Estado, validacionRequerida, cuentaBancaria, nombreBeneficiario) VALUES   
-(1, 'Efectivo', 'A', false, NULL, 'Televisión Comayagua Canal 40'),  
+(1, 'Contado', 'A', false, NULL, 'Televisión Comayagua Canal 40'),  
 (2, 'Transferencia Bancaria', 'A', true, '1234567890', 'Televisión Comayagua Canal 40'),  
 (3, 'Cheque', 'A', true, '1234567890', 'Televisión Comayagua Canal 40'),  
 (4, 'Tarjeta de Crédito', 'A', false, NULL, 'Televisión Comayagua Canal 40');  

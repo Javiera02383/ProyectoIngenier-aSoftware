@@ -14,7 +14,7 @@ import {
   Spinner,  
 } from "reactstrap";    
 import HeaderResponsive from "components/Headers/HeaderResponsive";    
-import { caiService } from "../../services/facturacion/facturaService";    
+import { caiService } from "../../services/facturacion/caiService";    
   
 const CAI = () => {    
   const [caiData, setCaiData] = useState({    
