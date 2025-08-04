@@ -105,11 +105,6 @@ INSERT INTO proveedor (idPersona, codigoProveedor, tipoProveedor, estado, fechaR
 (10, 'PROV004', 'Internacional', 'Activo', NOW());
   
 -- Tabla: cliente  
-INSERT INTO cliente (fechaRegistro, idPersona) VALUES   
-(NOW(), 4),  
-(NOW(), 5),  
-(NOW(), 6);  
-
 -- Clientes para Modulo de Anuncio
 INSERT INTO cliente (fechaRegistro, idPersona) VALUES    
 (NOW(), 11),    
@@ -268,63 +263,59 @@ INSERT INTO bloque_publicitario (idPrograma, horaBloque, ordenBloque, duracionTo
 (9, '15:45:00', 9, 120, '2024-03-01', 'Activo');
 
 -- **************************************************************************************
-
--- Anuncios para los nuevos bloques usando clientes 11-26
-
--- Bloque 1 (NOTICIAS 60 MINUTOS - 7:10)
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
-(1, 11, 1, 60, 'EMPRESA_11', 'Programado'),
-(1, 12, 2, 60, 'EMPRESA_12', 'Programado'),
-(1, 13, 3, 60, 'EMPRESA_13', 'Programado'),
-(1, 14, 4, 60, 'EMPRESA_14', 'Programado');
-
--- Bloque 2 (NOTICIAS 60 MINUTOS - 7:40)
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
-(2, 15, 1, 60, 'EMPRESA_15', 'Programado'),
-(2, 16, 2, 60, 'EMPRESA_16', 'Programado'),
-(2, 17, 3, 60, 'EMPRESA_17', 'Programado'),
-(2, 18, 4, 60, 'EMPRESA_18', 'Programado'),
-(2, 19, 5, 60, 'EMPRESA_19', 'Programado');
-
--- Bloque 3 (NOTICIAS 60 MINUTOS - 8:05)
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
-(3, 17, 1, 60, 'EMPRESA_20', 'Programado'),
-(3, 18, 2, 60, 'EMPRESA_21', 'Programado'),
-(3, 2, 3, 60, 'EMPRESA_22', 'Programado');
-
--- Bloque 4 (NOTICIAS 60 MINUTOS - 8:25)
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
-(4, 3, 1, 60, 'EMPRESA_23', 'Programado'),
-(4, 4, 2, 60, 'EMPRESA_24', 'Programado'),
-(4, 5, 3, 60, 'EMPRESA_25', 'Programado'),
-(4, 6, 4, 60, 'EMPRESA_26', 'Programado');
-
--- Bloques para PELÍCULA MATUTINA usando clientes 11-26 (distribución rotativa)
-
--- Bloque 5 (PELÍCULA MATUTINA - 9:15)
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
-(5, 11, 1, 60, 'EMPRESA_11', 'Programado'),
-(5, 15, 2, 60, 'EMPRESA_15', 'Programado'),
-(5, 15, 3, 60, 'EMPRESA_19', 'Programado');
-
--- Bloque 6 (PELÍCULA MATUTINA - 9:45)
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
-(6, 12, 1, 60, 'EMPRESA_12', 'Programado'),
-(6, 11, 2, 60, 'EMPRESA_16', 'Programado'),
-(6, 4, 3, 60, 'EMPRESA_20', 'Programado'),
-(6, 8, 4, 60, 'EMPRESA_24', 'Programado');
-
--- Bloque 7 (PELÍCULA MATUTINA - 10:15)
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
-(7, 13, 1, 60, 'EMPRESA_13', 'Programado'),
-(7, 13, 2, 60, 'EMPRESA_17', 'Programado'),
-(7, 9, 3, 60, 'EMPRESA_21', 'Programado');
-
--- Bloque 8 (PELÍCULA MATUTINA - 10:45)
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES
-(8, 14, 1, 60, 'EMPRESA_14', 'Programado'),
-(8, 12, 2, 60, 'EMPRESA_18', 'Programado'),
-(8, 2, 3, 60, 'EMPRESA_22', 'Programado');
+-- Bloque 1 (NOTICIAS 60 MINUTOS - 7:10)  
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
+(1, 4, 1, 60, 'EMPRESA_4', 'Programado'),  
+(1, 5, 2, 60, 'EMPRESA_5', 'Programado'),  
+(1, 6, 3, 60, 'EMPRESA_6', 'Programado'),  
+(1, 7, 4, 60, 'EMPRESA_7', 'Programado');  
+  
+-- Bloque 2 (NOTICIAS 60 MINUTOS - 7:40)  
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
+(2, 8, 1, 60, 'EMPRESA_8', 'Programado'),  
+(2, 9, 2, 60, 'EMPRESA_9', 'Programado'),  
+(2, 10, 3, 60, 'EMPRESA_10', 'Programado'),  
+(2, 11, 4, 60, 'EMPRESA_11', 'Programado'),  
+(2, 12, 5, 60, 'EMPRESA_12', 'Programado');  
+  
+-- Bloque 3 (NOTICIAS 60 MINUTOS - 8:05)  
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
+(3, 13, 1, 60, 'EMPRESA_13', 'Programado'),  
+(3, 14, 2, 60, 'EMPRESA_14', 'Programado'),  
+(3, 15, 3, 60, 'EMPRESA_15', 'Programado');  
+  
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
+(4, 4, 1, 60, 'EMPRESA_4_B', 'Programado'),  
+(4, 5, 2, 60, 'EMPRESA_5_B', 'Programado'),  
+(4, 6, 3, 60, 'EMPRESA_6_B', 'Programado'),  
+(4, 7, 4, 60, 'EMPRESA_7_B', 'Programado');
+  
+-- Bloques para PELÍCULA MATUTINA usando clientes 4-19 (distribución rotativa)  
+  
+-- Bloque 5 (PELÍCULA MATUTINA - 9:15)  
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
+(5, 4, 1, 60, 'EMPRESA_4', 'Programado'),  
+(5, 5, 2, 60, 'EMPRESA_5', 'Programado'),  
+(5, 6, 3, 60, 'EMPRESA_6', 'Programado');  
+  
+-- Bloque 6 (PELÍCULA MATUTINA - 9:45)  
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
+(6, 7, 1, 60, 'EMPRESA_7', 'Programado'),  
+(6, 8, 2, 60, 'EMPRESA_8', 'Programado'),  
+(6, 9, 3, 60, 'EMPRESA_9', 'Programado'),  
+(6, 10, 4, 60, 'EMPRESA_10', 'Programado');  
+  
+-- Bloque 7 (PELÍCULA MATUTINA - 10:15)  
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
+(7, 11, 1, 60, 'EMPRESA_11', 'Programado'),  
+(7, 12, 2, 60, 'EMPRESA_12', 'Programado'),  
+(7, 13, 3, 60, 'EMPRESA_13', 'Programado');  
+  
+-- Bloque 8 (PELÍCULA MATUTINA - 10:45)  
+INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
+(8, 14, 1, 60, 'EMPRESA_14', 'Programado'),  
+(8, 15, 2, 60, 'EMPRESA_15', 'Programado'),  
+(8, 16, 3, 60, 'EMPRESA_16', 'Programado');
 
 -- ***************************************************************************************************
 

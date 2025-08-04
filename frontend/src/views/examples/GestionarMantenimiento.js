@@ -45,17 +45,35 @@ const GestionarMantenimiento = () => {
     cargarInventarios();  
   }, []);  
   
-  const cargarMantenimientos = async () => {  
+  const cargarMantenimientos = async (aplicarFiltros = false) => {  
     try {  
       setLoading(true);  
-      const data = await mantenimientoService.obtenerMantenimientos(filtros);  
-      setMantenimientos(data);  
+        
+      let filtrosAUsar = {};  
+        
+      // Solo aplicar filtros si se solicita explícitamente  
+      if (aplicarFiltros) {  
+        Object.entries(filtros).forEach(([key, value]) => {  
+          if (value && value !== '') {  
+            filtrosAUsar[key] = value;  
+          }  
+        });  
+      }  
+        
+      console.log('Cargando mantenimientos con filtros:', filtrosAUsar);  
+        
+      const data = await mantenimientoService.obtenerMantenimientos(filtrosAUsar);  
+      console.log('Datos recibidos:', data);  
+        
+      setMantenimientos(Array.isArray(data) ? data : []);  
     } catch (error) {  
-      showError('Error al cargar mantenimientos');  
+      console.error('Error detallado:', error);  
+      showError('Error al cargar mantenimientos: ' + (error.message || 'Error desconocido'));  
+      setMantenimientos([]);  
     } finally {  
       setLoading(false);  
     }  
-  };  
+  };
   
   const cargarInventarios = async () => {  
     try {  
@@ -128,8 +146,8 @@ const GestionarMantenimiento = () => {
   };  
   
   const aplicarFiltros = () => {  
-    cargarMantenimientos();  
-  };  
+  cargarMantenimientos(true); // Pasar true para aplicar filtros  
+};  
   
   const limpiarFiltros = () => {  
     setFiltros({  
@@ -139,8 +157,9 @@ const GestionarMantenimiento = () => {
       costoMin: '',  
       costoMax: ''  
     });  
-    // Recargar datos con filtros vacíos  
-    setTimeout(() => cargarMantenimientos(), 0);  
+      
+    // Cargar todos los mantenimientos sin filtros  
+    cargarMantenimientos(false);  
   };  
   
   return (  

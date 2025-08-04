@@ -45,7 +45,7 @@ router.post('/mantenimiento',
 );  
   
 // Obtener todos los mantenimientos con filtros  
-router.get('/mantenimiento',  
+router.get('/mantenimientos',  
   verificarUsuario,  
   [  
     query('idInventario').optional().isInt({ min: 1 }).withMessage('El idInventario debe ser un número entero positivo'),  

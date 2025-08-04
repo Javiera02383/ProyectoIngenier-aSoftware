@@ -62,8 +62,8 @@ const Contratos = () => {
     try {  
       setLoadingData(true);  
       const [clientesRes, empleadosRes] = await Promise.all([  
-        clienteService.obtenerClientes(),  
-        empleadoService.obtenerEmpleados()  
+        clienteService.obtenerTodosLosClientes(),  
+        empleadoService.obtenerTodosLosEmpleados()  
       ]);  
   
       setClientes(clientesRes.data || clientesRes || []);  
@@ -71,11 +71,7 @@ const Contratos = () => {
         
       await cargarOrdenes();  
     } catch (error) {  
-      console.error('Error cargando datos:', error);  
-      setMensaje({  
-        tipo: 'danger',  
-        texto: 'Error al cargar datos de referencia. Verifique su conexión.'  
-      });  
+      console.error('Error cargando datos:', error);   
     } finally {  
       setLoadingData(false);  
     }  

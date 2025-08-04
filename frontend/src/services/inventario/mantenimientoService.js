@@ -3,33 +3,38 @@ import axiosInstance from '../../utils/axiosConfig';
 export const mantenimientoService = {  
   obtenerMantenimientos: async (filtros = {}) => {  
     const params = new URLSearchParams();  
-    if (filtros.idInventario) params.append('idInventario', filtros.idInventario);  
-    if (filtros.fechaInicio) params.append('fechaInicio', filtros.fechaInicio);  
-    if (filtros.fechaFin) params.append('fechaFin', filtros.fechaFin);  
-    if (filtros.costoMin) params.append('costoMin', filtros.costoMin);  
-    if (filtros.costoMax) params.append('costoMax', filtros.costoMax);  
+      
+    // Solo agregar parámetros que tengan valor  
+    Object.entries(filtros).forEach(([key, value]) => {  
+      if (value && value !== '') {  
+        params.append(key, value);  
+      }  
+    });  
   
-    const response = await axiosInstance.get(`/mantenimiento?${params.toString()}`);  
+    const queryString = params.toString();  
+    const url = queryString ? `/inventario/mantenimientos?${queryString}` : '/inventario/mantenimientos';  
+      
+    const response = await axiosInstance.get(url);  
     return response.data;  
   },  
   
   obtenerMantenimientoPorId: async (id) => {  
-    const response = await axiosInstance.get(`/mantenimiento/${id}`);  
+    const response = await axiosInstance.get(`/inventario/mantenimiento/${id}`);  
     return response.data;  
   },  
   
   crearMantenimiento: async (mantenimientoData) => {  
-    const response = await axiosInstance.post('/mantenimiento', mantenimientoData);  
+    const response = await axiosInstance.post('/inventario/mantenimiento', mantenimientoData);  
     return response.data;  
   },  
   
   editarMantenimiento: async (id, mantenimientoData) => {  
-    const response = await axiosInstance.put(`/mantenimiento/${id}`, mantenimientoData);  
+    const response = await axiosInstance.put(`/inventario/mantenimiento/${id}`, mantenimientoData);  
     return response.data;  
   },  
   
   eliminarMantenimiento: async (id) => {  
-    const response = await axiosInstance.delete(`/mantenimiento/${id}`);  
+    const response = await axiosInstance.delete(`/inventario/mantenimiento/${id}`);  
     return response.data;  
   }  
 };
