@@ -96,6 +96,30 @@ const crearMantenimiento = [
   }  
 ];  
   
+// Obtener todos los mantenimientos sin filtros  
+const obtenerMantenimientoTodos = async (req, res) => {  
+  try {  
+    const mantenimientos = await Mantenimiento.findAll({  
+      include: [  
+        {  
+          model: InventarioModel,  
+          attributes: ['codigo', 'nombre', 'estado']  
+        },  
+        {  
+          model: Movimiento,  
+          attributes: ['tipoMovimiento', 'fechaMovimiento']  
+        }  
+      ],  
+      order: [['fechaInicio', 'DESC']]  
+      
+    });  
+    
+    res.json(mantenimientos);  
+  } catch (error) {  
+    res.status(500).json({ mensaje: 'Error al obtener todos los mantenimientos', error: error.message });  
+  }  
+};
+
 // Obtener todos los mantenimientos con filtros  
 const obtenerMantenimientos = async (req, res) => {  
   try {  
@@ -105,24 +129,35 @@ const obtenerMantenimientos = async (req, res) => {
     if (idInventario) whereMantenimiento.idInventario = idInventario;  
       
     if (fechaInicio && fechaFin) {  
-      whereMantenimiento.fechaInicio = {  
-        [Op.between]: [new Date(fechaInicio), new Date(fechaFin)]  
-      };  
-    } else if (fechaInicio) {  
-      whereMantenimiento.fechaInicio = {  
-        [Op.gte]: new Date(fechaInicio)  
-      };  
-    } else if (fechaFin) {  
-      whereMantenimiento.fechaInicio = {  
-        [Op.lte]: new Date(fechaFin)  
-      };  
-    }  
-  
-    if (costoMin || costoMax) {  
-      whereMantenimiento.costoMantenimiento = {};  
-      if (costoMin) whereMantenimiento.costoMantenimiento[Op.gte] = costoMin;  
-      if (costoMax) whereMantenimiento.costoMantenimiento[Op.lte] = costoMax;  
-    }  
+    // Mantenimientos que se superponen con el rango especificado  
+    whereMantenimiento[Op.or] = [  
+      {  
+        fechaInicio: {  
+          [Op.between]: [new Date(fechaInicio), new Date(fechaFin)]  
+        }  
+      },  
+      {  
+        fechaFin: {  
+          [Op.between]: [new Date(fechaInicio), new Date(fechaFin)]  
+        }  
+      },  
+      {  
+        [Op.and]: [  
+          { fechaInicio: { [Op.lte]: new Date(fechaInicio) } },  
+          { fechaFin: { [Op.gte]: new Date(fechaFin) } }  
+        ]  
+      }  
+    ];  
+  } else if (fechaInicio) {  
+    whereMantenimiento[Op.or] = [  
+      { fechaInicio: { [Op.gte]: new Date(fechaInicio) } },  
+      { fechaFin: { [Op.gte]: new Date(fechaInicio) } }  
+    ];  
+  } else if (fechaFin) {  
+    whereMantenimiento.fechaInicio = {  
+      [Op.lte]: new Date(fechaFin)  
+    };  
+  }  
   
     const mantenimientos = await Mantenimiento.findAll({  
       where: Object.keys(whereMantenimiento).length ? whereMantenimiento : undefined,  
@@ -253,6 +288,7 @@ const eliminarMantenimiento = async (req, res) => {
 module.exports = {  
   crearMantenimiento,  
   obtenerMantenimientos,  
+  obtenerMantenimientoTodos,
   obtenerMantenimientoPorId,  
   obtenerHistorialPorActivo,  
   editarMantenimiento,  
