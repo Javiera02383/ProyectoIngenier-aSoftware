@@ -41,7 +41,7 @@ const GestionarMantenimiento = () => {
     costoMax: ''    
   });    
     
-  // Cargar todos los datos una sola vez  
+  // Cargar todos los datos una sola vezz  
   useEffect(() => {  
     cargarTodosLosDatos();  
   }, []);  
