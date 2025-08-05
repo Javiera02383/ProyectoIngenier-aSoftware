@@ -15,7 +15,7 @@ GRANT ALL PRIVILEGES ON proyecto.* TO 'sistemas'@'localhost';
 -- Aplicar los cambios
 FLUSH PRIVILEGES;
 
--- Ver usuarios y sus privilegios sobre la base de datos tareaclientes
+-- Ver usuarios y sus privilegios sobre la base de datos tareaclientest
 SELECT user, host, db, select_priv, insert_priv, update_priv, delete_priv
 FROM mysql.db
 WHERE db = 'proyecto' AND user = 'sistemas';
