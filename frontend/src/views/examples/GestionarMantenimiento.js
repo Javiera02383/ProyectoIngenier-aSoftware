@@ -10,7 +10,8 @@ import { mantenimientoService } from '../../services/inventario/mantenimientoSer
 import { inventarioService } from '../../services/inventario/inventarioService';    
 import { useToast } from '../../hooks/useToast';    
 import HeaderBlanco from 'components/Headers/HeaderBlanco';    
-import Toast from 'components/Toast/Toast';    
+import Toast from 'components/Toast/Toast';  
+import { Alert } from 'reactstrap';  
     
 const GestionarMantenimiento = () => {    
   const [todosLosMantenimientos, setTodosLosMantenimientos] = useState([]);    
@@ -21,7 +22,7 @@ const GestionarMantenimiento = () => {
   const [dropdownOpen, setDropdownOpen] = useState({});    
   const navigate = useNavigate();    
   const { toast, showSuccess, showError, hideToast } = useToast();    
-      
+  const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });  
   const [mantenimientoActual, setMantenimientoActual] = useState({    
     idInventario: '',    
     descripcionMantenimiento: '',    
@@ -111,29 +112,60 @@ const GestionarMantenimiento = () => {
     setDropdownOpen(prevState => ({ ...prevState, [id]: !prevState[id] }));    
   };    
     
-  const handleSubmit = async (e) => {    
-    e.preventDefault();    
-    try {    
-      setLoading(true);    
-    
-      if (editando) {    
-        await mantenimientoService.editarMantenimiento(mantenimientoActual.idMantenimiento, mantenimientoActual);    
-        showSuccess('Mantenimiento actualizado exitosamente');    
-      } else {    
-        await mantenimientoService.crearMantenimiento(mantenimientoActual);    
-        showSuccess('Mantenimiento creado exitosamente');    
-      }    
-        
-      setModal(false);    
-      resetForm();  
-      // Recargar todos los datos  
+  const handleSubmit = async (e) => {  
+  e.preventDefault();  
+  setLoading(true);  
+  setMensaje({ tipo: '', texto: '' });  
+  
+  try {  
+    // Preparar datos con conversiones correctas  
+    const datosMantenimiento = {  
+      idInventario: parseInt(mantenimientoActual.idInventario),  
+      descripcionMantenimiento: mantenimientoActual.descripcionMantenimiento.trim(),  
+      fechaInicio: mantenimientoActual.fechaInicio  
+    };  
+  
+    // Solo agregar campos opcionales si tienen valor  
+    if (mantenimientoActual.fechaFin && mantenimientoActual.fechaFin.trim() !== '') {  
+      datosMantenimiento.fechaFin = mantenimientoActual.fechaFin;  
+    }  
+  
+    if (mantenimientoActual.costoMantenimiento && mantenimientoActual.costoMantenimiento !== '') {  
+      datosMantenimiento.costoMantenimiento = parseFloat(mantenimientoActual.costoMantenimiento);  
+    }  
+  
+    if (mantenimientoActual.nombreImagen && mantenimientoActual.nombreImagen.trim() !== '') {  
+      datosMantenimiento.nombreImagen = mantenimientoActual.nombreImagen.trim();  
+    }  
+  
+    console.log('Datos a enviar:', datosMantenimiento); // Para debug  
+  
+    if (editando) {  
+      await mantenimientoService.editarMantenimiento(mantenimientoActual.idMantenimiento, datosMantenimiento);  
+    } else {  
+      await mantenimientoService.crearMantenimiento(datosMantenimiento);  
+    }  
+  
+    setMensaje({  
+      tipo: 'success',  
+      texto: editando ? 'Mantenimiento actualizado exitosamente' : 'Mantenimiento creado exitosamente'  
+    });  
+  
+    setTimeout(() => {  
+      setModal(false);  
       cargarTodosLosDatos();  
-    } catch (error) {    
-      showError('Error al guardar mantenimiento');    
-    } finally {    
-      setLoading(false);    
-    }    
-  };    
+    }, 1500);  
+  
+  } catch (error) {  
+    console.error('Error completo:', error.response?.data || error);  
+    setMensaje({  
+      tipo: 'danger',  
+      texto: error.response?.data?.mensaje || error.response?.data?.errores?.[0]?.msg || 'Error al guardar el mantenimiento'  
+    });  
+  } finally {  
+    setLoading(false);  
+  }  
+};
     
   const handleEliminar = async (id) => {    
     if (window.confirm('¿Está seguro de eliminar este mantenimiento?')) {    
@@ -350,102 +382,109 @@ const GestionarMantenimiento = () => {
           </Col>    
         </Row>    
     
-        {/* Modal para crear/editar mantenimiento */}    
-        <Modal isOpen={modal} toggle={() => setModal(!modal)} size="lg">    
-          <ModalHeader toggle={() => setModal(!modal)}>    
-            {editando ? 'Editar Mantenimiento' : 'Nuevo Mantenimiento'}    
-          </ModalHeader>    
-          <Form onSubmit={handleSubmit}>    
-            <ModalBody>    
-              <Row>    
-                <Col md="6">    
-                  <FormGroup>    
-                    <Label>Activo *</Label>    
-                    <Input    
-                      type="select"    
-                      value={mantenimientoActual.idInventario}    
-                      onChange={(e) => setMantenimientoActual({...mantenimientoActual, idInventario: e.target.value})}    
-                      required    
-                    >    
-                      <option value="">Seleccione un activo</option>    
-                      {inventarios.map(inv => (    
-                        <option key={inv.idInventario} value={inv.idInventario}>    
-                          {inv.codigo} - {inv.nombre}    
-                        </option>    
-                      ))}    
-                    </Input>    
-                  </FormGroup>    
-                </Col>    
-                <Col md="6">    
-                  <FormGroup>    
-                    <Label>Costo</Label>    
-                    <Input    
-                      type="number"    
-                      step="0.01"    
-                      value={mantenimientoActual.costoMantenimiento}    
-                      onChange={(e) => setMantenimientoActual({...mantenimientoActual, costoMantenimiento: e.target.value})}    
-                      placeholder="0.00"    
-                    />    
-                  </FormGroup>    
-                </Col>    
-              </Row>    
-              <Row>    
-                <Col md="6">    
-                  <FormGroup>    
-                    <Label>Fecha Inicio *</Label>    
-                    <Input    
-                      type="date"    
-                      value={mantenimientoActual.fechaInicio}    
-                      onChange={(e) => setMantenimientoActual({...mantenimientoActual, fechaInicio: e.target.value})}    
-                      required    
-                    />    
-                  </FormGroup>    
-                </Col>    
-                <Col md="6">    
-                  <FormGroup>    
-                    <Label>Fecha Fin</Label>    
-                    <Input    
-                      type="date"    
-                      value={mantenimientoActual.fechaFin}    
-                      onChange={(e) => setMantenimientoActual({...mantenimientoActual, fechaFin: e.target.value})}    
-                    />    
-                  </FormGroup>    
-                </Col>    
-              </Row>    
-              <FormGroup>    
-                <Label>Descripción del Mantenimiento *</Label>    
-                <Input    
-                  type="textarea"    
-                  rows="4"    
-                  value={mantenimientoActual.descripcionMantenimiento}    
-                  onChange={(e) => setMantenimientoActual({...mantenimientoActual, descripcionMantenimiento: e.target.value})}    
-                  placeholder="Describa el mantenimiento realizado (mínimo 10 caracteres)"    
-                  required    
-                  minLength="10"    
-                  maxLength="1000"    
-                />    
-              </FormGroup>    
-              <FormGroup>    
-                <Label>Nombre de Imagen</Label>    
-                <Input    
-                  type="text"    
-                  value={mantenimientoActual.nombreImagen}    
-                  onChange={(e) => setMantenimientoActual({...mantenimientoActual, nombreImagen: e.target.value})}    
-                  placeholder="Nombre del archivo de imagen (opcional)"    
-                  maxLength="255"    
-                />    
-              </FormGroup>    
-            </ModalBody>    
-            <ModalFooter>    
-              <Button color="secondary" onClick={() => setModal(false)}>    
-                Cancelar    
-              </Button>    
-              <Button color="primary" type="submit" disabled={loading}>    
-                {loading ? 'Guardando...' : (editando ? 'Actualizar' : 'Crear')}    
-              </Button>    
-            </ModalFooter>    
-          </Form>    
-        </Modal>    
+        {/* Modal para crear/editar mantenimiento */}  
+<Modal isOpen={modal} toggle={() => setModal(!modal)} size="lg">  
+  <ModalHeader toggle={() => setModal(!modal)}>  
+    {editando ? 'Editar Mantenimiento' : 'Nuevo Mantenimiento'}  
+  </ModalHeader>  
+  <Form onSubmit={handleSubmit}>  
+    <ModalBody>  
+      {/* Mostrar errores si existen */}  
+      {mensaje.texto && (  
+        <Alert color={mensaje.tipo} className="mb-3">  
+          {mensaje.texto}  
+        </Alert>  
+      )}  
+        
+      <Row>  
+        <Col md="6">  
+          <FormGroup>  
+            <Label>Activo *</Label>  
+            <Input  
+              type="select"  
+              value={mantenimientoActual.idInventario || ''}  
+              onChange={(e) => setMantenimientoActual({...mantenimientoActual, idInventario: e.target.value})}  
+              required  
+            >  
+              <option value="">Seleccione un activo</option>  
+              {inventarios.map(inv => (  
+                <option key={inv.idInventario} value={inv.idInventario}>  
+                  {inv.codigo} - {inv.nombre}  
+                </option>  
+              ))}  
+            </Input>  
+          </FormGroup>  
+        </Col>  
+        <Col md="6">  
+          <FormGroup>  
+            <Label>Costo</Label>  
+            <Input  
+              type="number"  
+              step="0.01"  
+              value={mantenimientoActual.costoMantenimiento || ''}  
+              onChange={(e) => setMantenimientoActual({...mantenimientoActual, costoMantenimiento: e.target.value})}  
+              placeholder="0.00"  
+            />  
+          </FormGroup>  
+        </Col>  
+      </Row>  
+      <Row>  
+        <Col md="6">  
+          <FormGroup>  
+            <Label>Fecha Inicio *</Label>  
+            <Input  
+              type="date"  
+              value={mantenimientoActual.fechaInicio || ''}  
+              onChange={(e) => setMantenimientoActual({...mantenimientoActual, fechaInicio: e.target.value})}  
+              required  
+            />  
+          </FormGroup>  
+        </Col>  
+        <Col md="6">  
+          <FormGroup>  
+            <Label>Fecha Fin</Label>  
+            <Input  
+              type="date"  
+              value={mantenimientoActual.fechaFin || ''}  
+              onChange={(e) => setMantenimientoActual({...mantenimientoActual, fechaFin: e.target.value})}  
+            />  
+          </FormGroup>  
+        </Col>  
+      </Row>  
+      <FormGroup>  
+        <Label>Descripción del Mantenimiento *</Label>  
+        <Input  
+          type="textarea"  
+          rows="4"  
+          value={mantenimientoActual.descripcionMantenimiento || ''}  
+          onChange={(e) => setMantenimientoActual({...mantenimientoActual, descripcionMantenimiento: e.target.value})}  
+          placeholder="Describa el mantenimiento realizado (mínimo 10 caracteres)"  
+          required  
+          minLength="10"  
+          maxLength="1000"  
+        />  
+      </FormGroup>  
+      <FormGroup>  
+        <Label>Nombre de Imagen</Label>  
+        <Input  
+          type="text"  
+          value={mantenimientoActual.nombreImagen || ''}  
+          onChange={(e) => setMantenimientoActual({...mantenimientoActual, nombreImagen: e.target.value})}  
+          placeholder="Nombre del archivo de imagen (opcional)"  
+          maxLength="255"  
+        />  
+      </FormGroup>  
+    </ModalBody>  
+    <ModalFooter>  
+      <Button color="secondary" onClick={() => setModal(false)}>  
+        Cancelar  
+      </Button>  
+      <Button color="primary" type="submit" disabled={loading}>  
+        {loading ? 'Guardando...' : (editando ? 'Actualizar' : 'Crear')}  
+      </Button>  
+    </ModalFooter>  
+  </Form>  
+</Modal>      
       </Container>    
     </>    
   );    
