@@ -2,6 +2,7 @@
 const express = require('express');  
 const { body, param, query } = require('express-validator');  
 const mantenimientoController = require('../../controladores/inventario/mantenimientoController');  
+const InventarioModel = require('../../modelos/inventario/Inventario');
 const router = express.Router();  
 const { verificarUsuario } = require('../../configuraciones/passport');  
   
