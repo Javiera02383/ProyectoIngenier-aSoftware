@@ -2,6 +2,7 @@
 const express = require('express');  
 const { body, param, query } = require('express-validator');  
 const mantenimientoController = require('../../controladores/inventario/mantenimientoController');  
+const InventarioModel = require('../../modelos/inventario/Inventario');
 const router = express.Router();  
 const { verificarUsuario } = require('../../configuraciones/passport');  
   
@@ -17,7 +18,7 @@ router.post('/mantenimiento',
   [  
     body('idInventario').isInt({ min: 1 }).withMessage('El idInventario debe ser un número entero positivo')  
       .custom(async value => {  
-        const InventarioModel = require('../../modelos/inventario/InventarioModel');  
+        
         const existe = await InventarioModel.findByPk(value);  
         if (!existe) throw new Error('El activo de inventario asociado no existe');  
         return true;  
@@ -78,7 +79,7 @@ router.get('/mantenimiento/historial/:idInventario',
   [  
     param('idInventario').isInt({ min: 1 }).withMessage('El idInventario debe ser un número entero positivo')  
       .custom(async value => {  
-        const InventarioModel = require('../../modelos/inventario/InventarioModel');  
+        
         const existe = await InventarioModel.findByPk(value);  
         if (!existe) throw new Error('El activo de inventario no existe');  
         return true;  
@@ -101,7 +102,7 @@ router.put('/mantenimiento/:id',
     body('idInventario').optional().isInt({ min: 1 }).withMessage('El idInventario debe ser un número entero positivo')  
       .custom(async value => {  
         if (value) {  
-          const InventarioModel = require('../../modelos/inventario/InventarioModel');  
+          
           const existe = await InventarioModel.findByPk(value);  
           if (!existe) throw new Error('El activo de inventario asociado no existe');  
         }  
