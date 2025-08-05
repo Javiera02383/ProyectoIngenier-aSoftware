@@ -251,6 +251,7 @@ const obtenerOrdenes = async (req, res) => {
   
     const ordenes = await OrdenPublicidad.findAll({  
       where: Object.keys(whereOrden).length ? whereOrden : undefined,  
+      
       include: [  
         {  
           model: Cliente,  

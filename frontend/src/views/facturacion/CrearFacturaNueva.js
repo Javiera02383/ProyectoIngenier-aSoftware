@@ -23,7 +23,9 @@ import { caiService } from '../../services/facturacion/caiService.js';
 import { clienteService } from '../../services/gestion_cliente/clienteService';  
 import { empleadoService } from '../../services/gestion_cliente/empleadoService';  
 import { productoService } from '../../services/productos/productoService';  
-  
+import { ordenPublicidadService } from '../../services/programacion/ordenpublicidadService.js';
+
+
 // Servicios que necesitas crear siguiendo el mismo patrón  
 import axiosInstance from '../../utils/axiosConfig';  
   
@@ -45,7 +47,8 @@ const descuentoService = {
 const CrearFacturaNueva = () => {        
   const [factura, setFactura] = useState({    
     idFactura: '',       
-    idCliente: '',        
+    idCliente: '',  
+    rtnCliente: '',      
     idFormaPago: '1',        
     idEmpleado: '',        
     Tipo_documento: 'Factura',        
@@ -212,6 +215,8 @@ useEffect(() => {
       cargarProductos(),  
       cargarDescuentos(),
       cargarCAIActivo(),
+      cargarOrdenesPublicidad(),
+      
       cargarSiguienteNumeroFactura()
     ]);  
       
@@ -231,7 +236,17 @@ useEffect(() => {
 
   const handleFacturaChange = (e) => {        
     const { name, value } = e.target;        
-    setFactura(prev => ({ ...prev, [name]: value }));        
+    // Si se está cambiando el cliente, también actualizar el RTN automáticamente  
+    if (name === 'idCliente' && value) {  
+      const clienteSeleccionado = clientes.find(cliente => cliente.idCliente == value);  
+      setFactura(prev => ({   
+        ...prev,   
+        [name]: value,  
+        rtnCliente: clienteSeleccionado?.persona?.DNI || '' // Actualizar RTN automáticamente  
+      }));  
+    } else {  
+      setFactura(prev => ({ ...prev, [name]: value }));  
+    }          
   };        
         
   const handleDetalleChange = (index, field, value) => {    
@@ -337,7 +352,8 @@ useEffect(() => {
       // Limpiar formulario        
       setFactura({        
         idFactura: '',  
-        idCliente: '',        
+        idCliente: '',
+        rtnCliente: '',        
         idFormaPago: '1',
         idEmpleado: '',        
         Tipo_documento: 'Factura',        
@@ -497,34 +513,27 @@ useEffect(() => {
                           />      
                         </FormGroup>      
                       </Col> 
-                      <Col lg="4">  
-                        <FormGroup>  
-                          <Label className="form-control-label" htmlFor="idOrdenPublicidad">  
-                            Orden de Publicidad (Opcional)  
-                          </Label>  
-                          <Input  
-                            className="form-control-alternative"  
-                            id="idOrdenPublicidad"  
-                            name="idOrdenPublicidad"  
-                            type="select"  
-                            value={factura.idOrdenPublicidad || ''}  
-                            onChange={(e) => {  
-                              const selectedOrden = ordenesPublicidad.find(o => o.idOrden == e.target.value);  
-                              setFactura(prev => ({  
-                                ...prev,  
-                                idOrdenPublicidad: e.target.value,  
-                                ordenNo: selectedOrden ? selectedOrden.numeroOrden : ''  
-                              }));  
-                            }}  
-                          >  
-                            <option value="">Sin orden de publicidad</option>  
-                            {ordenesPublicidad.map(orden => (  
-                              <option key={orden.idOrden} value={orden.idOrden}>  
-                                {orden.numeroOrden} - {orden.producto}  
-                              </option>  
-                            ))}  
-                          </Input>  
-                        </FormGroup>  
+                      <Col lg="4">      
+                        <FormGroup>      
+                          <Label className="form-control-label" htmlFor="ordenNo">      
+                            Orden de Publicidad (Opcional)      
+                          </Label>      
+                          <Input      
+                            className="form-control-alternative"      
+                            id="ordenNo"      
+                            name="ordenNo"      
+                            type="select"      
+                            value={factura.ordenNo}      
+                            onChange={handleFacturaChange}      
+                          >      
+                            <option value="">Seleccionar orden...</option>      
+                            {ordenesPublicidad.map(orden => (      
+                              <option key={orden.idOrden} value={orden.numeroOrden}>      
+                                {orden.numeroOrden} ({orden.Cliente?.persona?.Pnombre} {orden.Cliente?.persona?.Papellido})  
+                              </option>      
+                            ))}      
+                          </Input>      
+                        </FormGroup>      
                       </Col>
                       <Col lg="4">        
                         <FormGroup>        
@@ -557,7 +566,7 @@ useEffect(() => {
     
                   {/* Información Específica de Canal 40 */}      
                   <h6 className="heading-small text-muted mb-4">      
-                    Información Específica de Televisión      
+                    Información del Cliente     
                   </h6>      
                   <div className="pl-lg-4">      
                     <Row>    
@@ -584,30 +593,26 @@ useEffect(() => {
                           </Input>        
                         </FormGroup>        
                       </Col>  
-                                            <Col lg="4">        
-                        <FormGroup>        
-                          <Label className="form-control-label" htmlFor="idCliente">        
-                            RTN *        
-                          </Label>        
-                          <Input        
-                            className="form-control-alternative"        
-                            id="idCliente"        
-                            name="idCliente"        
-                            type="select"        
-                            value={factura.idCliente}        
-                            onChange={handleFacturaChange}        
-                            required        
-                          >    
-                            <option value="">Seleccionar cliente...</option>    
-                            {clientes.map(cliente => (    
-                              <option key={cliente.idCliente} value={cliente.idCliente}>    
-                                 {cliente.persona?.Pnombre} {cliente.persona?.Snombre} {cliente.persona?.Papellido} {cliente.persona?.Sapellido}       
-                              </option>    
-                            ))}    
-                          </Input>        
-                        </FormGroup>        
+                      <Col lg="4">  
+                        <FormGroup>  
+                          <Label className="form-control-label" htmlFor="rtnCliente">  
+                            RTN *  
+                          </Label>  
+                          <Input  
+                            className="form-control-alternative"  
+                            id="rtnCliente"  
+                            name="rtnCliente"  
+                            type="text"  
+                            value={factura.rtnCliente}  
+                            readOnly  
+                            placeholder="Seleccione cliente"  
+                            style={{ backgroundColor: '#f8f9fa' }}  
+                          />  
+                        </FormGroup>  
                       </Col>
-                      <Col lg="6">      
+                      </Row>
+                    <Row>
+                      <Col lg="4">      
                         <FormGroup>      
                           <Label className="form-control-label" htmlFor="productoCliente">      
                             Producto del Cliente      
@@ -623,8 +628,7 @@ useEffect(() => {
                           />      
                         </FormGroup>      
                       </Col>            
-                    </Row>      
-                    <Row>      
+                         
                       <Col lg="4">      
                         <FormGroup>      
                           <Label className="form-control-label" htmlFor="mencion">      
@@ -648,29 +652,10 @@ useEffect(() => {
                           </Input>      
                         </FormGroup>      
                       </Col>      
-                      <Col lg="4">      
-                        <FormGroup>      
-                          <Label className="form-control-label" htmlFor="tipoServicio">      
-                            Tipo de Servicio      
-                          </Label>      
-                          <Input      
-                            className="form-control-alternative"      
-                            id="tipoServicio"      
-                            name="tipoServicio"      
-                            type="select"      
-                            value={factura.tipoServicio}      
-                            onChange={handleFacturaChange}      
-                          >      
-                            <option value="spot">Spot</option>      
-                            <option value="programa">Programa</option>      
-                            <option value="contrato">Contrato</option>      
-                          </Input>      
-                        </FormGroup>      
-                      </Col>      
-                            
+                           
                     </Row>     
                     <Row>     
-                      <Col lg="6">      
+                      <Col lg="4">      
                         <FormGroup>      
                           <Label className="form-control-label" htmlFor="periodoInicio">      
                             Período Inicio      
@@ -685,7 +670,7 @@ useEffect(() => {
                           />      
                         </FormGroup>      
                       </Col>      
-                      <Col lg="6">      
+                      <Col lg="4">      
                         <FormGroup>      
                           <Label className="form-control-label" htmlFor="periodoFin">      
                             Período Fin      
@@ -700,9 +685,8 @@ useEffect(() => {
                           />      
                         </FormGroup>      
                       </Col>      
-                    </Row>
-                                        <Row>        
-                      <Col lg="6">        
+                           
+                      <Col lg="4">        
                         <FormGroup>        
                           <Label className="form-control-label" htmlFor="Fecha">        
                             Fecha Actual       

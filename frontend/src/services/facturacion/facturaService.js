@@ -1,5 +1,6 @@
 // services/facturaService.js    
 import axiosInstance from '../../utils/axiosConfig';    
+
 import { authService } from '../seguridad/authService';  
   
 // Función para obtener el token del localStorage    
@@ -25,6 +26,7 @@ export const facturaService = {
     return response.data;  
   },    
       
+  
   // Obtener factura por ID    
   obtenerFacturaPorId: async (id) => {    
     const response = await axiosInstance.get(`/factura/${id}`);  
@@ -39,8 +41,10 @@ export const facturaService = {
       
   // Descargar PDF de factura    
   descargarPDF: (id) => {    
-    const token = authService.getToken();  
-    window.open(`${axiosInstance.defaults.baseURL}/factura/${id}/pdf?token=${token}`, '_blank');    
+ 
+  const token = getAuthToken(); // Usar la función local  
+  window.open(`${axiosInstance.defaults.baseURL}/factura/${id}/pdf?token=${token}`, '_blank');    
+ 
   }    
 };  
   
