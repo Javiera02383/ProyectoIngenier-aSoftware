@@ -17,6 +17,12 @@ export const mantenimientoService = {
     const response = await axiosInstance.get(url);  
     return response.data;  
   },  
+
+  // NUEVO: Método sin filtros  
+  obtenerMantenimientoTodos: async () => {  
+    const response = await axiosInstance.get('/inventario/mantenimiento/todos');  
+    return response.data;  
+  }, 
   
   obtenerMantenimientoPorId: async (id) => {  
     const response = await axiosInstance.get(`/inventario/mantenimiento/${id}`);  

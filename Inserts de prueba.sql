@@ -323,38 +323,38 @@ INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, 
 -- Tabla: Orden Publicidad
 -- Órdenes de publicidad para empresas principales de Canal 40  
 INSERT INTO orden_publicidad (numeroOrden, idCliente, producto, periodoInicio, periodoFin, valorSinImpuesto, impuesto, costoTotal, costoPeriodo, fechaAlAire, estado, idEmpleado, fechaCreacion, observaciones) VALUES  
-('0001', 7, 'Servicios de Telecomunicaciones CLARO', '2024-03-01', '2024-03-31', 50000.00, 7500.00, 57500.00, 57500.00, '2024-03-01', 'Aprobada', 1, '2024-02-15 10:00:00', 'Campaña principal de marzo - horarios prime time'),  
+('0001', 7, 'Servicios de Telecomunicaciones', '2024-03-01', '2024-03-31', 50000.00, 7500.00, 57500.00, 57500.00, '2024-03-01', 'Aprobada', 1, '2024-02-15 10:00:00', 'Campaña principal de marzo - horarios prime time'),  
   
-('0002', 3, 'Servicios Municipales MUNICOM', '2024-03-01', '2024-03-31', 25000.00, 3750.00, 28750.00, 28750.00, '2024-03-01', 'Aprobada', 1, '2024-02-16 11:00:00', 'Promoción de servicios municipales'),  
+('0002', 3, 'Servicios Municipales', '2024-03-01', '2024-03-31', 25000.00, 3750.00, 28750.00, 28750.00, '2024-03-01', 'Aprobada', 1, '2024-02-16 11:00:00', 'Promoción de servicios municipales'),  
   
-('0003', 2, 'Seguros Vehiculares SECOPV', '2024-03-01', '2024-03-31', 18000.00, 2700.00, 20700.00, 20700.00, '2024-03-01', 'Aprobada', 2, '2024-02-17 09:30:00', 'Campaña de seguros para temporada alta'),  
+('0003', 2, 'Seguros Vehiculares', '2024-03-01', '2024-03-31', 18000.00, 2700.00, 20700.00, 20700.00, '2024-03-01', 'Aprobada', 2, '2024-02-17 09:30:00', 'Campaña de seguros para temporada alta'),  
   
-('0004', 6, 'Venta de Motocicletas MOTOMUNDO', '2024-03-01', '2024-03-31', 22000.00, 3300.00, 25300.00, 25300.00, '2024-03-01', 'Aprobada', 2, '2024-02-18 14:15:00', 'Promoción de nuevos modelos 2024'),  
+('0004', 6, 'Venta de Motocicletas', '2024-03-01', '2024-03-31', 22000.00, 3300.00, 25300.00, 25300.00, '2024-03-01', 'Aprobada', 2, '2024-02-18 14:15:00', 'Promoción de nuevos modelos 2024'),  
   
-('0005', 4, 'Construcción y Materiales MACONSA', '2024-03-01', '2024-03-31', 30000.00, 4500.00, 34500.00, 34500.00, '2024-03-01', 'Aprobada', 1, '2024-02-19 16:20:00', 'Campaña de temporada de construcción'),  
+('0005', 4, 'Construcción y Materiales', '2024-03-01', '2024-03-31', 30000.00, 4500.00, 34500.00, 34500.00, '2024-03-01', 'Aprobada', 1, '2024-02-19 16:20:00', 'Campaña de temporada de construcción'),  
   
-('0006', 5, 'Servicios Educativos UNAH', '2024-03-01', '2024-03-31', 15000.00, 2250.00, 17250.00, 17250.00, '2024-03-01', 'Aprobada', 3, '2024-02-20 08:45:00', 'Promoción de inscripciones universitarias'),  
+('0006', 5, 'Servicios Educativos', '2024-03-01', '2024-03-31', 15000.00, 2250.00, 17250.00, 17250.00, '2024-03-01', 'Aprobada', 3, '2024-02-20 08:45:00', 'Promoción de inscripciones universitarias'),  
   
-('0007', 7, 'Servicios de Internet SINET', '2024-03-01', '2024-03-31', 20000.00, 3000.00, 23000.00, 23000.00, '2024-03-01', 'Aprobada', 2, '2024-02-21 13:30:00', 'Campaña de fibra óptica residencial'),  
+('0007', 7, 'Servicios de Internet', '2024-03-01', '2024-03-31', 20000.00, 3000.00, 23000.00, 23000.00, '2024-03-01', 'Aprobada', 2, '2024-02-21 13:30:00', 'Campaña de fibra óptica residencial'),  
   
-('0008', 8, 'Servicios Financieros SANMARQUEÑA COOP', '2024-03-01', '2024-03-31', 28000.00, 4200.00, 32200.00, 32200.00, '2024-03-01', 'Aprobada', 1, '2024-02-22 11:15:00', 'Promoción de créditos y ahorros'),  
+('0008', 8, 'Servicios Financieros', '2024-03-01', '2024-03-31', 28000.00, 4200.00, 32200.00, 32200.00, '2024-03-01', 'Aprobada', 1, '2024-02-22 11:15:00', 'Promoción de créditos y ahorros'),  
   
-('0009', 9, 'Servicios Dentales SONRÍA', '2024-03-01', '2024-03-31', 12000.00, 1800.00, 13800.00, 13800.00, '2024-03-01', 'Aprobada', 3, '2024-02-23 15:45:00', 'Campaña de salud dental familiar'),  
+('0009', 9, 'Servicios Dentales', '2024-03-01', '2024-03-31', 12000.00, 1800.00, 13800.00, 13800.00, '2024-03-01', 'Aprobada', 3, '2024-02-23 15:45:00', 'Campaña de salud dental familiar'),  
   
 ('0010', 10, 'Servicios Financieros COFICESA', '2024-03-01', '2024-03-31', 35000.00, 5250.00, 40250.00, 40250.00, '2024-03-01', 'Aprobada', 1, '2024-02-24 09:00:00', 'Promoción de préstamos personales');
 
 
 -- Órdenes en diferentes estados del flujo de trabajo  
 INSERT INTO orden_publicidad (numeroOrden, idCliente, producto, periodoInicio, periodoFin, valorSinImpuesto, impuesto, costoTotal, costoPeriodo, estado, idEmpleado, fechaCreacion, observaciones) VALUES  
-('0011', 11, 'Materiales de Construcción VILLAMIX', '2024-04-01', '2024-04-30', 25000.00, 3750.00, 28750.00, 28750.00, 'Pendiente', 2, '2024-03-01 10:30:00', 'Orden pendiente de aprobación gerencial'),  
+('0011', 11, 'Materiales de Construcción', '2024-04-01', '2024-04-30', 25000.00, 3750.00, 28750.00, 28750.00, 'Pendiente', 2, '2024-03-01 10:30:00', 'Orden pendiente de aprobación gerencial'),  
   
-('0012', 12, 'Seguros LA COLONIA', '2024-04-01', '2024-04-30', 32000.00, 4800.00, 36800.00, 36800.00, 'En_Emision', 1, '2024-03-02 14:20:00', 'Actualmente en emisión - horarios nocturnos'),  
+('0012', 12, 'Seguros', '2024-04-01', '2024-04-30', 32000.00, 4800.00, 36800.00, 36800.00, 'En_Emision', 1, '2024-03-02 14:20:00', 'Actualmente en emisión - horarios nocturnos'),  
   
-('0013', 13, 'Retail TIENDA ERFA', '2024-04-01', '2024-04-30', 18000.00, 2700.00, 20700.00, 20700.00, 'Finalizada', 3, '2024-02-01 16:45:00', 'Campaña completada exitosamente'),  
+('0013', 13, 'Retail', '2024-04-01', '2024-04-30', 18000.00, 2700.00, 20700.00, 20700.00, 'Finalizada', 3, '2024-02-01 16:45:00', 'Campaña completada exitosamente'),  
   
-('0014', 14, 'Televisión CABLECOLOR', '2024-04-01', '2024-04-30', 40000.00, 6000.00, 46000.00, 46000.00, 'Cancelada', 2, '2024-03-03 12:10:00', 'Cancelada por solicitud del cliente'),  
+('0014', 14, 'Televisión', '2024-04-01', '2024-04-30', 40000.00, 6000.00, 46000.00, 46000.00, 'Cancelada', 2, '2024-03-03 12:10:00', 'Cancelada por solicitud del cliente'),  
   
-('0015', 15, 'Promociones PROMO DJ FLECHA', '2024-04-01', '2024-04-30', 8000.00, 1200.00, 9200.00, 9200.00, 'Pendiente', 3, '2024-03-04 08:30:00', 'Orden para eventos especiales');
+('0015', 15, 'Promociones', '2024-04-01', '2024-04-30', 8000.00, 1200.00, 9200.00, 9200.00, 'Pendiente', 3, '2024-03-04 08:30:00', 'Orden para eventos especiales');
 
 
 

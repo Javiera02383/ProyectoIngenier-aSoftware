@@ -5,6 +5,12 @@ const mantenimientoController = require('../../controladores/inventario/mantenim
 const router = express.Router();  
 const { verificarUsuario } = require('../../configuraciones/passport');  
   
+// Obtener todos los mantenimientos sin filtros  
+router.get('/mantenimiento/todos',  
+  verificarUsuario,  
+  mantenimientoController.obtenerMantenimientoTodos  
+);
+
 // Crear mantenimiento  
 router.post('/mantenimiento',  
   verificarUsuario,  
