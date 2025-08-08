@@ -6,10 +6,14 @@ const {
   obtenerBloques,  
   obtenerAnunciosPorBloque,  
   obtenerProgramacionCompleta,  
-  obtenerOrdenesProgramacion  
+  obtenerOrdenesProgramacion,
+    crearPrograma,
+    crearPauta  
 } = require('../../controladores/programacion/programacionController');  
   
 // Rutas para programación  
+router.post('/pauta', crearPauta);
+router.post('/programa', crearPrograma);
 router.get('/programa', obtenerProgramas);  
 router.get('/bloques', obtenerBloques);  
 router.get('/anuncios/:idBloque', obtenerAnunciosPorBloque);  

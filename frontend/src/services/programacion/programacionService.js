@@ -50,6 +50,8 @@ export const programacionService = {
     const response = await axiosInstance.post('/programacion/pauta', pautaData);  
     return response.data;  
   },  
+
+  
   
   // Obtener eventos para el calendario  
   obtenerEventosCalendario: async (fechaInicio, fechaFin) => {  
@@ -59,5 +61,15 @@ export const programacionService = {
       
     const response = await axiosInstance.get(`/programacion/eventos?${params.toString()}`);  
     return response.data;  
-  }  
+  },  
+
+    crearPauta: async (pautaData) => {  
+    const response = await axiosInstance.post('/programacion/pauta', pautaData);  
+    return response.data;  
+    },  
+    
+    obtenerClientes: async () => {  
+    const response = await axiosInstance.get('/clientes');  
+    return response.data;  
+    }
 };

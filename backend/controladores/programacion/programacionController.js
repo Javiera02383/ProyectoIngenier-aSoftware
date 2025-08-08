@@ -6,6 +6,7 @@ const OrdenProgramacion = require('../../modelos/programacion/OrdenProgramacion'
 const OrdenPublicidad = require('../../modelos/programacion/OrdenPublicidad');  
 const Cliente = require('../../modelos/gestion_cliente/Cliente');  
 const Persona = require('../../modelos/seguridad/Persona');  
+const db = require('../../configuraciones/db');
   
 // Obtener todos los programas  
 const obtenerProgramas = async (req, res) => {  
@@ -20,6 +21,33 @@ const obtenerProgramas = async (req, res) => {
   }  
 };  
   
+const crearPrograma = async (req, res) => {  
+  try {  
+    const { nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado } = req.body;  
+      
+    const nuevoPrograma = await Programa.create({  
+      nombre,  
+      tipoCalendario,  
+      horaInicio,  
+      duracion,  
+      categoria,  
+      estado: estado || 'Activo',  
+      idEmpleado: idEmpleado || 1, // Usar empleado por defecto si no se proporciona  
+      fechaCreacion: new Date()  
+    });  
+      
+    res.status(201).json({  
+      mensaje: 'Programa creado exitosamente',  
+      programa: nuevoPrograma  
+    });  
+  } catch (error) {  
+    res.status(500).json({   
+      mensaje: 'Error al crear programa',   
+      error: error.message   
+    });  
+  }  
+};  
+
 // Obtener bloques publicitarios  
 const obtenerBloques = async (req, res) => {  
   try {  
@@ -140,11 +168,61 @@ const obtenerOrdenesProgramacion = async (req, res) => {
     res.status(500).json({ mensaje: 'Error al obtener órdenes de programación', error: error.message });  
   }  
 };  
+
+const crearPauta = async (req, res) => {  
+  const transaction = await db.transaction();  
+    
+  try {  
+    const { idPrograma, horaBloque, ordenBloque, duracionTotal, fechaVigencia, estado, anuncios } = req.body;  
+      
+    // Crear el bloque publicitario  
+    const nuevoBloque = await BloquePublicitario.create({  
+      idPrograma,  
+      horaBloque,  
+      ordenBloque,  
+      duracionTotal,  
+      fechaVigencia,  
+      estado: estado || 'Activo'  
+    }, { transaction });  
+      
+    // Crear los anuncios del bloque  
+    const anunciosCreados = [];  
+    for (let i = 0; i < anuncios.length; i++) {  
+      const anuncio = anuncios[i];  
+      const nuevoAnuncio = await AnuncioBloque.create({  
+        idBloque: nuevoBloque.idBloque,  
+        idCliente: anuncio.idCliente,  
+        ordenAnuncio: i + 1,  
+        duracionAnuncio: anuncio.duracionAnuncio,  
+        nombreComercial: anuncio.nombreComercial,  
+        estado: anuncio.estado || 'Programado'  
+      }, { transaction });  
+        
+      anunciosCreados.push(nuevoAnuncio);  
+    }  
+      
+    await transaction.commit();  
+      
+    res.status(201).json({  
+      mensaje: 'Pauta publicitaria creada exitosamente',  
+      bloque: nuevoBloque,  
+      anuncios: anunciosCreados  
+    });  
+  } catch (error) {  
+    await transaction.rollback();  
+    res.status(500).json({   
+      mensaje: 'Error al crear pauta publicitaria',   
+      error: error.message   
+    });  
+  }  
+};
   
 module.exports = {  
   obtenerProgramas,  
   obtenerBloques,  
   obtenerAnunciosPorBloque,  
   obtenerProgramacionCompleta,  
-  obtenerOrdenesProgramacion  
+  obtenerOrdenesProgramacion,
+  crearPrograma,
+    crearPauta  
 };

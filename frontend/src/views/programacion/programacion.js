@@ -109,7 +109,7 @@ const Programacion = () => {
                                 </h6>  
                                 <div className="d-flex flex-wrap gap-1">  
                                   {comercial.empresas.map((empresa, eIdx) => (  
-                                    <Badge key={eIdx} color="primary" pill className="text-white">  
+                                    <Badge key={eIdx} color="primary" pill className="text-black">  
                                       {empresa}  
                                     </Badge>  
                                   ))}  
