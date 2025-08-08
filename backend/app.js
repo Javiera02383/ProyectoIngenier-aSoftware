@@ -59,7 +59,7 @@ const bloquePublicitarioRuta = require('./rutas/programacion/bloquePublicitarioR
 const anuncioBloqueRuta = require('./rutas/programacion/anuncioBloqueRutas');  
 const ordenPublicidadRuta = require('./rutas/programacion/ordenPublicidadRutas');  
 const ordenProgramacionRuta = require('./rutas/programacion/ordenProgramacionRutas');
-
+const programacionRutas = require('./rutas/programacion/programacionRutas');
 
 /* ========== RUTAS DE GESTIÓN CLIENTE ========== */
 const clienteRuta = require('./rutas/gestion_cliente/ClienteRuta');
@@ -116,7 +116,7 @@ app.use('/api/optica', express.static('uploads'));
 // Servir archivos estáticos desde la carpeta uploads
 app.use('/uploads', express.static('uploads'));
 
-// Usar rutas
+// Usar rutas de autenticación y seguridad
 app.use('/api/optica/auth', authRoutes);
 app.use('/api/optica/personas', personaRutas);
 app.use('/api/optica/roles', rolRutas);
@@ -141,7 +141,7 @@ app.use('/api/optica/programacion', anuncioBloqueRuta);
 app.use('/api/optica/programacion', ordenPublicidadRuta);  
 app.use('/api/optica/programacion', ordenProgramacionRuta);
 
-
+app.use('/api/optica/programacion', programacionRutas);
 
 /* ========== MODELOS A SINCRONIZAR (si querés controlar uno a uno) ========== */
 const Persona = require('./modelos/seguridad/Persona');
@@ -191,6 +191,7 @@ const BloquePublicitario = require('./modelos/programacion/BloquePublicitario');
 const AnuncioBloque = require('./modelos/programacion/AnuncioBloque');  
 const OrdenPublicidad = require('./modelos/programacion/OrdenPublicidad');  
 const OrdenProgramacion = require('./modelos/programacion/OrdenProgramacion'); 
+
 
 const startServer = async () => {
   try {

@@ -184,6 +184,8 @@ INSERT INTO reparacion_de_lentes (Tipo_Reparacion, idConsulta, Descripcion, Cost
 
 -- ***********************************************************************************************************************************************
 -- Modulo de Programacion - Publicidad
+-- Tabla: programa
+
 -- Programas de Noticias  
 INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
 ('NOTICIAS 60 MINUTOS', 'Lunes_Sabado', '07:00:00', 60, 'Noticias', 'Activo', 1, '2023-01-15 10:00:00'),  
@@ -262,7 +264,9 @@ INSERT INTO bloque_publicitario (idPrograma, horaBloque, ordenBloque, duracionTo
 (9, '15:15:00', 8, 180, '2024-03-01', 'Activo'),  
 (9, '15:45:00', 9, 120, '2024-03-01', 'Activo');
 
--- **************************************************************************************
+-- **************************************************************************************44
+-- Tabla: anuncio_bloque
+
 -- Bloque 1 (NOTICIAS 60 MINUTOS - 7:10)  
 INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
 (1, 4, 1, 60, 'EMPRESA_4', 'Programado'),  
