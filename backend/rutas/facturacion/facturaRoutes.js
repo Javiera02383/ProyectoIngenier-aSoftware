@@ -360,7 +360,7 @@ router.put('/facturas/:id', verificarUsuario, facturaController.editarFactura);
  *       500:
  *         description: Error al anular la factura
  */
-router.patch('/facturas/:id/anular', verificarUsuario, facturaController.anularFactura);
+router.patch('/factura/:id/anular', verificarUsuario, facturaController.anularFactura);
 
 
 /**

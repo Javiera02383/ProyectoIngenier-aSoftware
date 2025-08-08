@@ -57,6 +57,20 @@ const Contratos = () => {
   useEffect(() => {  
     cargarOrdenes();  
   }, [filtros]);  
+
+  useEffect(() => {
+  if (nuevaOrden.valorSinImpuesto) {
+    const valorSin = parseFloat(nuevaOrden.valorSinImpuesto) || 0;
+    const impuesto = valorSin * 0.15;
+    const total = valorSin + impuesto;
+    setNuevaOrden(prev => ({
+      ...prev,
+      impuesto: impuesto.toFixed(2),
+      costoTotal: total.toFixed(2),
+      costoPeriodo: total.toFixed(2),
+    }));
+  }
+}, [nuevaOrden.valorSinImpuesto]);
   
   const cargarDatosIniciales = async () => {  
     try {  
@@ -180,41 +194,45 @@ const Contratos = () => {
     }  
   };  
   
-  const editarOrden = async () => {  
-    if (!validarFormulario()) return;  
-  
-    try {  
-      setLoading(true);  
-      const ordenData = {  
-        ...nuevaOrden,  
-        idCliente: parseInt(nuevaOrden.idCliente),  
-        idEmpleado: parseInt(nuevaOrden.idEmpleado),  
-        valorSinImpuesto: parseFloat(nuevaOrden.valorSinImpuesto),  
-        costoTotal: parseFloat(nuevaOrden.costoTotal),  
-        costoPeriodo: parseFloat(nuevaOrden.costoPeriodo)  
-      };  
-  
-      await ordenPublicidadService.actualizarOrden(ordenSeleccionada.idOrden, ordenData);  
-        
-      setMensaje({  
-        tipo: 'success',  
-        texto: 'Orden de publicidad actualizada exitosamente.'  
-      });  
-  
-      limpiarFormulario();  
-      setModalEditar(false);  
-      setOrdenSeleccionada(null);  
-      cargarOrdenes();  
-    } catch (error) {  
-      console.error('Error editando orden:', error);  
-      setMensaje({  
-        tipo: 'danger',  
-        texto: error.response?.data?.mensaje || 'Error al actualizar la orden de publicidad.'  
-      });  
-    } finally {  
-      setLoading(false);  
-    }  
-  };  
+const editarOrden = async () => {
+  if (!validarFormulario()) return;
+
+  try {
+    setLoading(true);
+    const ordenData = {
+      ...nuevaOrden,
+      idCliente: parseInt(nuevaOrden.idCliente),
+      idEmpleado: parseInt(nuevaOrden.idEmpleado),
+      valorSinImpuesto: parseFloat(nuevaOrden.valorSinImpuesto),
+      costoTotal: parseFloat(nuevaOrden.costoTotal),
+      costoPeriodo: parseFloat(nuevaOrden.costoPeriodo)
+    };
+
+    await ordenPublicidadService.actualizarOrden(ordenSeleccionada.idOrden, ordenData);
+
+    setMensaje({
+      tipo: 'success',
+      texto: 'Orden de publicidad actualizada exitosamente.'
+    });
+
+    // Recarga las órdenes desde el backend para tener datos frescos y completos
+    await cargarOrdenes();
+
+    limpiarFormulario();
+    setModalEditar(false);
+    setOrdenSeleccionada(null);
+  } catch (error) {
+    console.error('Error editando orden:', error);
+    setMensaje({
+      tipo: 'danger',
+      texto: error.response?.data?.mensaje || 'Error al actualizar la orden de publicidad.'
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
+
   
   const aprobarOrden = async (id) => {  
     try {  

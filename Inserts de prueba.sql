@@ -184,6 +184,8 @@ INSERT INTO reparacion_de_lentes (Tipo_Reparacion, idConsulta, Descripcion, Cost
 
 -- ***********************************************************************************************************************************************
 -- Modulo de Programacion - Publicidad
+-- Tabla: programa
+
 -- Programas de Noticias  
 INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
 ('NOTICIAS 60 MINUTOS', 'Lunes_Sabado', '07:00:00', 60, 'Noticias', 'Activo', 1, '2023-01-15 10:00:00'),  
@@ -191,42 +193,14 @@ INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, e
 ('TV NOTICIAS 40 ESTELAR', 'Lunes_Sabado', '18:00:00', 60, 'Noticias', 'Activo', 1, '2023-01-15 11:00:00'),  
 ('RESUMEN SEMANAL', 'Domingo', '19:00:00', 30, 'Noticias', 'Activo', 1, '2023-02-01 09:00:00');  
   
--- Programas de Entretenimiento  
+
 INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
 ('PELÍCULA MATUTINA', 'Lunes_Sabado', '09:00:00', 120, 'Entretenimiento', 'Activo', 2, '2023-01-20 14:00:00'),  
 ('CINE ESTRENO', 'Lunes_Sabado', '19:00:00', 120, 'Entretenimiento', 'Activo', 2, '2023-01-20 14:30:00'),  
 ('PELÍCULA ESTELAR', 'Lunes_Sabado', '21:00:00', 120, 'Entretenimiento', 'Activo', 2, '2023-01-20 15:00:00'),  
-('SERIE CÓMICA', 'Lunes_Sabado', '08:30:00', 30, 'Entretenimiento', 'Activo', 2, '2023-02-10 16:00:00'),  
-('VIVA LA MÚSICA', 'Lunes_Sabado', '14:00:00', 120, 'Entretenimiento', 'Activo', 2, '2023-02-15 11:30:00');  
+('SERIE CÓMICA', 'Lunes_Sabado', '08:30:00', 30, 'Entretenimiento', 'Activo', 2, '2023-02-10 16:00:00');
+
   
--- Programas Educativos y Culturales  
-INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
-('USTED Y SU MÉDICO', 'Lunes_Sabado', '11:00:00', 60, 'Educativo', 'Activo', 3, '2023-03-01 13:00:00'),  
-('DOCUMENTAL', 'Domingo', '18:00:00', 120, 'Cultural', 'Activo', 3, '2023-03-05 15:30:00'),  
-('CULTURA Y TRADICIÓN', 'Domingo', '16:00:00', 60, 'Cultural', 'Activo', 3, '2023-03-10 12:00:00'),  
-('APRENDE CON NOSOTROS', 'Lunes_Sabado', '10:00:00', 30, 'Educativo', 'Activo', 3, '2023-03-15 09:45:00');  
-  
--- Programas Infantiles  
-INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
-('INFANTILES', 'Lunes_Sabado', '13:00:00', 60, 'Infantil', 'Activo', 3, '2023-04-01 10:15:00'),  
-('MUNDO INFANTIL', 'Domingo', '09:00:00', 120, 'Infantil', 'Activo', 3, '2023-04-05 11:20:00'),  
-('CARICATURAS MATUTINAS', 'Domingo', '07:00:00', 120, 'Infantil', 'Activo', 3, '2023-04-10 08:30:00');  
-  
--- Programas de Deportes  
-INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
-('DEPORTES HOY', 'Lunes_Sabado', '17:00:00', 30, 'Deportes', 'Activo', 3, '2023-05-01 16:45:00'),  
-('FÚTBOL NACIONAL', 'Domingo', '15:00:00', 180, 'Deportes', 'Activo', 3, '2023-05-05 14:20:00'),  
-('MERIDIANO DEPORTIVO', 'Lunes_Sabado', '12:30:00', 30, 'Deportes', 'Activo', 3, '2023-05-10 13:15:00');  
-  
--- Programas Especiales y de Temporada  
-INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
-('FIESTA NAVIDEÑA', 'Lunes_Sabado', '17:00:00', 60, 'Entretenimiento', 'Inactivo', 2, '2023-12-01 10:00:00'),  
-('ESPECIAL DE AÑO NUEVO', 'Domingo', '20:00:00', 180, 'Entretenimiento', 'Inactivo', 2, '2023-12-20 15:30:00');  
-  
--- Programas de Madrugada  
-INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
-('MÚSICA DE MADRUGADA', 'Lunes_Sabado', '01:00:00', 300, 'Entretenimiento', 'Activo', 2, '2023-06-01 12:00:00'),  
-('CINE TRASNOCHE', 'Domingo', '23:00:00', 180, 'Entretenimiento', 'Activo', 2, '2023-06-05 13:30:00');
 
 
 -- Tabla: Bloque publicitario
@@ -236,10 +210,11 @@ INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, e
   
 -- Bloques para NOTICIAS 60 MINUTOS (programa 1) - horarios adicionales  
 INSERT INTO bloque_publicitario (idPrograma, horaBloque, ordenBloque, duracionTotal, fechaVigencia, estado) VALUES  
-(1, '07:10:00', 6, 240, '2024-03-01', 'Activo'),  
-(1, '07:40:00', 7, 300, '2024-03-01', 'Activo'),  
-(1, '08:05:00', 8, 180, '2024-03-01', 'Activo'),  
-(1, '08:25:00', 9, 240, '2024-03-01', 'Activo');  
+(1, '07:10:00', 1, 240, '2024-03-01', 'Activo'),  
+(1, '07:40:00', 2, 300, '2024-03-01', 'Activo'),  
+(1, '08:05:00', 3, 180, '2024-03-01', 'Activo'),  
+(1, '08:05:00', 4, 180, '2024-03-01', 'Activo'), 
+(1, '08:25:00', 5, 240, '2024-03-01', 'Activo');  
   
 -- Bloques para PELÍCULA MATUTINA (programa 5) - horarios adicionales    
 INSERT INTO bloque_publicitario (idPrograma, horaBloque, ordenBloque, duracionTotal, fechaVigencia, estado) VALUES  
@@ -262,10 +237,12 @@ INSERT INTO bloque_publicitario (idPrograma, horaBloque, ordenBloque, duracionTo
 (9, '15:15:00', 8, 180, '2024-03-01', 'Activo'),  
 (9, '15:45:00', 9, 120, '2024-03-01', 'Activo');
 
--- **************************************************************************************
+-- **************************************************************************************44
+-- Tabla: anuncio_bloque
+
 -- Bloque 1 (NOTICIAS 60 MINUTOS - 7:10)  
 INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
-(1, 4, 1, 60, 'EMPRESA_4', 'Programado'),  
+(1, 4, 1, 60, 'nombre comercial', 'Programado'),  
 (1, 5, 2, 60, 'EMPRESA_5', 'Programado'),  
 (1, 6, 3, 60, 'EMPRESA_6', 'Programado'),  
 (1, 7, 4, 60, 'EMPRESA_7', 'Programado');  
