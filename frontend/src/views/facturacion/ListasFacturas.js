@@ -75,18 +75,27 @@ const confirmarAnulacion = (factura) => {
 // Función para ejecutar la anulación  
 const handleAnularFactura = async () => {  
   if (!facturaSeleccionada) return;  
-  
+    
   try {  
     setProcesandoAnulacion(true);  
     await facturaService.anularFactura(facturaSeleccionada.idFactura);  
       
-    // Mostrar mensaje de éxito y recargar lista  
+    // Mostrar mensaje de éxito  
+    setMensaje({  
+      tipo: 'success',  
+      texto: 'Factura anulada exitosamente'  
+    });  
+      
+    // Recargar lista y cerrar modal  
     await cargarFacturas();  
     setModalAnular(false);  
     setFacturaSeleccionada(null);  
   } catch (error) {  
     console.error('Error al anular factura:', error);  
-    // Mostrar mensaje de error  
+    setMensaje({  
+      tipo: 'danger',  
+      texto: error.response?.data?.mensaje || 'Error al anular la factura'  
+    });  
   } finally {  
     setProcesandoAnulacion(false);  
   }  
@@ -353,7 +362,7 @@ const handleAnularFactura = async () => {
               {facturaSeleccionada && (  
                 <div>  
                   <p>¿Está seguro que desea anular la siguiente factura?</p>  
-                  <div className="bg-light p-3 rounded">  
+                  <div className=" p-3 rounded">  
                     
                     <strong>Factura No:</strong> {facturaSeleccionada.idFactura.toString().padStart(8, '0')}<br/>  
                     <strong>Cliente:</strong> {facturaSeleccionada.Cliente?.persona ?   
@@ -369,7 +378,7 @@ const handleAnularFactura = async () => {
                     <strong>Fecha:</strong> {formatearFecha(facturaSeleccionada.Fecha)}  
                   </div>  
                   <div className="mt-3">  
-                    <small className="text-warning">  
+                    <small className="text-danger">  
                       <i className="fas fa-exclamation-triangle" />   
                        - Esta acción no se puede deshacer. La factura quedará marcada como anulada permanentemente.  
                     </small>  
@@ -390,15 +399,10 @@ const handleAnularFactura = async () => {
                 onClick={handleAnularFactura}  
                 disabled={procesandoAnulacion}  
               >  
-                {procesandoAnulacion ? (  
-                  <>  
-                    <i className="fas fa-spinner fa-spin" /> Anulando...  
-                  </>  
-                ) : (  
-                  <>  
+                
                     <i className="fas fa-ban" /> Confirmar Anulación  
-                  </>  
-                )}  
+                  
+                
               </Button>  
             </ModalFooter>  
           </Modal>  

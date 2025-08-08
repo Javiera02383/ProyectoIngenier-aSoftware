@@ -35,9 +35,9 @@ export const facturaService = {
       
   // Anular factura    
   anularFactura: async (id) => {    
-    const response = await axiosInstance.put(`/factura/${id}/anular`);  
-    return response.data;  
-  },    
+  const response = await axiosInstance.patch(`/factura/${id}/anular`);  
+  return response.data;  
+},   
       
   // Descargar PDF de factura    
   descargarPDF: (id) => {    
