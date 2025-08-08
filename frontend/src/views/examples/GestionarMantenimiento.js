@@ -23,6 +23,9 @@ const GestionarMantenimiento = () => {
   const navigate = useNavigate();    
   const { toast, showSuccess, showError, hideToast } = useToast();    
   const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });  
+  const [archivoImagen, setArchivoImagen] = useState(null); //cambio
+  const [modalImagen, setModalImagen] = useState(false);  
+  const [imagenActual, setImagenActual] = useState(null);
   const [mantenimientoActual, setMantenimientoActual] = useState({    
     idInventario: '',    
     descripcionMantenimiento: '',    
@@ -118,26 +121,48 @@ const GestionarMantenimiento = () => {
   setMensaje({ tipo: '', texto: '' });  
   
   try {  
-    // Preparar datos con conversiones correctas  
-    const datosMantenimiento = {  
+    let datosMantenimiento;
+
+    if (archivoImagen){
+      const datosMantenimiento = new FormData();
+      datosMantenimiento.append('idInventario', mantenimientoActual.idInventario);
+      datosMantenimiento.append('descripcionMantenimiento', mantenimientoActual.descripcionMantenimiento.trim());
+      datosMantenimiento.append('fechaInicio', mantenimientoActual.fechaInicio);
+      //datosMantenimiento.append('imagen', archivoImagen);
+    /*const datosMantenimiento = {  
       idInventario: parseInt(mantenimientoActual.idInventario),  
       descripcionMantenimiento: mantenimientoActual.descripcionMantenimiento.trim(),  
       fechaInicio: mantenimientoActual.fechaInicio  
-    };  
+    }; */
   
     // Solo agregar campos opcionales si tienen valor  
     if (mantenimientoActual.fechaFin && mantenimientoActual.fechaFin.trim() !== '') {  
-      datosMantenimiento.fechaFin = mantenimientoActual.fechaFin;  
+      datosMantenimiento.append('fechaFin', mantenimientoActual.fechaFin); 
     }  
   
-    if (mantenimientoActual.costoMantenimiento && mantenimientoActual.costoMantenimiento !== '') {  
-      datosMantenimiento.costoMantenimiento = parseFloat(mantenimientoActual.costoMantenimiento);  
+    if (mantenimientoActual.costoMantenimiento && mantenimientoActual.costoMantenimiento !== '' && !isNaN(mantenimientoActual.costoMantenimiento)) {  
+      datosMantenimiento.append('costoMantenimiento', parseFloat(mantenimientoActual.costoMantenimiento));
     }  
+    } else {
+      datosMantenimiento = {
+        idInventario:parseInt(mantenimientoActual.idInventario),
+        descripcionMantenimiento: mantenimientoActual.descripcionMantenimiento.trim(),
+        fechaInicio: mantenimientoActual.fechaInicio
+      };
+
+      if (mantenimientoActual.fechaFin && mantenimientoActual.fechaFin.trim() !== ''){
+        datosMantenimiento.fechaFin = mantenimientoActual.fechaFin;
+      }
+      if (mantenimientoActual.costoMantenimiento && mantenimientoActual.costoMantenimiento !== '' && !isNaN(mantenimientoActual.costoMantenimiento)) {
+          datosMantenimiento.costoMantenimiento = parseFloat(mantenimientoActual.costoMantenimiento);
+      }
+
+    }
   
-    if (mantenimientoActual.nombreImagen && mantenimientoActual.nombreImagen.trim() !== '') {  
+    /*if (mantenimientoActual.nombreImagen && mantenimientoActual.nombreImagen.trim() !== '') {  
       datosMantenimiento.nombreImagen = mantenimientoActual.nombreImagen.trim();  
     }  
-  
+  */
     console.log('Datos a enviar:', datosMantenimiento); // Para debug  
   
     if (editando) {  
@@ -188,7 +213,11 @@ const GestionarMantenimiento = () => {
     });    
     setEditando(true);    
     setModal(true);    
-  };    
+  };  
+   const handleVerImagen = (idMantenimiento) => {  
+  setImagenActual(`/api/optica/inventario/mantenimiento/${idMantenimiento}/imagen`);  
+  setModalImagen(true);  
+};  
     
   const resetForm = () => {    
     setMantenimientoActual({    
@@ -198,7 +227,8 @@ const GestionarMantenimiento = () => {
       fechaInicio: '',    
       fechaFin: '',    
       nombreImagen: ''    
-    });    
+    });  
+    setArchivoImagen(null);  
     setEditando(false);    
   };    
     
@@ -323,14 +353,15 @@ const GestionarMantenimiento = () => {
                       <th scope="col">Costo</th>    
                       <th scope="col">Fecha Inicio</th>    
                       <th scope="col">Fecha Fin</th>    
-                      <th scope="col">Estado</th>    
+                      <th scope="col">Estado</th> 
+                      <th scope="col">Imagen</th>   
                       <th scope="col">Acciones</th>    
                     </tr>    
                   </thead>    
                   <tbody>    
                     {loading ? (    
                       <tr>    
-                        <td colSpan="8" className="text-center">Cargando...</td>    
+                        <td colSpan="9" className="text-center">Cargando...</td>    
                       </tr>    
                     ) : mantenimientosFiltrados.length === 0 ? (    
                       <tr>    
@@ -359,7 +390,20 @@ const GestionarMantenimiento = () => {
                             <span className={`badge ${mantenimiento.fechaFin ? 'badge-success' : 'badge-warning'}`}>    
                               {mantenimiento.fechaFin ? 'Completado' : 'En proceso'}    
                             </span>    
-                          </td>    
+                          </td> 
+                           <td>  
+  {mantenimiento.nombreImagen ? (  
+    <Button  
+      color="info"  
+      size="sm"  
+      onClick={() => handleVerImagen(mantenimiento.idMantenimiento)}  
+    >  
+      <i className="fas fa-image" /> Ver  
+    </Button>  
+  ) : (  
+    <span className="text-muted">Sin imagen</span>  
+  )}  
+</td>  
                           <td>    
                             <Dropdown isOpen={dropdownOpen[mantenimiento.idMantenimiento]}     
                                       toggle={() => toggleDropdown(mantenimiento.idMantenimiento)}>    
@@ -395,7 +439,29 @@ const GestionarMantenimiento = () => {
           {mensaje.texto}  
         </Alert>  
       )}  
-        
+       {/* Modal para mostrar imagen */}  
+<Modal isOpen={modalImagen} toggle={() => setModalImagen(!modalImagen)} size="lg">  
+  <ModalHeader toggle={() => setModalImagen(!modalImagen)}>  
+    Imagen de Mantenimiento  
+  </ModalHeader>  
+  <ModalBody className="text-center">  
+    {imagenActual && (  
+      <img  
+        src={imagenActual}  
+        alt="Imagen de mantenimiento"  
+        style={{ maxWidth: '100%', maxHeight: '500px' }}  
+        onError={(e) => {  
+          e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZW4gbm8gZGlzcG9uaWJsZTwvdGV4dD48L3N2Zz4=';  
+        }}  
+      />  
+    )}  
+  </ModalBody>  
+  <ModalFooter>  
+    <Button color="secondary" onClick={() => setModalImagen(false)}>  
+      Cerrar  
+    </Button>  
+  </ModalFooter>  
+</Modal> 
       <Row>  
         <Col md="6">  
           <FormGroup>  
@@ -465,13 +531,14 @@ const GestionarMantenimiento = () => {
         />  
       </FormGroup>  
       <FormGroup>  
-        <Label>Nombre de Imagen</Label>  
+        <Label>Imagen de Respaldo</Label>  
         <Input  
-          type="text"  
-          value={mantenimientoActual.nombreImagen || ''}  
-          onChange={(e) => setMantenimientoActual({...mantenimientoActual, nombreImagen: e.target.value})}  
-          placeholder="Nombre del archivo de imagen (opcional)"  
-          maxLength="255"  
+          type="file"  
+          //value={mantenimientoActual.nombreImagen || ''}  
+          accept="image/jpeg,image/png,image/jpg"  
+          onChange={(e) => setArchivoImagen(e.target.files[0])}
+          //placeholder="Nombre del archivo de imagen (opcional)"  
+          //maxLength="255"  
         />  
       </FormGroup>  
     </ModalBody>  

@@ -5,20 +5,27 @@ const mantenimientoController = require('../../controladores/inventario/mantenim
 const InventarioModel = require('../../modelos/inventario/Inventario');
 const router = express.Router();  
 const { verificarUsuario } = require('../../configuraciones/passport');  
-  
-// Obtener todos los mantenimientos sin filtros  
-router.get('/mantenimiento/todos',  
-  verificarUsuario,  
-  mantenimientoController.obtenerMantenimientoTodos  
-);
+const path = require('path');  
+const fs = require('fs');  
+const { uploadImagenMantenimiento } = require('../../configuraciones/archivo');
 
 // Crear mantenimiento  
 router.post('/mantenimiento',  
-  verificarUsuario,  
+  verificarUsuario,
+  (req, res, next) => {  
+    uploadImagenMantenimiento(req, res, (err) => {  
+      if (err) {  
+        return res.status(400).json({ error: err.message });  
+      }   
+      if (req.file) {  
+        req.body.nombreImagen = req.file.filename;  
+      }  
+      next();  
+    });  
+  },  
   [  
     body('idInventario').isInt({ min: 1 }).withMessage('El idInventario debe ser un número entero positivo')  
       .custom(async value => {  
-        
         const existe = await InventarioModel.findByPk(value);  
         if (!existe) throw new Error('El activo de inventario asociado no existe');  
         return true;  
@@ -46,10 +53,47 @@ router.post('/mantenimiento',
         }  
         return true;  
       }),  
-    body('nombreImagen').optional().isLength({ max: 255 }).withMessage('El nombre de imagen no puede exceder 255 caracteres')  
+    body('nombreImagen').optional().isLength({ max: 255 }).withMessage('El nombre de imagen no puede exceder 255 caracteres')  //cambio
   ],  
   mantenimientoController.crearMantenimiento  
-);  
+);
+// Endpoint para servir imágenes de mantenimiento  
+router.get('/mantenimiento/:id/imagen', verificarUsuario, async (req, res) => {  
+  try {  
+    const Mantenimiento = require('../../modelos/inventario/Mantenimiento');
+    const mantenimiento = await Mantenimiento.findByPk(req.params.id);
+    //const mantenimiento = await mantenimientoController.obtenerMantenimientoPorId(req.params.id);  
+    if (!mantenimiento || !mantenimiento.nombreImagen) {  
+      return res.status(404).json({ error: 'Imagen de mantenimiento no encontrada' });  
+    }  
+      
+    const filePath = path.resolve(__dirname, '../../../public/img/mantenimiento', mantenimiento.nombreImagen);  
+    if (!fs.existsSync(filePath)) {  
+      return res.status(404).json({ error: 'Archivo de imagen no encontrado' });  
+    }  
+    // Determinar el tipo de contenido basado en la extensión  
+    const ext = path.extname(mantenimiento.nombreImagen).toLowerCase();  
+    let contentType = 'image/jpeg';  
+    if (ext === '.png') contentType = 'image/png'; 
+    if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';  
+    
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', 'inline');  
+    res.sendFile(filePath);  
+    // Headers para mostrar imagen en navegador 
+    /*res.setHeader('Content-Type', 'image/jpeg');  
+    res.setHeader('Cache-Control', 'no-cache'); */
+  } catch (error) {  
+    console.error('Error al servir imagen:', error);  
+    res.status(500).json({ error: 'Error al obtener imagen de mantenimiento' });  
+  }  
+});
+// Obtener todos los mantenimientos sin filtros  
+router.get('/mantenimiento/todos',  
+  verificarUsuario,  
+  mantenimientoController.obtenerMantenimientoTodos  
+);
+  
   
 // Obtener todos los mantenimientos con filtros  
 router.get('/mantenimientos',  

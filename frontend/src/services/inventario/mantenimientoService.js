@@ -30,7 +30,11 @@ export const mantenimientoService = {
   },  
   
   crearMantenimiento: async (mantenimientoData) => {  
-    const response = await axiosInstance.post('/inventario/mantenimiento', mantenimientoData);  
+    const config = {};
+    if (mantenimientoData instanceof FormData){
+      config.headers = {};
+    }
+    const response = await axiosInstance.post('/inventario/mantenimiento', mantenimientoData, config);  
     return response.data;  
   },  
   
