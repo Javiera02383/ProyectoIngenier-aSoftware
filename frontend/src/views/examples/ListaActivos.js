@@ -5,7 +5,7 @@ import {
   CardHeader,
   DropdownMenu,
   DropdownItem,
-  UncontrolledDropdown,
+  Dropdown,  
   DropdownToggle,
   Media,
   Table,
@@ -17,9 +17,11 @@ import {
   Col,
   Spinner,
 } from "reactstrap";
-
-import axios from "axios";
+import { useNavigate } from 'react-router-dom';  
+import { inventarioService } from '../../services/inventario/inventarioService';  
+import { useToast } from '../../hooks/useToast';
 import HeaderBlanco from "components/Headers/HeaderBlanco.js";
+import Toast from 'components/Toast/Toast';  
 
 const ListaActivos = () => {
   const [inventarioOriginal, setInventarioOriginal] = useState([]);
@@ -27,33 +29,53 @@ const ListaActivos = () => {
   const [uniqueCategories, setUniqueCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [cargando, setCargando] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState({}); 
 
-  useEffect(() => {
-    const obtenerDatos = async () => {
-      try {
-        const token = localStorage.getItem("token"); // o como estés guardando tu JWT
+  const navigate = useNavigate();  
+  const { toast, showSuccess, showError, hideToast } = useToast();
 
-        const res = await axios.get("http://localhost:4051/api/optica/inventario/todos", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
-        const data = res.data;
-
-        setInventarioOriginal(data);
-        setCargando(false);
-
-        const categorias = [...new Set(data.map(item => item.nombre))]; // o usa otra propiedad si tienes una categoría real
-        setUniqueCategories(["all", ...categorias]);
-      } catch (error) {
-        console.error("Error al obtener el inventario:", error);
-        setCargando(false);
-      }
-    };
+  useEffect(() => {  
+    const obtenerDatos = async () => {  
+      try {  
+        const data = await inventarioService.obtenerInventarios();  
+        setInventarioOriginal(Array.isArray(data) ? data : []);  
+        setCargando(false);  
+  
+        const categorias = [...new Set(data.map(item => item.nombre))];  
+        setUniqueCategories(["all", ...categorias]);  
+      } catch (error) {  
+        console.error("Error al obtener el inventario:", error);  
+        showError("Error al cargar el inventario");  
+        setCargando(false);  
+      }  
+    }; 
 
     obtenerDatos();
-  }, []);
+  }, [showError]);
+
+    const toggleDropdown = (id) => {  
+    setDropdownOpen(prevState => ({ ...prevState, [id]: !prevState[id] }));  
+  };  
+  
+  const handleEdit = (id) => {  
+    navigate(`/admin/editar-activo/${id}`);  
+  };  
+  
+  const handleDelete = async (id) => {  
+    if (window.confirm('¿Estás seguro de eliminar este activo?')) {  
+      try {  
+        await inventarioService.eliminarInventario(id);  
+        setInventarioOriginal(inventarioOriginal.filter(a => a.idInventario !== id));  
+        showSuccess('Activo eliminado exitosamente');  
+      } catch (error) {  
+        showError('Error al eliminar el activo');  
+      }  
+    }  
+  };  
+  
+  const handleViewDetails = (id) => {  
+    navigate(`/admin/detalle-activo/${id}`);  
+  }; 
 
   const filteredAssets = inventarioOriginal.filter(asset => {
     const matchesCategory = selectedCategory === "all" || asset.Nombre === selectedCategory;
@@ -137,16 +159,16 @@ const ListaActivos = () => {
                         <td>{asset.Empleado?.nombre || "No asignado"}</td>
                         <td>{asset.observacion}</td>
                         <td className="text-right">
-                          <UncontrolledDropdown>
-                            <DropdownToggle className="btn-icon-only text-light" href="#" size="sm">
-                              <i className="fas fa-ellipsis-v" />
-                            </DropdownToggle>
-                            <DropdownMenu className="dropdown-menu-arrow" right>
-                              <DropdownItem href="#">Ver Detalles</DropdownItem>
-                              <DropdownItem href="#">Editar</DropdownItem>
-                              <DropdownItem href="#">Eliminar</DropdownItem>
-                            </DropdownMenu>
-                          </UncontrolledDropdown>
+                          <Dropdown isOpen={dropdownOpen[asset.idInventario]} toggle={() => toggleDropdown(asset.idInventario)}>  
+                              <DropdownToggle className="btn-icon-only text-light" size="sm">  
+                                <i className="fas fa-ellipsis-v" />  
+                              </DropdownToggle>  
+                              <DropdownMenu className="dropdown-menu-arrow" right>  
+                                <DropdownItem onClick={() => handleViewDetails(asset.idInventario)}>Ver Detalles</DropdownItem>  
+                                <DropdownItem onClick={() => handleEdit(asset.idInventario)}>Editar</DropdownItem>  
+                                <DropdownItem onClick={() => handleDelete(asset.idInventario)}>Eliminar</DropdownItem>  
+                              </DropdownMenu>  
+                            </Dropdown>
                         </td>
                       </tr>
                     ))

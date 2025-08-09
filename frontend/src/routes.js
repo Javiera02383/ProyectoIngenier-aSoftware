@@ -45,6 +45,7 @@ import GestionarStock from "views/examples/GestionarStock.js";
 import InventarioHub from "views/examples/InventarioHub.js";
 import ListaActivos from "views/examples/ListaActivos.js";
 import RegistrarActivo from "views/examples/RegistrarActivo.js";
+import DetalleActivo from "views/examples/DetalleActivo.js";
 
 // Productos
 import Productos from "views/productos/Productos.js";
@@ -213,7 +214,20 @@ const routes = [
     layout: "/admin",
     hidden: true,
   },
-
+  {  
+  path: "/detalle-activo/:id",  
+  name: "Detalle de Activo",   
+  component: DetalleActivo,  
+  layout: "/admin",  
+  hidden: true,  
+},
+{  
+  path: "/editar-activo/:id",  
+  name: "Editar Activo",  
+  component: RegistrarActivo, // Reutilizar el mismo componente  
+  layout: "/admin",  
+  hidden: true,  
+},
   
   // Facturación
   {
