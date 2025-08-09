@@ -1,27 +1,26 @@
 // views/Facturas/ListaFacturas.js  
-import React, { useState, useEffect } from 'react';  
-import {  
-  Card,    
-  CardHeader,    
-  CardBody,    
-  Table,    
-  Container,    
-  Row,    
-  Col,    
-  Button,    
-  Badge,    
-  Input,    
-  InputGroup,    
-  InputGroupAddon,    
-  InputGroupText,  
-  Alert,  
-  Modal,  
-  ModalHeader,  
-  ModalBody,  
-  ModalFooter   
-} from 'reactstrap';  
-import HeaderBlanco from 'components/Headers/HeaderBlanco.js';  
-import { facturaService } from 'services/facturacion/facturaService.js';  
+import HeaderBlanco from 'components/Headers/HeaderBlanco.js';
+import { useEffect, useState } from 'react';
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Container,
+  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Row,
+  Table
+} from 'reactstrap';
+import { facturaService } from 'services/facturacion/facturaService.js';
 
  
 const ListaFacturas = () => {    

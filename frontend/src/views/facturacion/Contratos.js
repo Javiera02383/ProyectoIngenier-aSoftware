@@ -1,15 +1,26 @@
 // views/programacion/Contratos.js  
-import React, { useState, useEffect } from "react";  
-import {  
-  Card, CardBody, CardHeader,  
-  Container, Row, Col,  
-  Table, Button, FormGroup, Label, Input, Form, Badge, Alert,  
-  Modal, ModalHeader, ModalBody, ModalFooter  
-} from "reactstrap";  
-import HeaderBlanco from "components/Headers/HeaderBlanco.js";  
-import { ordenPublicidadService } from "../../services/programacion/ordenpublicidadService";  
-import { clienteService } from "../../services/gestion_cliente/clienteService";  
-import { empleadoService } from "../../services/gestion_cliente/empleadoService";  
+import HeaderBlanco from "components/Headers/HeaderBlanco.js";
+import { useEffect, useState } from "react";
+import {
+  Alert,
+  Badge,
+  Button,
+  Card, CardBody, CardHeader,
+  Col,
+  Container,
+  Form,
+  FormGroup,
+  Input,
+  Label,
+  Modal,
+  ModalBody, ModalFooter,
+  ModalHeader,
+  Row,
+  Table
+} from "reactstrap";
+import { clienteService } from "../../services/gestion_cliente/clienteService";
+import { empleadoService } from "../../services/gestion_cliente/empleadoService";
+import { ordenPublicidadService } from "../../services/programacion/ordenpublicidadService";
   
 const Contratos = () => {  
   // Estados principales  
