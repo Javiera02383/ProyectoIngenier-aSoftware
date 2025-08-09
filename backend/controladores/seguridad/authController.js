@@ -4,6 +4,7 @@ const Usuario = require('../../modelos/seguridad/Usuario');
 const { getToken } = require('../../configuraciones/passport');
 const { EnviarCorreo } = require('../../configuraciones/correo');
 const Persona = require('../../modelos/seguridad/Persona');
+const Empleado = require('../../modelos/gestion_cliente/Empleado');
 
 // Función para generar PIN de 6 dígitos
 const generarPin = () => {
@@ -32,6 +33,12 @@ exports.registrar = async (req, res) => {
       contraseña: hash,
       idPersona,
       idrol
+    });
+
+    // Asegurar que toda persona con usuario tenga registro de Empleado
+    await Empleado.findOrCreate({
+      where: { idPersona },
+      defaults: { idPersona }
     });
 
     res.status(201).json({ mensaje: 'Usuario registrado exitosamente', usuario: Nombre_Usuario });
@@ -75,9 +82,24 @@ exports.iniciarSesion = async (req, res) => {
       Nombre_Usuario: usuario.Nombre_Usuario
     };
 
+    // Garantizar que exista Empleado y obtener idEmpleado
+    let empleado = await Empleado.findOne({ where: { idPersona: usuario.idPersona } });
+    if (!empleado && usuario.idPersona) {
+      empleado = await Empleado.create({ idPersona: usuario.idPersona });
+    }
+
     const token = getToken(payload);
 
-    res.json({ mensaje: 'Inicio de sesión exitoso', token, user: { idUsuario: usuario.idUsuario, Nombre_Usuario: usuario.Nombre_Usuario } });
+    res.json({
+      mensaje: 'Inicio de sesión exitoso',
+      token,
+      user: {
+        idUsuario: usuario.idUsuario,
+        Nombre_Usuario: usuario.Nombre_Usuario,
+        idPersona: usuario.idPersona,
+        idEmpleado: empleado ? empleado.idEmpleado : null
+      }
+    });
 
   } catch (error) {
     res.status(500).json({ mensaje: 'Error en el servidor', error: error.message });

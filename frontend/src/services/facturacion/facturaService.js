@@ -39,12 +39,20 @@ export const facturaService = {
   return response.data;  
 },   
       
-  // Descargar PDF de factura    
-  descargarPDF: (id) => {    
- 
-  const token = getAuthToken(); // Usar la función local  
-  window.open(`${axiosInstance.defaults.baseURL}/factura/${id}/pdf?token=${token}`, '_blank');    
- 
-  }    
+  // Descargar PDF de factura con axios y blob, respetando Authorization
+  descargarPDF: async (id) => {
+    const response = await axiosInstance.get(`/factura/${id}/pdf`, {
+      responseType: 'blob'
+    });
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `factura_${id}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  }
 };  
   

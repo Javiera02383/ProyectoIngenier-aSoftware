@@ -89,6 +89,7 @@ const routes = [
     name: "Nuevo Cliente",
     component: ClienteForm,
     layout: "/admin",
+    hidden: true,
     
   },
   {
@@ -96,6 +97,7 @@ const routes = [
     name: "Editar Cliente",
     component: ClienteForm,
     layout: "/admin",
+    hidden: true,
     
   },
   {
@@ -110,6 +112,7 @@ const routes = [
     name: "Nuevo Empleado",
     component: EmpleadoForm,
     layout: "/admin",
+    hidden: true,
     
   },
   {
@@ -117,27 +120,28 @@ const routes = [
     name: "Editar Empleado",
     component: EmpleadoForm,
     layout: "/admin",
+    hidden: true,
     
   },
 
   // Productos
   {
     path: "/productos",
-    name: "Productos",
+    name: "Servicios",
     icon: "ni ni-shop text-info",
     component: Productos,
     layout: "/admin",
   },
   {
     path: "/productos/nuevo",
-    name: "Nuevo Producto",
+    name: "Nuevo Servicio",
     component: ProductoForm,
     layout: "/admin",
     hidden: true,
   },
   {
     path: "/productos/editar/:id",
-    name: "Editar Producto",
+    name: "Editar Servicio",
     component: ProductoForm,
     layout: "/admin",
     hidden: true,
@@ -148,6 +152,7 @@ const routes = [
     icon: "ni ni-tag text-warning",
     component: Categorias,
     layout: "/admin",
+    hidden: true,
   },
   {
     path: "/categorias/nueva",
@@ -299,7 +304,7 @@ const routes = [
     icon: "ni ni-briefcase-24 text-info",
     component: Contratos,
     layout: "/admin",
-    hidden: true,
+    
   },
   {
     path: "/facturacion/canjes",
@@ -404,6 +409,7 @@ const routes = [
     name: "Nueva Persona",
     component: PersonaForm,
     layout: "/admin",
+    hidden: true,
     
   },
   {
@@ -411,6 +417,7 @@ const routes = [
     name: "Editar Persona",
     component: PersonaForm,
     layout: "/admin",
+     hidden: true,
     
   },
 
@@ -448,6 +455,7 @@ const routes = [
     icon: "ni ni-pin-3 text-orange",
     component: Maps,
     layout: "/admin",
+     hidden: true,
   },
 
 ];

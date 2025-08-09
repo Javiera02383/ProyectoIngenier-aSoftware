@@ -22,6 +22,7 @@ import { facturaService } from '../../services/facturacion/facturaService.js';
 import { caiService } from '../../services/facturacion/caiService.js';
 import { clienteService } from '../../services/gestion_cliente/clienteService';  
 import { empleadoService } from '../../services/gestion_cliente/empleadoService';  
+import { authService } from '../../services/seguridad/authService';
 import { productoService } from '../../services/productos/productoService';  
 import { ordenPublicidadService } from '../../services/programacion/ordenpublicidadService.js';
 
@@ -63,6 +64,7 @@ const CrearFacturaNueva = () => {
     tipoServicio: 'spot',      
     agencia: '',      
     ordenNo: '',      
+    idOrdenPublicidad: '',
     ordenCompraExenta: '',      
     numeroRegistroSAG: '',      
     constanciaExonerado: ''      
@@ -121,7 +123,7 @@ const CrearFacturaNueva = () => {
   const cargarOrdenesPublicidad = async () => {  
     try {  
       const response = await axiosInstance.get('/programacion/orden?estado=Aprobada');  
-      setOrdenesPublicidad(response.data);  
+      setOrdenesPublicidad(Array.isArray(response.data) ? response.data : response.data?.ordenes || []);  
     } catch (error) {  
       console.error('Error cargando órdenes de publicidad:', error);  
     }  
@@ -220,6 +222,12 @@ useEffect(() => {
       cargarSiguienteNumeroFactura()
     ]);  
       
+    // Preseleccionar empleado que inició sesión (si existe)
+    const usuarioActual = authService.getCurrentUser();
+    if (usuarioActual?.idEmpleado) {
+      setFactura(prev => ({ ...prev, idEmpleado: String(usuarioActual.idEmpleado) }));
+    }
+
     setLoadingData(false);  
   };  
   
@@ -277,6 +285,14 @@ useEffect(() => {
   const agregarDescuento = () => {        
     setDescuentos([...descuentos, { idDescuento: '', monto: 0 }]);        
   };        
+
+  // Descuento 0% por defecto al cargar
+  useEffect(() => {
+    if (descuentosDisponibles.length >= 0 && descuentos.length === 0) {
+      // Insertar un renglón de descuento 0% (monto 0)
+      setDescuentos([{ idDescuento: '', monto: 0 }]);
+    }
+  }, [descuentosDisponibles]);
         
   const handleDescuentoChange = (index, field, value) => {  
     const nuevosDescuentos = [...descuentos];  
@@ -328,7 +344,8 @@ useEffect(() => {
           idFactura: parseInt(factura.idFactura),   
           idCliente: parseInt(factura.idCliente),        
           idFormaPago: parseInt(factura.idFormaPago),        
-          idEmpleado: parseInt(factura.idEmpleado)        
+          idEmpleado: parseInt(factura.idEmpleado),
+          idOrdenPublicidad: factura.idOrdenPublicidad ? parseInt(factura.idOrdenPublicidad) : null
         },         
         detalles: detalles.map(d => ({        
           ...d,        
@@ -366,7 +383,8 @@ useEffect(() => {
         periodoFin: '',      
         tipoServicio: 'spot',      
         agencia: '',      
-        ordenNo: '',      
+        ordenNo: '',
+        idOrdenPublicidad: '',
         ordenCompraExenta: '',      
         numeroRegistroSAG: '',      
         constanciaExonerado: ''      
@@ -514,26 +532,34 @@ useEffect(() => {
                         </FormGroup>      
                       </Col> 
                       <Col lg="4">      
-                        <FormGroup>      
-                          <Label className="form-control-label" htmlFor="ordenNo">      
-                            Orden de Publicidad (Opcional)      
-                          </Label>      
-                          <Input      
-                            className="form-control-alternative"      
-                            id="ordenNo"      
-                            name="ordenNo"      
-                            type="select"      
-                            value={factura.ordenNo}      
-                            onChange={handleFacturaChange}      
-                          >      
-                            <option value="">Seleccionar orden...</option>      
-                            {ordenesPublicidad.map(orden => (      
-                              <option key={orden.idOrden} value={orden.numeroOrden}>      
-                                {orden.numeroOrden} ({orden.Cliente?.persona?.Pnombre} {orden.Cliente?.persona?.Papellido})  
-                              </option>      
-                            ))}      
-                          </Input>      
-                        </FormGroup>      
+                        <FormGroup>
+                          <Label className="form-control-label" htmlFor="idOrdenPublicidad">
+                            Orden de Publicidad (Opcional)
+                          </Label>
+                          <Input
+                            className="form-control-alternative"
+                            id="idOrdenPublicidad"
+                            name="idOrdenPublicidad"
+                            type="select"
+                            value={factura.idOrdenPublicidad}
+                            onChange={(e) => {
+                              const selectedId = e.target.value;
+                              const orden = ordenesPublicidad.find(o => String(o.idOrden) === String(selectedId));
+                              setFactura(prev => ({
+                                ...prev,
+                                idOrdenPublicidad: selectedId || '',
+                                ordenNo: orden?.numeroOrden || ''
+                              }));
+                            }}
+                          >
+                            <option value="">Seleccionar orden...</option>
+                            {ordenesPublicidad.map(orden => (
+                              <option key={orden.idOrden} value={orden.idOrden}>
+                                {orden.numeroOrden} ({orden.Cliente?.persona?.Pnombre} {orden.Cliente?.persona?.Papellido})
+                              </option>
+                            ))}
+                          </Input>
+                        </FormGroup>
                       </Col>
                       <Col lg="4">        
                         <FormGroup>        

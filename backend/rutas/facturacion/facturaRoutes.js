@@ -413,7 +413,10 @@ router.get('/factura/:id/pdf', verificarUsuario, async (req, res) => {
       return res.status(404).json({ error: 'Archivo PDF no encontrado' });  
     }  
       
-    res.download(filePath);  
+    // Enviar como descarga explícita con headers
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${path.basename(filePath)}`);
+    res.download(filePath);
   } catch (error) {  
     res.status(500).json({ error: 'Error al obtener PDF de factura' });  
   }  

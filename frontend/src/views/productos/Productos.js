@@ -55,17 +55,22 @@ const Productos = () => {
         <Row>
           <div className="col">
             <Card className="shadow">
-              <CardHeader className="border-0">
-                <Row className="align-items-center">
-                  <Col xs="8">
-                    <h3 className="mb-0">Gestión de Servicios</h3>
-                  </Col>
-                  <Col className="text-right" xs="4">
-                    <Button color="primary" onClick={() => navigate('/admin/productos/nuevo')}>
-                      Nuevo Servicio
-                    </Button>
-                  </Col>
-                </Row>
+              <CardHeader className="border-0">  
+                <Row className="align-items-center">  
+                  <Col xs="8">  
+                    <h3 className="mb-0">Gestión de Servicios</h3>  
+                  </Col>  
+                  <Col xs="4" className="text-right">  
+                    <div className="btn-group" role="group">  
+                      <Button color="outline-primary" onClick={() => navigate('/admin/categorias')}>  
+                        Categorías  
+                      </Button>  
+                      <Button color="primary" onClick={() => navigate('/admin/productos/nuevo')}>  
+                        Nuevo Servicio  
+                      </Button>  
+                    </div>  
+                  </Col>  
+                </Row>  
               </CardHeader>
               <CardBody>
                 <Table className="align-items-center table-flush" responsive>

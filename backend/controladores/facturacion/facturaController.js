@@ -326,13 +326,13 @@ exports.crearFacturaCompleta = async (req, res) => {
     const doc = new PDFDocument({ margin: 50 });          
     doc.pipe(fs.createWriteStream(rutaPDF));          
       
-    // LOGO DEL CANAL (lado izquierdo)  
-    const logoPath = path.join(__dirname, '../../img/logoCanal.png');  
-    if (fs.existsSync(logoPath)) {  
-      doc.image(logoPath, "PNG", 10, 10, 30, 30);  
-    }  
-    else {  
-      console.log('Logo no encontrado en la ruta especificada');  
+    // LOGO DEL CANAL (lado izquierdo)
+    const logoPath = path.join(__dirname, '../../img/logoCanal.png');
+    if (fs.existsSync(logoPath)) {
+      // pdfkit: image(src, x, y, options)
+      doc.image(logoPath, 10, 10, { width: 30, height: 30 });
+    } else {
+      console.log('Logo no encontrado en la ruta especificada:', logoPath);
     }
       
     // ENCABEZADO DE LA EMPRESA (centrado, al lado del logo)  
