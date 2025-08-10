@@ -403,6 +403,7 @@ const routes = [
     icon: "ni ni-circle-08 text-info",
     component: Personas,
     layout: "/admin",
+    hidden: true,
   },
   {
     path: "/personas/nueva",

@@ -19,6 +19,16 @@ export const inventarioService = {
   actualizarInventario: async (id, inventarioData) => {  
     const response = await axiosInstance.put(`/inventario/${id}`, inventarioData);  
     return response.data;  
+  },
+
+  obtenerHistorialMovimientos: async (id) => {
+    const response = await axiosInstance.get(`/inventario/${id}/movimientos`);
+    return response.data;
+  },
+
+  registrarSalidaStock: async (id, salidaData) => {
+    const response = await axiosInstance.post(`/inventario/${id}/salida`, salidaData);
+    return response.data;
   },  
   
   eliminarInventario: async (id) => {  

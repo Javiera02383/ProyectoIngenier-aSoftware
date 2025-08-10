@@ -32,7 +32,9 @@ export const mantenimientoService = {
   crearMantenimiento: async (mantenimientoData) => {  
     const config = {};
     if (mantenimientoData instanceof FormData){
-      config.headers = {};
+      config.headers = {
+        'Content-Type': 'multipart/form-data'
+      };
     }
     const response = await axiosInstance.post('/inventario/mantenimiento', mantenimientoData, config);  
     return response.data;  
@@ -41,10 +43,26 @@ export const mantenimientoService = {
   editarMantenimiento: async (id, mantenimientoData) => {  
     const response = await axiosInstance.put(`/inventario/mantenimiento/${id}`, mantenimientoData);  
     return response.data;  
-  },  
+  },
+  
+  editarMantenimientoConImagen: async (id, mantenimientoData) => {
+    const config = {};
+    if (mantenimientoData instanceof FormData) {
+      config.headers = {
+        'Content-Type': 'multipart/form-data'
+      };
+    }
+    const response = await axiosInstance.put(`/inventario/mantenimiento/${id}/con-imagen`, mantenimientoData, config);
+    return response.data;
+  },
   
   eliminarMantenimiento: async (id) => {  
     const response = await axiosInstance.delete(`/inventario/mantenimiento/${id}`);  
     return response.data;  
-  }  
+  },
+
+  eliminarImagenMantenimiento: async (id) => {
+    const response = await axiosInstance.delete(`/inventario/mantenimiento/${id}/imagen`);
+    return response.data;
+  }
 };

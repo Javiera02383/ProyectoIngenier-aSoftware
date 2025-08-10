@@ -28,6 +28,7 @@ const GestionarStock = () => {
   // Estados del formulario - SOLO SALIDAS  
   const [selectedAssetId, setSelectedAssetId] = useState("");    
   const [quantity, setQuantity] = useState("");    
+  const [observaciones, setObservaciones] = useState("");    
   // Removido movementType ya que solo será salida  
       
   // Estados para mensajes    
@@ -55,82 +56,87 @@ const GestionarStock = () => {
     cargarInventario();    
   }, [showError]);    
     
-  // Función para actualizar stock    
-  const updateStock = async (assetId, newQuantity) => {    
-    try {    
-      setLoadingSubmit(true);    
-      await inventarioService.actualizarInventario(assetId, { cantidad: newQuantity });    
+    // Función para registrar salida de stock
+  const registrarSalidaStock = async (assetId, cantidadSalida, observaciones = '') => {
+    try {
+      setLoadingSubmit(true);
+      
+      // Usar la nueva función específica para salidas
+      const response = await inventarioService.registrarSalidaStock(assetId, {
+        cantidad: cantidadSalida,
+        observaciones: observaciones
+      });
           
-      // Actualizar el estado local    
+      // Actualizar el estado local con la nueva cantidad
       setInventoryData(prevData =>     
         prevData.map(asset =>     
           asset.idInventario === parseInt(assetId)     
-            ? { ...asset, cantidad: newQuantity }    
-            : asset    
-        )    
-      );    
+            ? { ...asset, cantidad: response.inventario.stockActual }     
+            : asset     
+        )     
+      );
           
-      showSuccess('Stock actualizado exitosamente');    
-      return true;    
-    } catch (error) {    
-      console.error('Error al actualizar stock:', error);    
-      showError('Error al actualizar el stock');    
-      return false;    
-    } finally {    
-      setLoadingSubmit(false);    
-    }    
+      showSuccess(`Salida registrada: ${cantidadSalida} unidades de ${response.inventario.nombre}`);
+      return true;
+    } catch (error) {
+      console.error('Error al registrar salida de stock:', error);
+      
+      // Manejar errores específicos
+      if (error.response?.data?.mensaje) {
+        showError(error.response.data.mensaje);
+      } else {
+        showError('Error al registrar la salida de stock');
+      }
+      return false;
+    } finally {
+      setLoadingSubmit(false);
+    }
   };    
     
-  const handleSubmit = async (e) => {    
-    e.preventDefault();    
-    setMensaje({ tipo: '', texto: '' });    
+    const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMensaje({ tipo: '', texto: '' });
     
-    if (!selectedAssetId || quantity <= 0) {    
-      setMensaje({ tipo: 'danger', texto: 'Por favor, selecciona un activo y una cantidad válida.' });    
-      return;    
-    }    
+    if (!selectedAssetId || quantity <= 0) {
+      setMensaje({ tipo: 'danger', texto: 'Por favor, selecciona un activo y una cantidad válida.' });
+      return;
+    }
     
-    const qty = parseInt(quantity);    
-    if (isNaN(qty) || qty <= 0) {    
-      setMensaje({ tipo: 'danger', texto: 'La cantidad debe ser un número positivo.' });    
-      return;    
-    }    
+    const qty = parseInt(quantity);
+    if (isNaN(qty) || qty <= 0) {
+      setMensaje({ tipo: 'danger', texto: 'La cantidad debe ser un número positivo.' });
+      return;
+    }
     
-    const currentAsset = inventoryData.find(asset => asset.idInventario === parseInt(selectedAssetId));    
-    if (!currentAsset) {    
-      setMensaje({ tipo: 'danger', texto: 'Activo no encontrado.' });    
-      return;    
-    }    
+    const currentAsset = inventoryData.find(asset => asset.idInventario === parseInt(selectedAssetId));
+    if (!currentAsset) {
+      setMensaje({ tipo: 'danger', texto: 'Activo no encontrado.' });
+      return;
+    }
     
-    // SOLO SALIDAS - Verificar stock suficiente  
-    if (currentAsset.cantidad < qty) {    
+    // Verificar stock suficiente  
+    if (currentAsset.cantidad < qty) {
       setMensaje({   
         tipo: 'danger',   
         texto: `No hay suficiente stock para la salida. Stock actual: ${currentAsset.cantidad}`   
-      });    
-      return;    
-    }    
-      
-    const newQuantity = currentAsset.cantidad - qty;    
+      });   
+      return;   
+    }
     
-    // Actualizar stock    
-    const success = await updateStock(selectedAssetId, newQuantity);    
+    // Registrar salida usando la nueva función
+    const success = await registrarSalidaStock(selectedAssetId, qty, observaciones);
         
-    if (success) {    
-      setMensaje({     
-        tipo: 'success',     
-        texto: `Salida registrada: ${qty} unidades de ${currentAsset.nombre}. Stock actual: ${newQuantity}`     
-      });    
+    if (success) {
+      // Limpiar formulario
+      setSelectedAssetId("");
+      setQuantity("");
+      setObservaciones("");
           
-      // Limpiar formulario    
-      setSelectedAssetId("");    
-      setQuantity("");    
-          
-      // Opcional: redirigir después de un tiempo    
-      setTimeout(() => {    
-        navigate("/admin/lista-activos");    
-      }, 2000);    
-    }    
+      // Opcional: redirigir después de un tiempo
+      setTimeout(() => {
+        navigate("/admin/lista-activos");
+      }, 2000);
+    }
   };    
     
   // Función para renderizar opciones del select    
@@ -161,10 +167,8 @@ const GestionarStock = () => {
               <CardHeader className="bg-white border-0">    
                 <Row className="align-items-center">    
                   <Col xs="8">    
-                    <h3 className="mb-0">Gestionar Stock de Activos - Solo Salidas</h3>    
-                    <p className="text-sm mb-0 text-muted">  
-                      Registrar salidas de stock de activos del inventario  
-                    </p>  
+                    <h3 className="mb-0">Registro de Salidas / Stock de Activos</h3>    
+ 
                   </Col>    
                   <Col xs="4" className="text-right">    
                     <Button    
@@ -210,24 +214,44 @@ const GestionarStock = () => {
                           </Input>    
                         </FormGroup>    
                       </Col>    
-                      <Col lg="6">    
-                        <FormGroup>    
-                          <Label htmlFor="input-quantity">Cantidad a Retirar *</Label>    
-                          <Input    
-                            className="form-control-alternative"    
-                            id="input-quantity"    
-                            placeholder="Cantidad a retirar"    
-                            type="number"    
-                            value={quantity}    
-                            onChange={(e) => setQuantity(e.target.value)}    
-                            required    
-                            min="1"    
-                            disabled={loading || loadingSubmit}    
-                          />    
+                                            <Col lg="6">
+                        <FormGroup>
+                          <Label htmlFor="input-quantity">Cantidad a Retirar *</Label>
+                          <Input
+                            className="form-control-alternative"
+                            id="input-quantity"
+                            placeholder="Cantidad a retirar"
+                            type="number"
+                            value={quantity}
+                            onChange={(e) => setQuantity(e.target.value)}
+                            required
+                            min="1"
+                            disabled={loading || loadingSubmit}
+                          />
                           <small className="form-text text-muted">  
                             Solo se permiten salidas de stock  
                           </small>  
-                        </FormGroup>    
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg="12">
+                        <FormGroup>
+                          <Label htmlFor="input-observaciones">Observaciones (Opcional)</Label>
+                          <Input
+                            className="form-control-alternative"
+                            id="input-observaciones"
+                            placeholder="Motivo de la salida, destino, etc."
+                            type="textarea"
+                            value={observaciones}
+                            onChange={(e) => setObservaciones(e.target.value)}
+                            disabled={loading || loadingSubmit}
+                            rows="3"
+                          />
+                          <small className="form-text text-muted">  
+                            Describe el motivo o destino de la salida para mejor trazabilidad
+                          </small>  
+                        </FormGroup>
                       </Col>    
                     </Row>    
                   </div>    

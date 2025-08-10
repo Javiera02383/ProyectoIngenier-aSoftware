@@ -61,10 +61,31 @@ router.put(
   '/:id',
   verificarUsuario,
   param('id').isInt().withMessage('ID debe ser un número entero'),
-  body('cantidad').optional().isInt({ min: 1 }),
+  body('cantidad').optional().isInt({ min: 0 }).withMessage('Cantidad no puede ser negativa'),
   body('estado').optional().isIn(['Disponible', 'Asignado', 'En Mantenimiento', 'Baja']),
   manejarErrores,
   inventarioController.actualizarInventario
+);
+
+// Obtener historial de movimientos de un activo
+router.get(
+  '/:id/movimientos',
+  verificarUsuario,
+  param('id').isInt().withMessage('ID debe ser un número entero'),
+  manejarErrores,
+  inventarioController.obtenerHistorialMovimientos
+);
+
+// Registrar salida de stock
+router.post(
+  '/:id/salida',
+  verificarUsuario,
+  param('id').isInt().withMessage('ID debe ser un número entero'),
+  body('cantidad').isInt({ min: 1 }).withMessage('Cantidad debe ser un entero positivo'),
+  body('idEmpleado').optional().isInt().withMessage('ID de empleado debe ser un número entero'),
+  body('observaciones').optional().isLength({ max: 500 }).withMessage('Observaciones no deben superar 500 caracteres'),
+  manejarErrores,
+  inventarioController.registrarSalidaStock
 );
 
 // Eliminar inventario

@@ -87,7 +87,17 @@ const crearMantenimiento = [
           return res.status(400).json({ mensaje: 'La fecha de fin debe ser posterior a la fecha de inicio' });  
         }  
       }  
-  
+
+      // Validar nombre de imagen si se proporciona
+      if (req.body.nombreImagen) {
+        if (typeof req.body.nombreImagen !== 'string' || req.body.nombreImagen.trim().length === 0) {
+          return res.status(400).json({ mensaje: 'El nombre de imagen no puede estar vacío' });
+        }
+        if (req.body.nombreImagen.length > 255) {
+          return res.status(400).json({ mensaje: 'El nombre de imagen es demasiado largo' });
+        }
+      }
+
       const mantenimiento = await Mantenimiento.create(req.body);  
       res.status(201).json({ mensaje: 'Mantenimiento creado', mantenimiento });  
     } catch (error) {  
@@ -262,7 +272,19 @@ const editarMantenimiento = [
           return res.status(400).json({ mensaje: 'La fecha de fin debe ser posterior a la fecha de inicio' });  
         }  
       }  
-  
+
+      // Validar nombre de imagen si se proporciona
+      if (req.body.nombreImagen !== undefined) {
+        if (req.body.nombreImagen === null || req.body.nombreImagen === '') {
+          // Si se envía null o string vacío, eliminar la imagen
+          req.body.nombreImagen = null;
+        } else if (typeof req.body.nombreImagen !== 'string' || req.body.nombreImagen.trim().length === 0) {
+          return res.status(400).json({ mensaje: 'El nombre de imagen no puede estar vacío' });
+        } else if (req.body.nombreImagen.length > 255) {
+          return res.status(400).json({ mensaje: 'El nombre de imagen es demasiado largo' });
+        }
+      }
+
       await mantenimiento.update(req.body);  
       res.json({ mensaje: 'Mantenimiento actualizado', mantenimiento });  
     } catch (error) {  
@@ -284,6 +306,48 @@ const eliminarMantenimiento = async (req, res) => {
     res.status(500).json({ mensaje: 'Error al eliminar mantenimiento', error: error.message });  
   }  
 };  
+
+// Eliminar imagen de mantenimiento
+const eliminarImagenMantenimiento = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const mantenimiento = await Mantenimiento.findByPk(id);
+    if (!mantenimiento) {
+      return res.status(404).json({ mensaje: 'Mantenimiento no encontrado' });
+    }
+
+    if (!mantenimiento.nombreImagen) {
+      return res.status(400).json({ mensaje: 'Este mantenimiento no tiene imagen asociada' });
+    }
+
+    // Eliminar archivo físico del repositorio
+    const fs = require('fs');
+    const path = require('path');
+    const rutaImagen = path.join(__dirname, '../../../public/img/mantenimiento/', mantenimiento.nombreImagen);
+    
+    if (fs.existsSync(rutaImagen)) {
+      fs.unlinkSync(rutaImagen);
+      console.log('Archivo de imagen eliminado del repositorio:', rutaImagen);
+    } else {
+      console.log('Archivo de imagen no encontrado en el repositorio:', rutaImagen);
+    }
+
+    // Actualizar base de datos
+    mantenimiento.nombreImagen = null;
+    await mantenimiento.save();
+
+    res.json({ 
+      mensaje: 'Imagen eliminada exitosamente', 
+      mantenimiento: {
+        idMantenimiento: mantenimiento.idMantenimiento,
+        nombreImagen: mantenimiento.nombreImagen
+      }
+    });
+  } catch (error) {
+    console.error('Error al eliminar imagen:', error);
+    res.status(500).json({ mensaje: 'Error al eliminar imagen', error: error.message });
+  }
+};
   
 module.exports = {  
   crearMantenimiento,  
@@ -292,5 +356,6 @@ module.exports = {
   obtenerMantenimientoPorId,  
   obtenerHistorialPorActivo,  
   editarMantenimiento,  
-  eliminarMantenimiento  
+  eliminarMantenimiento,
+  eliminarImagenMantenimiento
 };

@@ -197,8 +197,8 @@ const Reportes = () => {
         item.descripcion,
         item.cantidad,
         item.ubicacion,
-        item?.Empleado?.Persona
-          ? `${item.Empleado.Persona.Pnombre} ${item.Empleado.Persona.Papellido}`
+        item?.Empleado
+          ? (item.Empleado.nombre || item.Empleado.persona?.nombreCompleto || "No asignado")
           : "No asignado",
         item.valor,
         item.observacion,

@@ -63,7 +63,7 @@ const InventarioHub = () => {
                     </CardTitle>
                     <hr className="my-3" />
                     <Link to="/admin/gestionar-stock">
-                      <Button color="info">Entrada/Salida de Stock</Button>
+                      <Button color="info">Salida de Stock</Button>
                     </Link>
                   </CardBody>
                 </Card>
@@ -79,7 +79,7 @@ const InventarioHub = () => {
                     </CardTitle>
                     <hr className="my-3" />
                     <Link to="/admin/gestionar-mantenimiento">
-                      <Button color="warning">Registrar Mantenimiento</Button>
+                      <Button color="primary">Registrar Mantenimiento</Button>
                     </Link>
                   </CardBody>
                 </Card>

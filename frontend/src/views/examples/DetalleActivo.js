@@ -25,24 +25,27 @@ const DetalleActivo = () => {
   const [error, setError] = useState('');  
   const { toast, showError, hideToast } = useToast();  
   
-  useEffect(() => {  
-    const cargarActivo = async () => {  
-      try {  
-        setLoading(true);  
-        const data = await inventarioService.obtenerInventarioPorId(id);  
-        setActivo(data);  
-      } catch (error) {  
-        console.error('Error al cargar activo:', error);  
-        setError('Error al cargar los detalles del activo');  
-        showError('Error al cargar los detalles del activo');  
-      } finally {  
-        setLoading(false);  
-      }  
-    };  
-  
-    if (id) {  
-      cargarActivo();  
-    }  
+    useEffect(() => {
+    const cargarActivo = async () => {
+      try {
+        setLoading(true);
+        const data = await inventarioService.obtenerInventarioPorId(id);
+        console.log('Datos del activo recibidos:', data);
+        console.log('Empleado:', data.Empleado);
+        console.log('Proveedor:', data.Proveedor);
+        setActivo(data);
+      } catch (error) {
+        console.error('Error al cargar activo:', error);
+        setError('Error al cargar los detalles del activo');
+        showError('Error al cargar los detalles del activo');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      cargarActivo();
+    }
   }, [id, showError]);  
   
   const formatearFecha = (fecha) => {  
@@ -238,31 +241,31 @@ const DetalleActivo = () => {
                         </h6>  
                         <Row>  
                           <Col>  
-                            <div className="mb-3">  
-                              <label className="form-control-label">Empleado Asignado</label>  
-                              <div className="form-control-plaintext">  
-                                {activo.Empleado ? (  
-                                  <span>  
-                                    <i className="fas fa-user-circle mr-1" />  
-                                    {activo.Empleado.nombre || 'Nombre no disponible'}  
-                                  </span>  
-                                ) : (  
-                                  <span className="text-muted">No asignado</span>  
-                                )}  
-                              </div>  
+                                                        <div className="mb-3">
+                              <label className="form-control-label">Empleado Asignado</label>
+                              <div className="form-control-plaintext">
+                                {activo.Empleado ? (
+                                  <span>
+                                    <i className="fas fa-user-circle mr-1" />
+                                    {activo.Empleado.nombre || activo.Empleado.persona?.nombreCompleto || 'Nombre no disponible'}
+                                  </span>
+                                ) : (
+                                  <span className="text-muted">No asignado</span>
+                                )}
+                              </div>
                             </div>  
-                            <div className="mb-3">  
-                              <label className="form-control-label">Proveedor</label>  
-                              <div className="form-control-plaintext">  
-                                {activo.Proveedor ? (  
-                                  <span>  
-                                    <i className="fas fa-building mr-1" />  
-                                    {activo.Proveedor.nombre || 'Nombre no disponible'}  
-                                  </span>  
-                                ) : (  
-                                  <span className="text-muted">No especificado</span>  
-                                )}  
-                              </div>  
+                                                        <div className="mb-3">
+                              <label className="form-control-label">Proveedor</label>
+                              <div className="form-control-plaintext">
+                                {activo.Proveedor ? (
+                                  <span>
+                                    <i className="fas fa-building mr-1" />
+                                    {activo.Proveedor.nombre || activo.Proveedor.persona?.nombreCompleto || 'Nombre no disponible'}
+                                  </span>
+                                ) : (
+                                  <span className="text-muted">No especificado</span>
+                                )}
+                              </div>
                             </div>  
                           </Col>  
                         </Row>  

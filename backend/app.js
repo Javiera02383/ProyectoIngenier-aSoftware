@@ -116,6 +116,10 @@ app.use('/api/optica', express.static('uploads'));
 // Servir archivos estáticos desde la carpeta uploads
 app.use('/uploads', express.static('uploads'));
 
+// Servir archivos estáticos desde la carpeta public
+app.use('/api/optica/public', express.static('public'));
+app.use('/public', express.static('public'));
+
 // Usar rutas de autenticación y seguridad
 app.use('/api/optica/auth', authRoutes);
 app.use('/api/optica/personas', personaRutas);

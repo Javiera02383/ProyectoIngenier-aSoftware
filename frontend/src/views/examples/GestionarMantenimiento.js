@@ -121,28 +121,42 @@ const GestionarMantenimiento = () => {
   setMensaje({ tipo: '', texto: '' });  
   
   try {  
+    // Validaciones básicas
+    if (!mantenimientoActual.idInventario) {
+      throw new Error('Debe seleccionar un activo');
+    }
+    
+    if (!mantenimientoActual.descripcionMantenimiento || mantenimientoActual.descripcionMantenimiento.trim().length < 10) {
+      throw new Error('La descripción debe tener al menos 10 caracteres');
+    }
+    
+    if (!mantenimientoActual.fechaInicio) {
+      throw new Error('Debe seleccionar una fecha de inicio');
+    }
+
     let datosMantenimiento;
 
     if (archivoImagen){
-      const datosMantenimiento = new FormData();
+      datosMantenimiento = new FormData();
       datosMantenimiento.append('idInventario', mantenimientoActual.idInventario);
       datosMantenimiento.append('descripcionMantenimiento', mantenimientoActual.descripcionMantenimiento.trim());
       datosMantenimiento.append('fechaInicio', mantenimientoActual.fechaInicio);
-      //datosMantenimiento.append('imagen', archivoImagen);
-    /*const datosMantenimiento = {  
-      idInventario: parseInt(mantenimientoActual.idInventario),  
-      descripcionMantenimiento: mantenimientoActual.descripcionMantenimiento.trim(),  
-      fechaInicio: mantenimientoActual.fechaInicio  
-    }; */
+      datosMantenimiento.append('imagen', archivoImagen);
+      
+      // Solo agregar campos opcionales si tienen valor  
+      if (mantenimientoActual.fechaFin && mantenimientoActual.fechaFin.trim() !== '') {  
+        datosMantenimiento.append('fechaFin', mantenimientoActual.fechaFin); 
+      }  
   
-    // Solo agregar campos opcionales si tienen valor  
-    if (mantenimientoActual.fechaFin && mantenimientoActual.fechaFin.trim() !== '') {  
-      datosMantenimiento.append('fechaFin', mantenimientoActual.fechaFin); 
-    }  
-  
-    if (mantenimientoActual.costoMantenimiento && mantenimientoActual.costoMantenimiento !== '' && !isNaN(mantenimientoActual.costoMantenimiento)) {  
-      datosMantenimiento.append('costoMantenimiento', parseFloat(mantenimientoActual.costoMantenimiento));
-    }  
+      if (mantenimientoActual.costoMantenimiento && mantenimientoActual.costoMantenimiento !== '' && !isNaN(mantenimientoActual.costoMantenimiento)) {  
+        datosMantenimiento.append('costoMantenimiento', parseFloat(mantenimientoActual.costoMantenimiento));
+      }  
+      
+      // Si estamos editando y hay una nueva imagen, NO enviar el nombreImagen anterior
+      // El backend generará un nuevo nombre para la nueva imagen
+      console.log('Enviando nueva imagen, no se incluye nombreImagen anterior');
+      console.log('Imagen anterior en estado:', mantenimientoActual.nombreImagen);
+      console.log('Nueva imagen seleccionada:', archivoImagen.name);
     } else {
       datosMantenimiento = {
         idInventario:parseInt(mantenimientoActual.idInventario),
@@ -156,17 +170,30 @@ const GestionarMantenimiento = () => {
       if (mantenimientoActual.costoMantenimiento && mantenimientoActual.costoMantenimiento !== '' && !isNaN(mantenimientoActual.costoMantenimiento)) {
           datosMantenimiento.costoMantenimiento = parseFloat(mantenimientoActual.costoMantenimiento);
       }
-
+      
+      // Si estamos editando y NO hay nueva imagen, mantener el nombreImagen existente
+      if (editando && mantenimientoActual.nombreImagen) {
+        datosMantenimiento.nombreImagen = mantenimientoActual.nombreImagen;
+        console.log('Manteniendo imagen existente:', mantenimientoActual.nombreImagen);
+      } else if (editando && mantenimientoActual.nombreImagen === '') {
+        // Si nombreImagen es string vacío, significa que se eliminó la imagen
+        datosMantenimiento.nombreImagen = null;
+        console.log('Editando sin imagen, se eliminará la imagen anterior');
+      }
     }
   
-    /*if (mantenimientoActual.nombreImagen && mantenimientoActual.nombreImagen.trim() !== '') {  
-      datosMantenimiento.nombreImagen = mantenimientoActual.nombreImagen.trim();  
-    }  
-  */
     console.log('Datos a enviar:', datosMantenimiento); // Para debug  
   
     if (editando) {  
-      await mantenimientoService.editarMantenimiento(mantenimientoActual.idMantenimiento, datosMantenimiento);  
+      if (archivoImagen) {
+        // Si hay una nueva imagen, usar el método que soporta FormData
+        await mantenimientoService.editarMantenimientoConImagen(mantenimientoActual.idMantenimiento, datosMantenimiento);
+        console.log('Mantenimiento actualizado con nueva imagen');
+      } else {
+        // Si no hay nueva imagen, usar el método normal
+        await mantenimientoService.editarMantenimiento(mantenimientoActual.idMantenimiento, datosMantenimiento);
+        console.log('Mantenimiento actualizado sin cambios en imagen');
+      }
     } else {  
       await mantenimientoService.crearMantenimiento(datosMantenimiento);  
     }  
@@ -182,10 +209,28 @@ const GestionarMantenimiento = () => {
     }, 1500);  
   
   } catch (error) {  
-    console.error('Error completo:', error.response?.data || error);  
+    console.error('Error completo:', error);
+    console.error('Error response:', error.response?.data);
+    
+    let mensajeError = 'Error al guardar el mantenimiento';
+    
+    if (error.message) {
+      // Error de validación del frontend
+      mensajeError = error.message;
+    } else if (error.response?.data?.error) {
+      // Error del backend
+      mensajeError = error.response.data.error;
+    } else if (error.response?.data?.mensaje) {
+      // Mensaje del backend
+      mensajeError = error.response.data.mensaje;
+    } else if (error.response?.data?.errores?.[0]?.msg) {
+      // Errores de validación del backend
+      mensajeError = error.response.data.errores[0].msg;
+    }
+    
     setMensaje({  
       tipo: 'danger',  
-      texto: error.response?.data?.mensaje || error.response?.data?.errores?.[0]?.msg || 'Error al guardar el mantenimiento'  
+      texto: mensajeError
     });  
   } finally {  
     setLoading(false);  
@@ -214,10 +259,26 @@ const GestionarMantenimiento = () => {
     setEditando(true);    
     setModal(true);    
   };  
-   const handleVerImagen = (idMantenimiento) => {  
-  setImagenActual(`/api/optica/inventario/mantenimiento/${idMantenimiento}/imagen`);  
-  setModalImagen(true);  
-};  
+   const handleVerImagen = (mantenimiento) => {  
+    if (mantenimiento && mantenimiento.nombreImagen && mantenimiento.nombreImagen.trim() !== '') {
+      // Usar la ruta estática con el puerto correcto
+      const imagenUrl = `http://localhost:4051/api/optica/public/img/mantenimiento/${mantenimiento.nombreImagen}`;
+      console.log('URL de imagen:', imagenUrl); // Debug
+      console.log('Mantenimiento:', mantenimiento); // Debug adicional
+      setImagenActual(imagenUrl);  
+      setModalImagen(true);  
+    } else {
+      console.log('Mantenimiento sin imagen válida:', mantenimiento);
+      showError('Este mantenimiento no tiene imagen asociada o el nombre de imagen es inválido');
+    }
+  };
+  
+  const handleVerImagenFallback = (idMantenimiento) => {
+    // Fallback a la ruta dinámica si la estática falla
+    const imagenUrl = `/api/optica/inventario/mantenimiento/${idMantenimiento}/imagen`;
+    setImagenActual(imagenUrl);
+    setModalImagen(true);
+  };
     
   const resetForm = () => {    
     setMantenimientoActual({    
@@ -229,8 +290,88 @@ const GestionarMantenimiento = () => {
       nombreImagen: ''    
     });  
     setArchivoImagen(null);  
-    setEditando(false);    
-  };    
+    setEditando(false);
+    setMensaje({ tipo: '', texto: '' });
+    console.log('Formulario reseteado, imagen limpiada');
+  };
+    
+  const limpiarImagen = () => {
+    setArchivoImagen(null);
+    setMantenimientoActual(prev => ({
+      ...prev,
+      nombreImagen: ''
+    }));
+    console.log('Imagen limpiada, se eliminará al guardar');
+  };
+  
+  const removerImagenExistente = async () => {
+    if (editando && mantenimientoActual.nombreImagen) {
+      try {
+        console.log('Eliminando imagen existente durante edición:', mantenimientoActual.nombreImagen);
+        
+        // Llamar al backend para eliminar la imagen
+        await mantenimientoService.eliminarImagenMantenimiento(mantenimientoActual.idMantenimiento);
+        
+        // Actualizar el estado local
+        setMantenimientoActual(prev => ({
+          ...prev,
+          nombreImagen: ''
+        }));
+        
+        // También limpiar cualquier nueva imagen seleccionada
+        setArchivoImagen(null);
+        
+        // Mostrar mensaje de éxito
+        showSuccess('Imagen eliminada exitosamente');
+        
+        // Recargar los datos para reflejar el cambio
+        cargarTodosLosDatos();
+        
+      } catch (error) {
+        console.error('Error al eliminar imagen:', error);
+        let mensajeError = 'Error al eliminar la imagen';
+        
+        if (error.response?.data?.mensaje) {
+          mensajeError = error.response.data.mensaje;
+        } else if (error.response?.data?.error) {
+          mensajeError = error.response.data.error;
+        }
+        
+        showError(mensajeError);
+      }
+    }
+  };
+  
+  const handleNuevaImagen = (file) => {
+    if (!file) {
+      console.log('No se seleccionó archivo');
+      return;
+    }
+
+    // Validar tipo de archivo
+    const tiposPermitidos = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (!tiposPermitidos.includes(file.type)) {
+      showError('Solo se permiten archivos de imagen (JPG, JPEG, PNG)');
+      return;
+    }
+
+    // Validar tamaño (5MB máximo)
+    const maxSize = 5 * 1024 * 1024; // 5MB en bytes
+    if (file.size > maxSize) {
+      showError('El archivo es demasiado grande. Máximo 5MB');
+      return;
+    }
+
+    console.log('Archivo válido seleccionado:', file.name, 'Tipo:', file.type, 'Tamaño:', file.size);
+    setArchivoImagen(file);
+    
+    if (editando && mantenimientoActual.nombreImagen) {
+      console.log('Nueva imagen seleccionada, la imagen anterior será reemplazada');
+      console.log('Imagen anterior:', mantenimientoActual.nombreImagen);
+      console.log('Nueva imagen:', file.name);
+      // No limpiar nombreImagen aquí, se manejará en handleSubmit
+    }
+  };
     
   const limpiarFiltros = () => {    
     setFiltros({    
@@ -253,7 +394,10 @@ const GestionarMantenimiento = () => {
               <CardHeader className="border-0">    
                 <Row className="align-items-center">    
                   <Col xs="8">    
-                    <h3 className="mb-0">Gestionar Mantenimiento</h3>    
+                    <h3 className="mb-0">Gestionar Mantenimiento</h3>
+                    <small className="text-muted">
+                      Sistema de gestión de mantenimientos con soporte para imágenes de respaldo
+                    </small>
                   </Col>    
                   <Col xs="4" className="text-right">    
                     <Button    
@@ -347,15 +491,16 @@ const GestionarMantenimiento = () => {
                 <Table className="align-items-center table-flush table-sm " responsive>    
                   <thead className="thead-light">    
                     <tr>    
-                      <th scope="col">ID</th>    
+                      <th scope="col">Acciones</th> 
+                      <th scope="col">Estado</th>
                       <th scope="col">Activo</th>    
                       <th scope="col">Descripción</th>    
                       <th scope="col">Costo</th>    
                       <th scope="col">Fecha Inicio</th>    
                       <th scope="col">Fecha Fin</th>    
-                      <th scope="col">Estado</th> 
-                      <th scope="col">Imagen</th>   
-                      <th scope="col">Acciones</th>    
+                       
+                       
+                         
                     </tr>    
                   </thead>    
                   <tbody>    
@@ -374,37 +519,8 @@ const GestionarMantenimiento = () => {
                       </tr>    
                     ) : (    
                       mantenimientosFiltrados.map(mantenimiento => (    
-                        <tr key={mantenimiento.idMantenimiento}>    
-                          <td>{mantenimiento.idMantenimiento}</td>    
-                          <td>      
-                            {mantenimiento.Inventario ?       
-                              `${mantenimiento.Inventario.codigo} - ${mantenimiento.Inventario.nombre}` :       
-                              'N/A'      
-                            }      
-                          </td>    
-                          <td>{mantenimiento.descripcionMantenimiento.substring(0, 50)}...</td>    
-                          <td>L. {mantenimiento.costoMantenimiento || 'N/A'}</td>    
-                          <td>{mantenimiento.fechaInicio ? new Date(mantenimiento.fechaInicio).toLocaleDateString() : 'N/A'}</td>    
-                          <td>{mantenimiento.fechaFin ? new Date(mantenimiento.fechaFin).toLocaleDateString() : 'En proceso'}</td>    
-                          <td>    
-                            <span className={`badge ${mantenimiento.fechaFin ? 'badge-success' : 'badge-warning'}`}>    
-                              {mantenimiento.fechaFin ? 'Completado' : 'En proceso'}    
-                            </span>    
-                          </td> 
-                           <td>  
-  {mantenimiento.nombreImagen ? (  
-    <Button  
-      color="info"  
-      size="sm"  
-      onClick={() => handleVerImagen(mantenimiento.idMantenimiento)}  
-    >  
-      <i className="fas fa-image" /> Ver  
-    </Button>  
-  ) : (  
-    <span className="text-muted">Sin imagen</span>  
-  )}  
-</td>  
-                          <td>    
+                        <tr key={mantenimiento.idMantenimiento}>
+                                                    <td>    
                             <Dropdown isOpen={dropdownOpen[mantenimiento.idMantenimiento]}     
                                       toggle={() => toggleDropdown(mantenimiento.idMantenimiento)}>    
                               <DropdownToggle>    
@@ -415,7 +531,44 @@ const GestionarMantenimiento = () => {
                                 <DropdownItem onClick={() => handleEliminar(mantenimiento.idMantenimiento)}>Eliminar</DropdownItem>    
                               </DropdownMenu>    
                             </Dropdown>    
+                          </td> 
+                          <td>  
+                            {mantenimiento.nombreImagen ? (  
+                              <Button  
+                                color="info"  
+                                size="sm"  
+                                onClick={() => {
+                                  console.log('Botón Ver clickeado para mantenimiento:', mantenimiento);
+                                  console.log('nombreImagen:', mantenimiento.nombreImagen);
+                                  handleVerImagen(mantenimiento);
+                                }}  
+                              >  
+                                <i className="fas fa-image" /> Ver  
+                              </Button>  
+                              
+                            ) : (  
+                              <span className="text-muted">Sin imagen</span>  
+                            )}  
+                          </td>     
+                          <td>    
+                            <span className={`badge ${mantenimiento.fechaFin ? 'badge-success' : 'badge-warning'}`}>    
+                              {mantenimiento.fechaFin ? 'Completado' : 'En proceso'}    
+                            </span>    
+                          </td> 
+                            
+                          <td>      
+                            {mantenimiento.Inventario ?       
+                              `${mantenimiento.Inventario.codigo} - ${mantenimiento.Inventario.nombre}` :       
+                              'N/A'      
+                            }      
                           </td>    
+                          <td>{mantenimiento.descripcionMantenimiento.substring(0, 50)}...</td>    
+                          <td>L. {mantenimiento.costoMantenimiento || 'N/A'}</td>    
+                          <td>{mantenimiento.fechaInicio ? new Date(mantenimiento.fechaInicio).toLocaleDateString() : 'N/A'}</td>    
+                          <td>{mantenimiento.fechaFin ? new Date(mantenimiento.fechaFin).toLocaleDateString() : 'En proceso'}</td>    
+ 
+
+   
                         </tr>    
                       ))    
                     )}    
@@ -439,29 +592,12 @@ const GestionarMantenimiento = () => {
           {mensaje.texto}  
         </Alert>  
       )}  
-       {/* Modal para mostrar imagen */}  
-<Modal isOpen={modalImagen} toggle={() => setModalImagen(!modalImagen)} size="lg">  
-  <ModalHeader toggle={() => setModalImagen(!modalImagen)}>  
-    Imagen de Mantenimiento  
-  </ModalHeader>  
-  <ModalBody className="text-center">  
-    {imagenActual && (  
-      <img  
-        src={imagenActual}  
-        alt="Imagen de mantenimiento"  
-        style={{ maxWidth: '100%', maxHeight: '500px' }}  
-        onError={(e) => {  
-          e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZW4gbm8gZGlzcG9uaWJsZTwvdGV4dD48L3N2Zz4=';  
-        }}  
-      />  
-    )}  
-  </ModalBody>  
-  <ModalFooter>  
-    <Button color="secondary" onClick={() => setModalImagen(false)}>  
-      Cerrar  
-    </Button>  
-  </ModalFooter>  
-</Modal> 
+  
+  
+  
+  
+  
+       
       <Row>  
         <Col md="6">  
           <FormGroup>  
@@ -534,12 +670,77 @@ const GestionarMantenimiento = () => {
         <Label>Imagen de Respaldo</Label>  
         <Input  
           type="file"  
-          //value={mantenimientoActual.nombreImagen || ''}  
           accept="image/jpeg,image/png,image/jpg"  
-          onChange={(e) => setArchivoImagen(e.target.files[0])}
-          //placeholder="Nombre del archivo de imagen (opcional)"  
-          //maxLength="255"  
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (file) {
+              handleNuevaImagen(file);
+            } else {
+              setArchivoImagen(null);
+            }
+          }}
+          onInvalid={(e) => {
+            e.preventDefault();
+            showError('Por favor seleccione un archivo de imagen válido');
+          }}
         />  
+        <small className="form-text text-muted">
+          Formatos permitidos: JPG, JPEG, PNG. Tamaño máximo: 5MB. 
+          <br />
+          
+        </small>
+        {mantenimientoActual.nombreImagen && !archivoImagen && (
+          <div className="mt-2">
+            <small className="text-muted">Imagen actual: {mantenimientoActual.nombreImagen}</small>
+            <Button 
+              color="info" 
+              size="sm" 
+              className="ml-2" 
+              onClick={() => handleVerImagen(mantenimientoActual)}
+            >
+              <i className="fas fa-eye" /> Ver
+            </Button>
+            {editando && (
+              <Button 
+                color="warning" 
+                size="sm" 
+                className="ml-2" 
+                onClick={removerImagenExistente}
+                title="Eliminar la imagen existente del mantenimiento"
+              >
+                <i className="fas fa-times" /> Eliminar
+              </Button>
+            )}
+          </div>
+        )}
+        {editando && !mantenimientoActual.nombreImagen && !archivoImagen && (
+          <div className="mt-2">
+            <small className="text-warning">
+              <i className="fas fa-exclamation-triangle" /> La imagen será eliminada al guardar
+            </small>
+          </div>
+        )}
+        {archivoImagen && (
+          <div className="mt-2">
+            <small className="text-info">
+              <i className="fas fa-info-circle" /> Nueva imagen seleccionada: {archivoImagen.name}
+              {editando && mantenimientoActual.nombreImagen && (
+                <span className="text-warning"> (reemplazará la imagen anterior)</span>
+              )}
+            </small>
+            <Button 
+              color="secondary" 
+              size="sm" 
+              className="ml-2" 
+              onClick={() => {
+                setArchivoImagen(null);
+                console.log('Selección de nueva imagen cancelada');
+              }}
+            >
+              <i className="fas fa-times" /> Cancelar
+            </Button>
+          </div>
+        )}
       </FormGroup>  
     </ModalBody>  
     <ModalFooter>  
@@ -551,7 +752,63 @@ const GestionarMantenimiento = () => {
       </Button>  
     </ModalFooter>  
   </Form>  
-</Modal>      
+</Modal>
+
+      {/* Modal para mostrar imagen */}
+      <Modal isOpen={modalImagen} toggle={() => setModalImagen(false)} size="lg">
+        <ModalHeader toggle={() => setModalImagen(false)}>
+          Imagen de Mantenimiento
+        </ModalHeader>
+        <ModalBody className="text-center">
+          {imagenActual ? (
+            <img  
+              src={imagenActual}  
+              alt="Imagen de mantenimiento"  
+              style={{ maxWidth: '100%', maxHeight: '500px' }}  
+              onError={(e) => {  
+                console.log('Error cargando imagen estática, intentando fallback...');
+                console.log('URL que falló:', imagenActual);
+                
+                // Extraer el nombre del archivo de la URL
+                const urlParts = imagenActual.split('/');
+                const nombreArchivo = urlParts[urlParts.length - 1];
+                console.log('Nombre del archivo:', nombreArchivo);
+                
+                // Si la imagen falla, intentar con la ruta dinámica
+                if (nombreArchivo && nombreArchivo !== 'undefined' && nombreArchivo !== 'null') {
+                  // Buscar el mantenimiento actual para obtener el ID
+                  const mantenimientoEncontrado = todosLosMantenimientos.find(m => m.nombreImagen === nombreArchivo);
+                  if (mantenimientoEncontrado) {
+                    const fallbackUrl = `/api/optica/inventario/mantenimiento/${mantenimientoEncontrado.idMantenimiento}/imagen`;
+                    console.log('Intentando fallback con URL:', fallbackUrl);
+                    e.target.src = fallbackUrl;
+                  } else {
+                    console.log('No se encontró el mantenimiento para el fallback');
+                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZW4gbm8gZGlzcG9uaWJsZTwvdGV4dD48L3N2Zz4=';  
+                  }
+                } else {
+                  console.log('No se pudo extraer el nombre del archivo de la URL');
+                  e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZW4gbm8gZGlzcG9uaWJsZTwvdGV4dD48L3N2Zz4=';  
+                }
+              }}  
+              onLoad={() => {
+                console.log('Imagen cargada exitosamente:', imagenActual);
+              }}
+            />  
+          ) : (
+            <div className="text-center p-4">
+              <p className="text-muted">No se pudo cargar la imagen</p>
+              <small className="text-danger">Error: URL de imagen no válida</small>
+            </div>
+          )}  
+        </ModalBody>  
+        <ModalFooter>  
+          <Button color="secondary" onClick={() => setModalImagen(false)}>  
+            Cerrar  
+          </Button>  
+        </ModalFooter>  
+      </Modal>
+      
       </Container>    
     </>    
   );    

@@ -41,7 +41,8 @@ const ListaActivos = () => {
         setInventarioOriginal(Array.isArray(data) ? data : []);  
         setCargando(false);  
   
-        const categorias = [...new Set(data.map(item => item.nombre))];  
+        // Obtener categorías únicas basadas en el nombre del activo
+        const categorias = [...new Set(data.map(item => item.nombre))].filter(Boolean);
         setUniqueCategories(["all", ...categorias]);  
       } catch (error) {  
         console.error("Error al obtener el inventario:", error);  
@@ -64,31 +65,72 @@ const ListaActivos = () => {
   const handleDelete = async (id) => {  
     if (window.confirm('¿Estás seguro de eliminar este activo?')) {  
       try {  
-        await inventarioService.eliminarInventario(id);  
+        console.log('Intentando eliminar activo con ID:', id);
+        const response = await inventarioService.eliminarInventario(id);  
+        console.log('Respuesta del servidor:', response);
         setInventarioOriginal(inventarioOriginal.filter(a => a.idInventario !== id));  
         showSuccess('Activo eliminado exitosamente');  
       } catch (error) {  
-        showError('Error al eliminar el activo');  
+        console.error('Error detallado al eliminar activo:', error);
+        const errorMessage = error.response?.data?.mensaje || error.message || 'Error al eliminar el activo';
+        showError(`Error al eliminar el activo: ${errorMessage}`);  
       }  
     }  
   };  
   
   const handleViewDetails = (id) => {  
     navigate(`/admin/detalle-activo/${id}`);  
+  };
+
+  const limpiarFiltros = () => {
+    setSelectedCategory("all");
+    setSearchQuery("");
   }; 
 
+  // Función para normalizar texto (eliminar acentos y convertir a minúsculas)
+  const normalizarTexto = (texto) => {
+    if (!texto) return '';
+    return texto
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Eliminar acentos
+      .toLowerCase()
+      .trim();
+  };
+
+  // Definir filteredAssets antes de usarlo en useEffect
   const filteredAssets = inventarioOriginal.filter(asset => {
-    const matchesCategory = selectedCategory === "all" || asset.Nombre === selectedCategory;
-    const matchesSearch =
-      asset.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      asset.codigo?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      asset.descripcion?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      asset.ubicacion?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      asset?.Empleado?.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      asset.observacion?.toLowerCase().includes(searchQuery.toLowerCase());
+    // Filtro por categoría
+    const matchesCategory = selectedCategory === "all" || asset.nombre === selectedCategory;
+    
+    // Filtro de búsqueda insensible a acentos y mayúsculas
+    const searchTerm = normalizarTexto(searchQuery);
+    const matchesSearch = searchTerm === "" || (
+      (asset.nombre && normalizarTexto(asset.nombre).includes(searchTerm)) ||
+      (asset.codigo && normalizarTexto(asset.codigo).includes(searchTerm)) ||
+      (asset.descripcion && normalizarTexto(asset.descripcion).includes(searchTerm)) ||
+      (asset.ubicacion && normalizarTexto(asset.ubicacion).includes(searchTerm)) ||
+      (asset?.Empleado?.persona?.nombreCompleto && normalizarTexto(asset.Empleado.persona.nombreCompleto).includes(searchTerm)) ||
+      (asset.observacion && normalizarTexto(asset.observacion).includes(searchTerm))
+    );
 
     return matchesCategory && matchesSearch;
   });
+
+  // Debug: Loggear cambios en filtros (después de que filteredAssets esté definido)
+  useEffect(() => {
+    if (searchQuery) {
+      console.log('Búsqueda normalizada:', {
+        original: searchQuery,
+        normalizada: normalizarTexto(searchQuery)
+      });
+    }
+    console.log('Filtros actualizados:', {
+      selectedCategory,
+      searchQuery,
+      totalAssets: inventarioOriginal.length,
+      filteredAssets: filteredAssets.length
+    });
+  }, [selectedCategory, searchQuery, inventarioOriginal.length, filteredAssets.length]);
 
   return (
     <>
@@ -97,7 +139,7 @@ const ListaActivos = () => {
         <Row className="mb-4">
           <Col md="4">
             <FormGroup>
-              <Label>Filtrar por Categoría:</Label>
+              <Label>Filtrar por Activo:</Label>
               <Input
                 type="select"
                 value={selectedCategory}
@@ -106,23 +148,46 @@ const ListaActivos = () => {
               >
                 {uniqueCategories.map(category => (
                   <option key={category} value={category}>
-                    {category === "all" ? "Todas las Categorías" : category}
+                    {category === "all" ? "Todas los productos" : category}
                   </option>
                 ))}
               </Input>
             </FormGroup>
           </Col>
           <Col md="5">
-            <FormGroup>
-              <Label>Buscar por Nombre, Código o Detalles:</Label>
-              <Input
-                type="text"
-                placeholder="Ej. Laptop, INV001, oficina"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="form-control-alternative"
-              />
+                         <FormGroup>
+               <Label>Buscar en todos los campos:</Label>
+                             <Input
+                 type="text"
+                 placeholder="Buscar por nombre, código, descripción, ubicación, empleado..."
+                 value={searchQuery}
+                 onChange={(e) => setSearchQuery(e.target.value)}
+                 className="form-control-alternative"
+               />
             </FormGroup>
+          </Col>
+          <Col md="3">
+            <FormGroup>
+              <Label>Resultados:</Label>
+              <div className="form-control-plaintext">
+                <Badge color="default">
+                  {filteredAssets.length} de {inventarioOriginal.length} activos
+                </Badge>
+              </div>
+            </FormGroup>
+          </Col>
+        </Row>
+        <Row className="mb-3">
+          <Col md="12" className="text-right">
+            <button
+              type="button"
+              className="btn btn-outline-secondary btn-sm"
+              onClick={limpiarFiltros}
+              disabled={selectedCategory === "all" && searchQuery === ""}
+            >
+              <i className="fas fa-times mr-1"></i>
+              Limpiar Filtros
+            </button>
           </Col>
         </Row>
 
@@ -135,6 +200,7 @@ const ListaActivos = () => {
               <Table className="align-items-center table-flush" responsive>
                 <thead className="thead-light">
                   <tr>
+                    <th>ACCIONES</th>
                     <th>CÓDIGO</th>
                     <th>NOMBRE</th>
                     <th>DESCRIPCIÓN</th>
@@ -142,7 +208,7 @@ const ListaActivos = () => {
                     <th>UBICACIÓN</th>
                     <th>ASIGNADO</th>
                     <th>OBSERVACIÓN</th>
-                    <th />
+                    
                   </tr>
                 </thead>
                 <tbody>
@@ -151,13 +217,6 @@ const ListaActivos = () => {
                   ) : filteredAssets.length > 0 ? (
                     filteredAssets.map((asset) => (
                       <tr key={asset.codigo}>
-                        <td>{asset.codigo}</td>
-                        <td>{asset.nombre}</td>
-                        <td>{asset.descripcion}</td>
-                        <td>{asset.cantidad}</td>
-                        <td>{asset.ubicacion}</td>
-                        <td>{asset.Empleado?.nombre || "No asignado"}</td>
-                        <td>{asset.observacion}</td>
                         <td className="text-right">
                           <Dropdown isOpen={dropdownOpen[asset.idInventario]} toggle={() => toggleDropdown(asset.idInventario)}>  
                               <DropdownToggle className="btn-icon-only text-light" size="sm">  
@@ -170,6 +229,14 @@ const ListaActivos = () => {
                               </DropdownMenu>  
                             </Dropdown>
                         </td>
+                        <td>{asset.codigo}</td>
+                        <td>{asset.nombre}</td>
+                        <td>{asset.descripcion}</td>
+                        <td>{asset.cantidad}</td>
+                        <td>{asset.ubicacion}</td>
+                                                 <td>{asset.Empleado?.persona?.nombreCompleto || "No asignado"}</td>
+                        <td>{asset.observacion}</td>
+
                       </tr>
                     ))
                   ) : (
