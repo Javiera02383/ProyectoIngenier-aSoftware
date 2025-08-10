@@ -39,7 +39,10 @@ exports.registrar = async (req, res) => {
     // Asegurar que toda persona con usuario tenga registro de Empleado
     await Empleado.findOrCreate({
       where: { idPersona },
-      defaults: { idPersona }
+      defaults: { 
+        idPersona,
+        idRol: idrol || null // Asignar el rol si viene en el request
+      }
     });
 
     res.status(201).json({ mensaje: 'Usuario registrado exitosamente', usuario: Nombre_Usuario });
@@ -86,7 +89,11 @@ exports.iniciarSesion = async (req, res) => {
     // Garantizar que exista Empleado y obtener idEmpleado
     let empleado = await Empleado.findOne({ where: { idPersona: usuario.idPersona } });
     if (!empleado && usuario.idPersona) {
-      empleado = await Empleado.create({ idPersona: usuario.idPersona });
+      // Crear empleado con el rol del usuario si existe
+      empleado = await Empleado.create({ 
+        idPersona: usuario.idPersona,
+        idRol: usuario.idrol || null
+      });
     }
 
     const token = getToken(payload);

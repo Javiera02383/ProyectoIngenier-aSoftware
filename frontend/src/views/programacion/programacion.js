@@ -12,7 +12,6 @@ import {
 } from "reactstrap";  
 import { useNavigate } from "react-router-dom";  
 import HeaderResponsive from "components/Headers/HeaderResponsive";  
-import CalendarioPautas from "views/programacion/CalendarioPautas";  
 import { programacionService } from "../../services/programacion/programacionService";  
   
 const Programacion = () => {  
@@ -65,9 +64,6 @@ const Programacion = () => {
                   </Button>  
                 </div>  
               </CardHeader>  
-              <CardBody>  
-                <CalendarioPautas />  
-              </CardBody>  
             </Card>  
           </Col>  
         </Row>  

@@ -90,10 +90,10 @@ INSERT INTO usuario (Nombre_Usuario, contraseña, estado, idPersona, idrol) VALU
 ('laura.castro', 'laura012', 'Activo', 4, 2);  
   
 -- Tabla: empleado  
-INSERT INTO empleado (idPersona, Fecha_Registro) VALUES   
-(1, NOW()),  
-(2, NOW()),  
-(3, NOW());  
+INSERT INTO empleado (idPersona, idRol, Fecha_Registro) VALUES   
+(1, 1, NOW()),  
+(2, 2, NOW()),  
+(3, 2, NOW());  
 
 
 -- Tabla: Proveedores  
