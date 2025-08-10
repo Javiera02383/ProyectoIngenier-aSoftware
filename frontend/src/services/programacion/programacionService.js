@@ -8,6 +8,12 @@ export const programacionService = {
     return response.data;  
   },  
   
+  // Obtener programas por tipo de calendario
+  obtenerProgramasPorTipoCalendario: async (tipoCalendario) => {
+    const response = await axiosInstance.get(`/programacion/programa/tipo/${tipoCalendario}`);
+    return response.data;
+  },
+  
   // Obtener bloques publicitarios  
   obtenerBloques: async (idPrograma = null) => {  
     const params = idPrograma ? `?idPrograma=${idPrograma}` : '';  
@@ -26,6 +32,12 @@ export const programacionService = {
     const response = await axiosInstance.get('/programacion/completa');  
     return response.data;  
   },  
+
+  // Obtener programación por tipo de calendario
+  obtenerProgramacionPorTipoCalendario: async (tipoCalendario) => {
+    const response = await axiosInstance.get(`/programacion/programacion/tipo/${tipoCalendario}`);
+    return response.data;
+  },
   
   // Obtener órdenes de programación  
   obtenerOrdenesProgramacion: async (filtros = {}) => {  
@@ -35,9 +47,7 @@ export const programacionService = {
       
     const response = await axiosInstance.get(`/programacion/orden-programacion?${params.toString()}`);  
     return response.data;  
-  } , 
-
-
+  }, 
 
   // Crear nuevo programa  
   crearPrograma: async (programaData) => {  
@@ -50,8 +60,6 @@ export const programacionService = {
     const response = await axiosInstance.post('/programacion/pauta', pautaData);  
     return response.data;  
   },  
-
-  
   
   // Obtener eventos para el calendario  
   obtenerEventosCalendario: async (fechaInicio, fechaFin) => {  
@@ -61,15 +69,10 @@ export const programacionService = {
       
     const response = await axiosInstance.get(`/programacion/eventos?${params.toString()}`);  
     return response.data;  
-  },  
-
-    crearPauta: async (pautaData) => {  
-    const response = await axiosInstance.post('/programacion/pauta', pautaData);  
-    return response.data;  
-    },  
+  },
     
-    obtenerClientes: async () => {  
+  obtenerClientes: async () => {  
     const response = await axiosInstance.get('/clientes');  
     return response.data;  
-    }
+  }
 };

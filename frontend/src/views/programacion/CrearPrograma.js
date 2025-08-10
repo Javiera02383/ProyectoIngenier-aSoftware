@@ -83,7 +83,6 @@ const CrearPrograma = () => {
                       <option value="">Seleccionar tipo de calendario</option>  
                       <option value="Lunes_Sabado">Lunes a Sábado</option>  
                       <option value="Domingo">Domingo</option>  
-                      <option value="Diario">Diario</option>  
                     </Input>  
                   </FormGroup>  
   

@@ -11,8 +11,15 @@ const db = require('../../configuraciones/db');
 // Obtener todos los programas  
 const obtenerProgramas = async (req, res) => {  
   try {  
+    const { tipoCalendario, categoria, estado } = req.query;
+    const whereClause = {};
+    
+    if (tipoCalendario) whereClause.tipoCalendario = tipoCalendario;
+    if (categoria) whereClause.categoria = categoria;
+    if (estado) whereClause.estado = estado;
+    
     const programas = await Programa.findAll({  
-      where: { estado: 'Activo' },  
+      where: Object.keys(whereClause).length ? whereClause : { estado: 'Activo' },  
       order: [['horaInicio', 'ASC']]  
     });  
     res.json(programas);  
@@ -20,7 +27,83 @@ const obtenerProgramas = async (req, res) => {
     res.status(500).json({ mensaje: 'Error al obtener programas', error: error.message });  
   }  
 };  
-  
+
+// Obtener programas por tipo de calendario
+const obtenerProgramasPorTipoCalendario = async (req, res) => {
+  try {
+    const { tipoCalendario } = req.params;
+    
+    if (!['Lunes_Sabado', 'Domingo'].includes(tipoCalendario)) {
+      return res.status(400).json({ mensaje: 'Tipo de calendario inválido. Debe ser "Lunes_Sabado" o "Domingo"' });
+    }
+    
+    const programas = await Programa.findAll({
+      where: { 
+        tipoCalendario,
+        estado: 'Activo' 
+      },
+      order: [['horaInicio', 'ASC']]
+    });
+    
+    res.json(programas);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al obtener programas por tipo de calendario', error: error.message });
+  }
+};
+
+// Obtener programación completa por tipo de calendario
+const obtenerProgramacionPorTipoCalendario = async (req, res) => {
+  try {
+    const { tipoCalendario } = req.params;
+    
+    if (!['Lunes_Sabado', 'Domingo'].includes(tipoCalendario)) {
+      return res.status(400).json({ mensaje: 'Tipo de calendario inválido. Debe ser "Lunes_Sabado" o "Domingo"' });
+    }
+    
+    const programas = await Programa.findAll({  
+      where: { 
+        tipoCalendario,
+        estado: 'Activo' 
+      },  
+      include: [{  
+        model: BloquePublicitario,  
+        include: [{  
+          model: AnuncioBloque,  
+          include: [{  
+            model: Cliente,  
+            include: [{  
+              model: Persona,  
+              as: 'persona',  
+              attributes: ['Pnombre', 'Papellido']  
+            }]  
+          }]  
+        }]  
+      }],  
+      order: [  
+        ['horaInicio', 'ASC'],  
+        [BloquePublicitario, 'horaBloque', 'ASC']  
+      ]  
+    });  
+
+    // Formatear datos para el frontend  
+    const programacionFormateada = programas.map(programa => ({  
+      bloque: programa.nombre,  
+      comerciales: programa.BloquePublicitarios?.map(bloque => ({  
+        hora: bloque.horaBloque.substring(0, 5), // HH:MM format  
+        empresas: bloque.AnuncioBloques?.map(anuncio =>   
+          anuncio.Cliente?.persona ?   
+          `${anuncio.Cliente.persona.Pnombre} ${anuncio.Cliente.persona.Papellido}`.toUpperCase() :   
+          'CLIENTE'  
+        ) || []  
+      })) || []  
+    }));  
+
+    res.json(programacionFormateada);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al obtener programación por tipo de calendario', error: error.message });
+  }
+};
+
 const crearPrograma = async (req, res) => {  
   try {  
     const { nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado } = req.body;  
@@ -47,7 +130,7 @@ const crearPrograma = async (req, res) => {
     });  
   }  
 };  
-
+  
 // Obtener bloques publicitarios  
 const obtenerBloques = async (req, res) => {  
   try {  
@@ -219,6 +302,8 @@ const crearPauta = async (req, res) => {
   
 module.exports = {  
   obtenerProgramas,  
+  obtenerProgramasPorTipoCalendario,
+  obtenerProgramacionPorTipoCalendario,
   obtenerBloques,  
   obtenerAnunciosPorBloque,  
   obtenerProgramacionCompleta,  
