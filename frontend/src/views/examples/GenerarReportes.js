@@ -438,44 +438,47 @@ const GenerarReportes = () => {
                     Opciones de Reporte  
                   </h6>  
                   <div className="pl-lg-4">  
-                    <Row>  
-                      <Col lg="6">  
-                        <FormGroup>  
-                          <Label htmlFor="report-type">Tipo de Reporte</Label>  
-                          <Input  
-                            type="select"  
-                            id="report-type"  
-                            className="form-control-alternative"  
-                            value={reportType}  
-                            onChange={(e) => {  
-                              setReportType(e.target.value);  
-                              setGeneratedReport(null);  
-                            }}  
-                          >  
-                            <option value="">Selecciona un tipo de reporte...</option>  
-                            <option value="all_assets">Inventario General de Activos</option>   
-                            <option value="low_stock">Activos con Stock Bajo</option>  
-                            <option value="by_status">Activos por Estado</option>  
-                          </Input>  
-                        </FormGroup>  
-                      </Col>  
-                    </Row>   
-                  </div>  
-                  <hr className="my-4" />  
-                  <div className="text-center">  
-                    <Button   
-                      color="primary"   
-                      onClick={generateReport}   
-                      disabled={!reportType || loading}  
-                    >  
-                      Generar Reporte  
-                    </Button>  
-                    {generatedReport && (  
-                      <Button color="info" className="ml-2" onClick={printReport}>  
-                        Imprimir Reporte  
-                      </Button>  
-                    )}  
-                  </div>  
+  <Row className="align-items-end">  
+    <Col lg="6">  
+      <FormGroup>  
+        <Label htmlFor="report-type">Tipo de Reporte</Label>  
+        <Input  
+          type="select"  
+          id="report-type"  
+          className="form-control-alternative"  
+          value={reportType}  
+          onChange={(e) => {  
+            setReportType(e.target.value);  
+            setGeneratedReport(null);  
+          }}  
+        >  
+          <option value="">Selecciona un tipo de reporte...</option>  
+          <option value="all_assets">Inventario General de Activos</option>  
+          <option value="low_stock">Activos con Stock Bajo</option>  
+          <option value="by_status">Activos por Estado</option>  
+        </Input>  
+      </FormGroup>  
+    </Col>  
+    <Col lg="3">  
+       
+        <Button  
+          color="primary"  
+          onClick={generateReport}  
+          disabled={!reportType || loading}  
+          className="mb-4"  
+        >  
+          Generar Reporte  
+        </Button>  </Col>
+        <Col lg="3"> 
+        {generatedReport && (  
+          <Button color="info" onClick={printReport} className="mb-4"  >  
+            Imprimir Reporte  
+          </Button>  
+        )}  
+       
+    </Col>  
+  </Row>  
+</div>
                 </Form>  
               </CardBody>  
             </Card>  
