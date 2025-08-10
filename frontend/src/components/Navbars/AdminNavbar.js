@@ -55,19 +55,17 @@ const AdminNavbar = (props) => {
           <Nav className="align-items-center d-none d-md-flex" navbar>
             <UncontrolledDropdown nav>
               <DropdownToggle className="pr-0" nav>
-                <Media className="align-items-center">
-                  <span className="avatar avatar-sm rounded-circle">
-                    <img
-                      alt="..."
-                      src={require("../../assets/img/theme/team-4-800x800.jpg")}
-                    />
-                  </span>
-                  <Media className="ml-2 d-none d-lg-block">
-                    <span className="mb-0 text-sm font-weight-bold">
-                      {user?.nombre_usuario || 'Usuario'}
-                    </span>
-                  </Media>
-                </Media>
+              <Media className="align-items-center">  
+                <span className="avatar avatar-sm rounded-circle bg-primary d-flex align-items-center justify-content-center">  
+                  <i className="ni ni-single-02 text-white"></i>  
+                </span>  
+                <Media className="ml-2 d-none d-lg-block">  
+                  <span className="mb-0 text-sm font-weight-bold">  
+                    {user?.Nombre_Usuario || 'Usuario'}  
+                  </span>  
+                  
+                </Media>  
+              </Media>
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-arrow" right>
                 <DropdownItem className="noti-title" header tag="div">

@@ -83,6 +83,19 @@ export const authService = {
     return usuario ? JSON.parse(usuario) : null;
   },
 
+  getProfile: async () => {
+    const response = await axiosInstance.get('/auth/perfil');
+    // Sincronizar localStorage con IDs completos para frontend
+    const user = response.data?.user || {};
+    localStorage.setItem('usuario', JSON.stringify({
+      idUsuario: user.idUsuario,
+      Nombre_Usuario: user.Nombre_Usuario,
+      idPersona: user.idPersona,
+      idEmpleado: user.idEmpleado
+    }));
+    return response.data;
+  },
+
   isAuthenticated: () => {
     return !!localStorage.getItem('token');
   }

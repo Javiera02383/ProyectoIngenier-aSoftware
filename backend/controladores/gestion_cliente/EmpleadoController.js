@@ -1,6 +1,7 @@
 const { body, validationResult } = require('express-validator');
 const Empleado = require('../../modelos/gestion_cliente/Empleado');
 const Persona = require('../../modelos/seguridad/Persona');
+const Rol = require('../../modelos/seguridad/Rol');
 const { Op } = require('sequelize');
 
 // === VALIDACIONES ===
@@ -8,6 +9,9 @@ const reglasCrear = [
   body('idPersona')
     .notEmpty().withMessage('El idPersona es obligatorio')
     .isInt({ min: 1 }).withMessage('El idPersona debe ser un número entero positivo'),
+  body('idRol')
+    .optional()
+    .isInt({ min: 1 }).withMessage('El idRol debe ser un número entero positivo'),
   body('Fecha_Registro')
     .optional()
     .isISO8601().withMessage('La fecha debe tener un formato válido (YYYY-MM-DD)')
@@ -17,6 +21,9 @@ const reglasEditar = [
   body('idPersona')
     .optional()
     .isInt({ min: 1 }).withMessage('El idPersona debe ser un número entero positivo'),
+  body('idRol')
+    .optional()
+    .isInt({ min: 1 }).withMessage('El idRol debe ser un número entero positivo'),
   body('Fecha_Registro')
     .optional()
     .isISO8601().withMessage('La fecha debe tener un formato válido (YYYY-MM-DD)')
@@ -48,10 +55,16 @@ exports.crearEmpleado = [
 exports.obtenerTodosLosEmpleados = async (req, res) => {  
   try {  
     const empleados = await Empleado.findAll({  
-      include: [{  
-        model: Persona,  
-        as: 'persona'  
-      }]  
+      include: [
+        {  
+          model: Persona,  
+          as: 'persona'  
+        },
+        {
+          model: Rol,
+          as: 'rol'
+        }
+      ]  
     });  
     res.json(empleados);  
   } catch (error) {  
@@ -68,11 +81,17 @@ exports.obtenerEmpleados = async (req, res) => {
     if (Papellido) wherePersona.Papellido = { [Op.like]: `%${Papellido}%` };
 
     const empleados = await Empleado.findAll({
-      include: [{
-        model: Persona,
-        as: 'persona',
-        where: Object.keys(wherePersona).length ? wherePersona : undefined
-      }]
+      include: [
+        {
+          model: Persona,
+          as: 'persona',
+          where: Object.keys(wherePersona).length ? wherePersona : undefined
+        },
+        {
+          model: Rol,
+          as: 'rol'
+        }
+      ]
     });
     res.json(empleados);
   } catch (error) {
@@ -85,10 +104,16 @@ exports.obtenerEmpleadoPorId = async (req, res) => {
   const { id } = req.params;
   try {
     const empleado = await Empleado.findByPk(id, {
-      include: [{
-        model: Persona,
-        as: 'persona'
-      }]
+      include: [
+        {
+          model: Persona,
+          as: 'persona'
+        },
+        {
+          model: Rol,
+          as: 'rol'
+        }
+      ]
     });
     if (!empleado) return res.status(404).json({ mensaje: 'Empleado no encontrado' });
     res.json(empleado);
@@ -114,6 +139,15 @@ exports.editarEmpleado = [
           return res.status(400).json({ mensaje: 'La persona asociada (idPersona) no existe' });
         }
       }
+      
+      // Si se envía idRol, validar que exista
+      if (req.body.idRol) {
+        const rol = await Rol.findByPk(req.body.idRol);
+        if (!rol) {
+          return res.status(400).json({ mensaje: 'El rol asociado (idRol) no existe' });
+        }
+      }
+      
       const empleado = await Empleado.findByPk(id);
       if (!empleado) return res.status(404).json({ mensaje: 'Empleado no encontrado' });
       await empleado.update(req.body);

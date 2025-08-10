@@ -5,6 +5,7 @@ const { getToken } = require('../../configuraciones/passport');
 const { EnviarCorreo } = require('../../configuraciones/correo');
 const Persona = require('../../modelos/seguridad/Persona');
 const Empleado = require('../../modelos/gestion_cliente/Empleado');
+const Rol = require('../../modelos/seguridad/Rol');
 
 // Función para generar PIN de 6 dígitos
 const generarPin = () => {
@@ -106,6 +107,82 @@ exports.iniciarSesion = async (req, res) => {
   }
 };
 
+// OBTENER PERFIL ACTUAL
+exports.obtenerPerfil = async (req, res) => {
+  try {
+    const usuarioDb = await Usuario.findByPk(req.user?.idUsuario || 0, {
+      include: [{ model: Persona, as: 'persona' }],
+      attributes: { exclude: ['contraseña'] }
+    });
+    if (!usuarioDb) return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+
+    // Obtener empleado por idPersona si existe
+    let empleado = null;
+    if (usuarioDb.idPersona) {
+      empleado = await Empleado.findOne({ 
+        where: { idPersona: usuarioDb.idPersona },
+        include: [{ model: Rol, as: 'rol' }]
+      });
+    }
+
+    res.json({
+      user: {
+        idUsuario: usuarioDb.idUsuario,
+        Nombre_Usuario: usuarioDb.Nombre_Usuario,
+        idPersona: usuarioDb.idPersona,
+        idEmpleado: empleado ? empleado.idEmpleado : null,
+        persona: usuarioDb.persona || null
+      },
+      empleado: empleado || null
+    });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al obtener perfil', error: error.message });
+  }
+};
+
+// ACTUALIZAR USUARIO (nombre de usuario y/o contraseña)
+exports.actualizarUsuario = async (req, res) => {
+  const { id } = req.params;
+  const { Nombre_Usuario, contraseña, contraseñaActual } = req.body;
+  try {
+    const usuario = await Usuario.findByPk(id);
+    if (!usuario) return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+
+    // Si se va a cambiar la contraseña, validar la contraseña actual
+    if (contraseña && contraseñaActual) {
+      const contraseñaValida = await argon2.verify(usuario.contraseña, contraseñaActual);
+      if (!contraseñaValida) {
+        return res.status(400).json({ mensaje: 'La contraseña actual es incorrecta' });
+      }
+    }
+
+    if (Nombre_Usuario) {
+      // Verificar que el nuevo nombre de usuario no esté en uso por otro usuario
+      if (Nombre_Usuario !== usuario.Nombre_Usuario) {
+        const existeUsuario = await Usuario.findOne({ 
+          where: { 
+            Nombre_Usuario,
+            idUsuario: { [require('sequelize').Op.ne]: id }
+          }
+        });
+        if (existeUsuario) {
+          return res.status(400).json({ mensaje: 'El nombre de usuario ya está en uso' });
+        }
+        usuario.Nombre_Usuario = Nombre_Usuario;
+      }
+    }
+    
+    if (contraseña) {
+      usuario.contraseña = await argon2.hash(contraseña);
+    }
+    
+    await usuario.save();
+
+    res.json({ mensaje: 'Usuario actualizado correctamente', user: { idUsuario: usuario.idUsuario, Nombre_Usuario: usuario.Nombre_Usuario } });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al actualizar usuario', error: error.message });
+  }
+};
 // Obtener todos los usuarios
 exports.obtenerUsuarios = async (req, res) => {
   try {

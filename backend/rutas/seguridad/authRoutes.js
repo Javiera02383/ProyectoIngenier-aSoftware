@@ -204,4 +204,8 @@ router.post(
 router.get('/listar', verificarUsuario, authController.obtenerUsuarios);
 router.get('/error', authController.error)
 
+// Perfil y actualización de usuario
+router.get('/perfil', verificarUsuario, authController.obtenerPerfil);
+router.put('/usuario/:id', verificarUsuario, authController.actualizarUsuario);
+
 module.exports = router;

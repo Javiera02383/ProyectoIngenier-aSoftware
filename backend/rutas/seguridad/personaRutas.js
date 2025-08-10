@@ -234,4 +234,7 @@ router.post('/personas', personaController.crearMultiplesPersonas);
 // Ruta: Obtener todas las personas
 router.get('/persona', personaController.obtenerPersonas);
 
+// Ruta: Obtener una persona por ID
+router.get('/persona/:id', personaController.obtenerPersonaPorId);
+
 module.exports = router;
