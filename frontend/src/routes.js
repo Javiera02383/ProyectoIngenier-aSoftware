@@ -300,7 +300,7 @@ const routes = [
   },
   {
     path: "/facturacion/contratos",
-    name: "Contratos",
+    name: "Ordenes de Publicidad",
     icon: "ni ni-briefcase-24 text-info",
     component: Contratos,
     layout: "/admin",

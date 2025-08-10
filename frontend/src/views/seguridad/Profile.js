@@ -369,11 +369,7 @@ const Profile = () => {
         <Row>
           <Col className="order-xl-2 mb-5 mb-xl-0" xl="4">
             <Card className="card-profile shadow" style={profileStyles.cardProfile}>
-              <CardHeader className="text-center border-0 pt-8 pb-0" style={profileStyles.cardHeader}>
-                <div className="d-flex justify-content-between">
- 
-                </div>
-              </CardHeader>
+
               <CardBody className="pt-0 pt-md-4" style={profileStyles.cardBody}>
                 <div className="text-center">
                   {/* Avatar placeholder */}
@@ -452,31 +448,7 @@ const Profile = () => {
               </CardBody>
             </Card>
             
-            {/* Additional info card */}
-            <Card className="card-profile shadow mt-4" style={profileStyles.cardProfile}>
-              <CardHeader className="bg-gradient-info text-white text-center" style={profileStyles.cardHeader}>
-                <h6 className="mb-0">
-                  <i className="ni ni-chart-bar-32 mr-2" />
-                  Información del Sistema
-                </h6>
-              </CardHeader>
-              <CardBody className="pt-3" style={profileStyles.cardBody}>
-                <div className="row text-center">
-                  <div className="col-6">
-                    <div style={profileStyles.infoItem}>
-                      <h6 className="text-info mb-1">Usuario ID</h6>
-                      <small className="text-muted">{usuario.idUsuario || 'N/A'}</small>
-                    </div>
-                  </div>
-                  <div className="col-6">
-                    <div style={profileStyles.infoItem}>
-                      <h6 className="text-info mb-1">Persona ID</h6>
-                      <small className="text-muted">{persona ? persona.idPersona : 'N/A'}</small>
-                    </div>
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
+
           </Col>
           <Col className="order-xl-1" xl="8">
             <Card className="bg-secondary shadow">

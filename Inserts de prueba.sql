@@ -187,114 +187,206 @@ INSERT INTO reparacion_de_lentes (Tipo_Reparacion, idConsulta, Descripcion, Cost
 -- Tabla: programa
 
 -- Programas de Noticias  
-INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
-('NOTICIAS 60 MINUTOS', 'Lunes_Sabado', '07:00:00', 60, 'Noticias', 'Activo', 1, '2023-01-15 10:00:00'),  
-('TV NOTICIAS 40', 'Lunes_Sabado', '12:00:00', 60, 'Noticias', 'Activo', 1, '2023-01-15 10:30:00'),  
-('TV NOTICIAS 40 ESTELAR', 'Lunes_Sabado', '18:00:00', 60, 'Noticias', 'Activo', 1, '2023-01-15 11:00:00'),  
-('RESUMEN SEMANAL', 'Domingo', '19:00:00', 30, 'Noticias', 'Activo', 1, '2023-02-01 09:00:00');  
+INSERT INTO `programa` (`idPrograma`, `nombre`, `tipoCalendario`, `horaInicio`, `duracion`, `categoria`, `estado`, `idEmpleado`, `fechaCreacion`) VALUES
+(1, 'NOTICIAS 60 MINUTOS', 'Lunes_Sabado', '07:00:00', 151, 'Noticias', 'Activo', 2, '2025-08-08 07:32:27'),
+(2, 'PELÍCULA MATUTINA', 'Lunes_Sabado', '09:00:00', 120, 'Entretenimiento', 'Activo', 1, '2025-08-09 21:22:11'),
+(3, 'DOCUMENTALES', 'Lunes_Sabado', '11:00:00', 60, 'Cultural', 'Activo', 1, '2025-08-09 21:39:27'),
+(4, 'TVN40 MERIDIANO', 'Lunes_Sabado', '12:00:00', 60, 'Noticias', 'Activo', 1, '2025-08-09 21:50:37'),
+(5, 'INFANTILES', 'Lunes_Sabado', '13:00:00', 60, 'Infantil', 'Activo', 1, '2025-08-09 22:18:38'),
+(6, 'VIVA LA MÚSICA', 'Lunes_Sabado', '14:00:00', 180, 'Entretenimiento', 'Activo', 1, '2025-08-09 22:28:05'),
+(7, 'SERIES', 'Lunes_Sabado', '17:00:00', 58, 'Entretenimiento', 'Activo', 1, '2025-08-09 23:07:18'),
+(8, 'TV NOTICIAS 40', 'Lunes_Sabado', '18:00:00', 240, 'Noticias', 'Activo', 1, '2025-08-09 23:13:28'),
+(9, 'CIERRE', 'Lunes_Sabado', '22:00:00', 1, 'Noticias', 'Activo', 1, '2025-08-09 23:39:04');
   
 
-INSERT INTO programa (nombre, tipoCalendario, horaInicio, duracion, categoria, estado, idEmpleado, fechaCreacion) VALUES  
-('PELÍCULA MATUTINA', 'Lunes_Sabado', '09:00:00', 120, 'Entretenimiento', 'Activo', 2, '2023-01-20 14:00:00'),  
-('CINE ESTRENO', 'Lunes_Sabado', '19:00:00', 120, 'Entretenimiento', 'Activo', 2, '2023-01-20 14:30:00'),  
-('PELÍCULA ESTELAR', 'Lunes_Sabado', '21:00:00', 120, 'Entretenimiento', 'Activo', 2, '2023-01-20 15:00:00'),  
-('SERIE CÓMICA', 'Lunes_Sabado', '08:30:00', 30, 'Entretenimiento', 'Activo', 2, '2023-02-10 16:00:00');
-
-  
-
-
+-- ************************************************
 -- Tabla: Bloque publicitario
 
 -- Bloques publicitarios adicionales para programas existentes  
 -- Usando clientes con IDs del 11 al 26  
   
--- Bloques para NOTICIAS 60 MINUTOS (programa 1) - horarios adicionales  
-INSERT INTO bloque_publicitario (idPrograma, horaBloque, ordenBloque, duracionTotal, fechaVigencia, estado) VALUES  
-(1, '07:10:00', 1, 240, '2024-03-01', 'Activo'),  
-(1, '07:40:00', 2, 300, '2024-03-01', 'Activo'),  
-(1, '08:05:00', 3, 180, '2024-03-01', 'Activo'),  
-(1, '08:05:00', 4, 180, '2024-03-01', 'Activo'), 
-(1, '08:25:00', 5, 240, '2024-03-01', 'Activo');  
-  
--- Bloques para PELÍCULA MATUTINA (programa 5) - horarios adicionales    
-INSERT INTO bloque_publicitario (idPrograma, horaBloque, ordenBloque, duracionTotal, fechaVigencia, estado) VALUES  
-(5, '09:15:00', 6, 180, '2024-03-01', 'Activo'),  
-(5, '09:45:00', 7, 240, '2024-03-01', 'Activo'),  
-(5, '10:15:00', 8, 180, '2024-03-01', 'Activo'),  
-(5, '10:45:00', 9, 180, '2024-03-01', 'Activo');  
-  
--- Bloques para TV NOTICIAS 40 (programa 2) - horarios del mediodía  
-INSERT INTO bloque_publicitario (idPrograma, horaBloque, ordenBloque, duracionTotal, fechaVigencia, estado) VALUES  
-(2, '12:05:00', 1, 180, '2024-03-01', 'Activo'),  
-(2, '12:20:00', 2, 240, '2024-03-01', 'Activo'),  
-(2, '12:40:00', 3, 180, '2024-03-01', 'Activo'),  
-(2, '12:50:00', 4, 120, '2024-03-01', 'Activo');  
-  
--- Bloques para VIVA LA MÚSICA (programa 9) - horarios adicionales  
-INSERT INTO bloque_publicitario (idPrograma, horaBloque, ordenBloque, duracionTotal, fechaVigencia, estado) VALUES  
-(9, '14:15:00', 6, 180, '2024-03-01', 'Activo'),  
-(9, '14:45:00', 7, 240, '2024-03-01', 'Activo'),  
-(9, '15:15:00', 8, 180, '2024-03-01', 'Activo'),  
-(9, '15:45:00', 9, 120, '2024-03-01', 'Activo');
+INSERT INTO `bloque_publicitario` (`idBloque`, `idPrograma`, `horaBloque`, `ordenBloque`, `duracionTotal`, `fechaVigencia`, `estado`) VALUES
+(1, 1, '07:55:00', 3, 30, '2025-08-09', 'Activo'),
+(2, 1, '07:05:00', 2, 60, '2025-08-09', 'Activo'),
+(3, 1, '08:20:00', 4, 45, '2025-08-09', 'Activo'),
+(4, 1, '08:30:00', 5, 45, '2025-08-09', 'Activo'),
+(5, 2, '09:00:00', 1, 45, '2025-08-09', 'Activo'),
+(6, 2, '09:30:00', 2, 30, '2025-08-09', 'Activo'),
+(7, 2, '10:00:00', 3, 30, '2025-08-09', 'Activo'),
+(8, 2, '10:30:00', 4, 30, '2025-08-09', 'Activo'),
+(9, 2, '11:00:00', 5, 30, '2025-08-09', 'Activo'),
+(10, 3, '11:15:00', 1, 30, '2025-08-09', 'Activo'),
+(11, 3, '11:30:00', 2, 30, '2025-08-09', 'Activo'),
+(12, 3, '11:55:00', 3, 45, '2025-08-09', 'Activo'),
+(13, 4, '12:10:00', 1, 30, '2025-08-09', 'Activo'),
+(14, 4, '12:25:00', 2, 45, '2025-08-09', 'Activo'),
+(15, 4, '12:35:00', 1, 30, '2025-08-09', 'Activo'),
+(18, 4, '12:45:00', 4, 30, '2025-08-09', 'Activo'),
+(19, 4, '12:55:00', 5, 30, '2025-08-09', 'Activo'),
+(20, 5, '13:15:00', 1, 30, '2025-08-09', 'Activo'),
+(21, 5, '13:45:00', 2, 30, '2025-08-09', 'Activo'),
+(22, 6, '14:00:00', 1, 30, '2025-08-09', 'Activo'),
+(23, 6, '14:30:00', 2, 45, '2025-08-09', 'Activo'),
+(24, 6, '15:00:00', 3, 45, '2025-08-09', 'Activo'),
+(25, 6, '15:30:00', 4, 45, '2025-08-09', 'Activo'),
+(26, 6, '16:00:00', 5, 30, '2025-08-09', 'Activo'),
+(27, 7, '17:00:00', 1, 45, '2025-08-09', 'Activo'),
+(28, 7, '17:15:00', 2, 30, '2025-08-09', 'Activo'),
+(29, 7, '17:30:00', 3, 30, '2025-08-09', 'Activo'),
+(30, 7, '17:45:00', 4, 30, '2025-08-09', 'Activo'),
+(31, 7, '18:00:00', 5, 30, '2025-08-09', 'Activo'),
+(32, 8, '18:10:00', 1, 60, '2025-08-09', 'Activo'),
+(33, 8, '18:25:00', 2, 60, '2025-08-09', 'Activo'),
+(34, 8, '18:35:00', 3, 45, '2025-08-09', 'Activo'),
+(35, 8, '18:45:00', 4, 60, '2025-08-09', 'Activo'),
+(36, 8, '18:55:00', 5, 45, '2025-08-09', 'Activo'),
+(37, 8, '19:30:00', 6, 60, '2025-08-09', 'Activo'),
+(38, 8, '20:00:00', 7, 60, '2025-08-09', 'Activo'),
+(39, 8, '20:30:00', 8, 75, '2025-08-09', 'Activo'),
+(40, 8, '21:00:00', 9, 74, '2025-08-09', 'Activo'),
+(41, 8, '21:30:00', 10, 60, '2025-08-09', 'Activo');
 
--- **************************************************************************************44
+-- ************************************************
 -- Tabla: anuncio_bloque
 
--- Bloque 1 (NOTICIAS 60 MINUTOS - 7:10)  
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
-(1, 4, 1, 60, 'nombre comercial', 'Programado'),  
-(1, 5, 2, 60, 'EMPRESA_5', 'Programado'),  
-(1, 6, 3, 60, 'EMPRESA_6', 'Programado'),  
-(1, 7, 4, 60, 'EMPRESA_7', 'Programado');  
-  
--- Bloque 2 (NOTICIAS 60 MINUTOS - 7:40)  
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
-(2, 8, 1, 60, 'EMPRESA_8', 'Programado'),  
-(2, 9, 2, 60, 'EMPRESA_9', 'Programado'),  
-(2, 10, 3, 60, 'EMPRESA_10', 'Programado'),  
-(2, 11, 4, 60, 'EMPRESA_11', 'Programado'),  
-(2, 12, 5, 60, 'EMPRESA_12', 'Programado');  
-  
--- Bloque 3 (NOTICIAS 60 MINUTOS - 8:05)  
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
-(3, 13, 1, 60, 'EMPRESA_13', 'Programado'),  
-(3, 14, 2, 60, 'EMPRESA_14', 'Programado'),  
-(3, 15, 3, 60, 'EMPRESA_15', 'Programado');  
-  
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
-(4, 4, 1, 60, 'EMPRESA_4_B', 'Programado'),  
-(4, 5, 2, 60, 'EMPRESA_5_B', 'Programado'),  
-(4, 6, 3, 60, 'EMPRESA_6_B', 'Programado'),  
-(4, 7, 4, 60, 'EMPRESA_7_B', 'Programado');
-  
--- Bloques para PELÍCULA MATUTINA usando clientes 4-19 (distribución rotativa)  
-  
--- Bloque 5 (PELÍCULA MATUTINA - 9:15)  
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
-(5, 4, 1, 60, 'EMPRESA_4', 'Programado'),  
-(5, 5, 2, 60, 'EMPRESA_5', 'Programado'),  
-(5, 6, 3, 60, 'EMPRESA_6', 'Programado');  
-  
--- Bloque 6 (PELÍCULA MATUTINA - 9:45)  
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
-(6, 7, 1, 60, 'EMPRESA_7', 'Programado'),  
-(6, 8, 2, 60, 'EMPRESA_8', 'Programado'),  
-(6, 9, 3, 60, 'EMPRESA_9', 'Programado'),  
-(6, 10, 4, 60, 'EMPRESA_10', 'Programado');  
-  
--- Bloque 7 (PELÍCULA MATUTINA - 10:15)  
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
-(7, 11, 1, 60, 'EMPRESA_11', 'Programado'),  
-(7, 12, 2, 60, 'EMPRESA_12', 'Programado'),  
-(7, 13, 3, 60, 'EMPRESA_13', 'Programado');  
-  
--- Bloque 8 (PELÍCULA MATUTINA - 10:45)  
-INSERT INTO anuncio_bloque (idBloque, idCliente, ordenAnuncio, duracionAnuncio, nombreComercial, estado) VALUES  
-(8, 14, 1, 60, 'EMPRESA_14', 'Programado'),  
-(8, 15, 2, 60, 'EMPRESA_15', 'Programado'),  
-(8, 16, 3, 60, 'EMPRESA_16', 'Programado');
-
--- ***************************************************************************************************
+INSERT INTO `anuncio_bloque` (`idAnuncioBloque`, `idBloque`, `idCliente`, `ordenAnuncio`, `duracionAnuncio`, `nombreComercial`, `archivoAnuncio`, `estado`) VALUES
+(1, 1, 6, 1, 10, 'MOTOMUNDO', NULL, 'Programado'),
+(2, 1, 3, 2, 10, 'MUNICOM', NULL, 'Programado'),
+(3, 1, 7, 3, 10, 'SINET', NULL, 'Programado'),
+(4, 2, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(5, 2, 2, 2, 10, 'SECOPV', NULL, 'Programado'),
+(6, 2, 3, 3, 10, 'MUNICOM', NULL, 'Programado'),
+(7, 2, 4, 4, 15, 'MACONSA', NULL, 'Programado'),
+(8, 2, 5, 5, 15, 'UNAH', NULL, 'Programado'),
+(9, 3, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(10, 3, 3, 2, 10, 'MUNICOM', NULL, 'Programado'),
+(11, 3, 8, 3, 10, 'COOPERATIVA SANMARQUEÑA', NULL, 'Programado'),
+(12, 3, 9, 4, 15, 'SONRÍA', NULL, 'Programado'),
+(13, 4, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(14, 4, 10, 2, 10, 'COFICESA', NULL, 'Programado'),
+(15, 4, 3, 3, 10, 'MUNICOM', NULL, 'Programado'),
+(16, 4, 11, 4, 15, 'VILLAMIX', NULL, 'Programado'),
+(17, 5, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(18, 5, 2, 2, 10, 'SECOVP', NULL, 'Programado'),
+(19, 5, 9, 3, 10, 'SONRÍA', NULL, 'Programado'),
+(20, 5, 14, 4, 15, 'CABLE COLOR', NULL, 'Programado'),
+(21, 6, 12, 1, 10, 'LA COLONIA', NULL, 'Programado'),
+(22, 6, 13, 2, 10, 'TIENDA ERFA', NULL, 'Programado'),
+(23, 6, 7, 3, 10, 'SINET', NULL, 'Programado'),
+(24, 7, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(25, 7, 8, 2, 10, 'COOPERATIVA SANMARQUEÑA', NULL, 'Programado'),
+(26, 7, 10, 3, 10, 'COFICESA', NULL, 'Programado'),
+(27, 8, 6, 1, 10, 'MOTOMUNDO', NULL, 'Programado'),
+(28, 8, 2, 2, 10, 'SECOPV', NULL, 'Programado'),
+(29, 8, 15, 3, 10, 'CLARO', NULL, 'Programado'),
+(30, 9, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(31, 9, 3, 2, 10, 'MUNICOM', NULL, 'Programado'),
+(32, 9, 4, 3, 10, 'MACONSA', NULL, 'Programado'),
+(33, 10, 10, 1, 15, 'COFICESA', NULL, 'Programado'),
+(34, 10, 3, 2, 15, 'MUNICOM', NULL, 'Programado'),
+(35, 11, 1, 1, 15, 'CLARO', NULL, 'Programado'),
+(36, 11, 13, 2, 15, 'TIENDA ERFA', NULL, 'Programado'),
+(37, 12, 2, 1, 10, 'SECOPV', NULL, 'Programado'),
+(38, 12, 4, 2, 10, 'MACONSA', NULL, 'Programado'),
+(39, 12, 5, 3, 10, 'UNAH', NULL, 'Programado'),
+(40, 12, 11, 4, 15, 'VILLAMIX', NULL, 'Programado'),
+(41, 13, 12, 1, 10, 'LA COLONIA', NULL, 'Programado'),
+(42, 13, 13, 2, 10, 'TIENDA ERFA', NULL, 'Programado'),
+(43, 13, 14, 3, 10, 'CABLE COLOR', NULL, 'Programado'),
+(44, 14, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(45, 14, 8, 2, 10, 'COOPERATIVA SANMARQUEÑA', NULL, 'Programado'),
+(46, 14, 9, 3, 10, 'SONRÍA', NULL, 'Programado'),
+(47, 14, 10, 4, 15, 'COFICESA', NULL, 'Programado'),
+(48, 15, 6, 1, 10, 'MOTOMUNDO', NULL, 'Programado'),
+(49, 15, 4, 2, 10, 'MACONSA', NULL, 'Programado'),
+(50, 15, 13, 3, 10, 'TIENDA ERFA', NULL, 'Programado'),
+(57, 18, 7, 1, 15, 'SINET', NULL, 'Programado'),
+(58, 18, 3, 2, 15, 'MUNICOM', NULL, 'Programado'),
+(59, 19, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(60, 19, 9, 2, 10, 'SONRÍA', NULL, 'Programado'),
+(61, 19, 2, 3, 11, 'SECOPV', NULL, 'Programado'),
+(62, 20, 4, 1, 15, 'MACONSA', NULL, 'Programado'),
+(63, 20, 15, 2, 14, 'DJ FLECHA', NULL, 'Programado'),
+(64, 21, 3, 1, 30, 'MUNICOM', NULL, 'Programado'),
+(65, 22, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(66, 22, 8, 2, 10, 'COOPERATIVA SANMARQUEÑA', NULL, 'Programado'),
+(67, 22, 2, 3, 10, 'SECOPV', NULL, 'Programado'),
+(68, 23, 12, 1, 10, 'LA COLONIA', NULL, 'Programado'),
+(69, 23, 6, 2, 10, 'MOTOMUNDO', NULL, 'Programado'),
+(70, 23, 13, 3, 10, 'TIENDA ERFA', NULL, 'Programado'),
+(71, 23, 10, 4, 15, 'COFICESA', NULL, 'Programado'),
+(72, 24, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(73, 24, 8, 2, 10, 'COOPERATIVA SANMARQUEÑA', NULL, 'Programado'),
+(74, 24, 2, 3, 10, 'SECOPV', NULL, 'Programado'),
+(75, 24, 11, 4, 15, 'VILLAMIX', NULL, 'Programado'),
+(76, 25, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(77, 25, 4, 2, 10, 'MACONSA', NULL, 'Programado'),
+(78, 25, 7, 3, 10, 'SINET', NULL, 'Programado'),
+(79, 25, 15, 4, 15, 'DJ FLECHA', NULL, 'Programado'),
+(80, 26, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(81, 26, 10, 2, 10, 'COFICESA', NULL, 'Programado'),
+(82, 26, 14, 3, 10, 'CABLECOLOR', NULL, 'Programado'),
+(83, 27, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(84, 27, 14, 2, 10, 'CABLE COLOR', NULL, 'Programado'),
+(85, 27, 3, 3, 10, 'MUNICOM', NULL, 'Programado'),
+(86, 27, 15, 4, 15, 'DJ FLECHA', NULL, 'Programado'),
+(87, 28, 2, 1, 30, 'SECOPV', NULL, 'Programado'),
+(88, 29, 1, 1, 15, 'CLARO', NULL, 'Programado'),
+(89, 29, 10, 2, 15, 'COFICESA', NULL, 'Programado'),
+(90, 30, 4, 1, 30, 'MACONSA', NULL, 'Programado'),
+(91, 31, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(92, 31, 3, 2, 10, 'MUNICOM', NULL, 'Programado'),
+(93, 31, 5, 3, 10, 'UNAH', NULL, 'Programado'),
+(94, 32, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(95, 32, 8, 2, 10, 'COOPERATIVA SANMARQUEÑA', NULL, 'Programado'),
+(96, 32, 10, 3, 10, 'COFICESA', NULL, 'Programado'),
+(97, 32, 13, 4, 15, 'TIENDA ERFA', NULL, 'Programado'),
+(98, 32, 7, 5, 15, 'SINET', NULL, 'Programado'),
+(99, 33, 12, 1, 10, 'LA COLONIA', NULL, 'Programado'),
+(100, 33, 6, 2, 10, 'MOTOMUNDO', NULL, 'Programado'),
+(101, 33, 9, 3, 10, 'SONRÍA', NULL, 'Programado'),
+(102, 33, 2, 4, 15, 'SECOPV', NULL, 'Programado'),
+(103, 33, 3, 5, 15, 'MUNICOM', NULL, 'Programado'),
+(104, 34, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(105, 34, 14, 2, 10, 'CABLE COLOR', NULL, 'Programado'),
+(106, 34, 8, 3, 10, 'COOPERATIVA SANMARQUEÑA', NULL, 'Programado'),
+(107, 34, 10, 4, 15, 'COFICESA', NULL, 'Programado'),
+(108, 35, 6, 1, 10, 'MOTOMUNDO', NULL, 'Programado'),
+(109, 35, 12, 2, 10, 'LA COLONIA', NULL, 'Programado'),
+(110, 35, 9, 3, 10, 'SONRÍA', NULL, 'Programado'),
+(111, 35, 4, 4, 15, 'MACONSA', NULL, 'Programado'),
+(112, 35, 3, 5, 15, 'MUNICOM', NULL, 'Programado'),
+(113, 36, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(114, 36, 2, 2, 10, 'SECOPV', NULL, 'Programado'),
+(115, 36, 16, 3, 10, 'CHAVER Y ASOCIADO', NULL, 'Programado'),
+(116, 36, 11, 4, 15, 'VILLAMIX', NULL, 'Programado'),
+(117, 37, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(118, 37, 6, 2, 10, 'MOTOMUNDO', NULL, 'Programado'),
+(119, 37, 8, 3, 10, 'COOPERATIVA SANMARQUEÑA', NULL, 'Programado'),
+(120, 37, 9, 4, 15, 'SONRÍA', NULL, 'Programado'),
+(121, 37, 3, 5, 15, 'MUNICOM', NULL, 'Programado'),
+(122, 38, 12, 1, 10, 'LA COLONIA', NULL, 'Programado'),
+(123, 38, 13, 2, 10, 'TIENDA ERFA', NULL, 'Programado'),
+(124, 38, 10, 3, 10, 'COFICESA', NULL, 'Programado'),
+(125, 38, 4, 4, 15, 'MACONSA', NULL, 'Programado'),
+(126, 38, 7, 5, 15, 'SINET', NULL, 'Programado'),
+(127, 39, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(128, 39, 6, 2, 10, 'MOTOMUNDO', NULL, 'Programado'),
+(129, 39, 8, 3, 10, 'COOPERATIVA SANMARQUEÑA', NULL, 'Programado'),
+(130, 39, 3, 4, 15, 'MUNICOM', NULL, 'Programado'),
+(131, 39, 2, 5, 15, 'SECOPV', NULL, 'Programado'),
+(132, 39, 14, 6, 15, 'CABLE COLOR', NULL, 'Programado'),
+(133, 40, 12, 1, 10, 'LA COLONIA', NULL, 'Programado'),
+(134, 40, 13, 2, 10, 'TIENDA ERFA', NULL, 'Programado'),
+(135, 40, 10, 3, 10, 'COFICESA', NULL, 'Programado'),
+(136, 40, 4, 4, 15, 'MACONSA', NULL, 'Programado'),
+(137, 40, 7, 5, 15, 'SINET', NULL, 'Programado'),
+(138, 40, 15, 6, 15, 'DJ FLECHA', NULL, 'Programado'),
+(139, 41, 1, 1, 10, 'CLARO', NULL, 'Programado'),
+(140, 41, 6, 2, 10, 'MOTOMUNDO', NULL, 'Programado'),
+(141, 41, 8, 3, 10, 'COOPERATIVA SANMARQUEÑA', NULL, 'Programado'),
+(142, 41, 3, 4, 15, 'MUNICOM', NULL, 'Programado'),
+(143, 41, 14, 5, 15, 'CABLE COLOR', NULL, 'Programado');
 
 -- *******************************************************************
 -- Tabla: Orden Publicidad
@@ -336,67 +428,6 @@ INSERT INTO orden_publicidad (numeroOrden, idCliente, producto, periodoInicio, p
 
 
 -- Tabla: Orden Programacion
--- Programación para NOTICIAS 60 MINUTOS (idPrograma: 1)
-INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
-(1, 1, 1, 5, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
-(1, 1, 2, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
-(1, 1, 3, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
-(1, 1, 4, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes');
-
--- Programación para PELÍCULA MATUTINA (idPrograma: 5)
-INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
-(2, 5, 5, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
-(2, 5, 6, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
-(2, 5, 7, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
-(2, 5, 8, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado');
-
--- Programación para TV NOTICIAS 40 (idPrograma: 2)
--- Asumiendo que los bloques 29-32 no existen, usando bloques existentes (1-8)
-INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
-(3, 2, 1, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
-(3, 2, 2, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
-(3, 2, 3, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
-(3, 2, 4, 2, 'Lunes,Martes,Miércoles,Jueves,Viernes');
-
--- Programación para VIVA LA MÚSICA (idPrograma: 9)
--- Asumiendo que los bloques 21-25 no existen, usando bloques existentes (1-8)
-INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
-(4, 9, 5, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
-(4, 9, 6, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
-(4, 9, 7, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
-(4, 9, 8, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado');
-
--- Programación para INFANTILES (idPrograma: 14)
-INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
-(5, 14, 5, 2, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
-(5, 14, 6, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado');
-
--- Programación para MERIDIANO DEPORTIVO (idPrograma: 18)
-INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
-(6, 18, 1, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
-(6, 18, 2, 4, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
-(6, 18, 3, 3, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
-(6, 18, 4, 2, 'Lunes,Martes,Miércoles,Jueves,Viernes');
-
--- Programación especial para domingos
--- Asumiendo que existe al menos un bloque para domingos (crear primero si no existe)
-INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
-(7, 4, 1, 3, 'Domingo'),  -- RESUMEN SEMANAL
-(8, 15, 2, 2, 'Domingo'), -- MUNDO INFANTIL
-(9, 16, 3, 2, 'Domingo'), -- CARICATURAS MATUTINAS
-(10, 17, 4, 3, 'Domingo'); -- FÚTBOL NACIONAL
-
--- Empresas con presencia en múltiples programas
-INSERT INTO orden_programacion (idOrden, idPrograma, idBloque, cantidadSpots, diasEmision) VALUES
--- CLARO en diferentes horarios
-(1, 5, 5, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
-(1, 2, 2, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
-(1, 9, 5, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado'),
-
--- MUNICOM en horarios estratégicos
-(3, 1, 1, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
-(3, 1, 3, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes'),
-(3, 18, 3, 1, 'Lunes,Martes,Miércoles,Jueves,Viernes');
 
 
 -- ********************************************************************************
