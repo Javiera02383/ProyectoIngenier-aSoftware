@@ -4,7 +4,7 @@ import { Button, Card, CardHeader, CardBody, Container, Row, Col, Form, FormGrou
 import { productoService } from '../../services/productos/productoService';
 import { categoriaProductoService } from '../../services/productos/categoriaProductoService';
 import { useToast } from '../../hooks/useToast';
-import Header from 'components/Headers/Header.js';
+import HeaderBlanco from 'components/Headers/HeaderBlanco.js';
 import Toast from 'components/Toast/Toast';
 
 const ProductoForm = () => {
@@ -74,14 +74,14 @@ const ProductoForm = () => {
 
   return (
     <>
-      <Header />
+      <HeaderBlanco />
       <Container className="mt--7" fluid>
         <Toast show={toast.show} message={toast.message} type={toast.type} onClose={hideToast} />
         <Row>
           <Col>
             <Card className="shadow">
               <CardHeader>
-                <h3>{id ? 'Editar Producto' : 'Nuevo Producto'}</h3>
+                <h3>{id ? 'Editar Servicio' : 'Nuevo Servicio'}</h3>
               </CardHeader>
               <CardBody>
                 <Form onSubmit={handleSubmit}>
@@ -125,27 +125,9 @@ const ProductoForm = () => {
                         <Input type="number" name="precioVenta" id="precioVenta" value={producto.precioVenta} onChange={handleChange} required />
                       </FormGroup>
                     </Col>
-                    <Col md="6">
-                      <FormGroup>
-                        <Label for="stockInicial">Stock</Label>
-                        <Input type="number" name="stockInicial" id="stockInicial" value={producto.stockInicial} onChange={handleChange} required />
-                      </FormGroup>
-                    </Col>
+
                   </Row>
-                  <Row>
-                    <Col md="6">
-                        <FormGroup>
-                            <Label for="impuesto">Impuesto (%)</Label>
-                            <Input type="number" name="impuesto" id="impuesto" value={producto.impuesto} onChange={handleChange} />
-                        </FormGroup>
-                    </Col>
-                    <Col md="6">
-                      <FormGroup>
-                        <Label for="imagen">Imagen (Opcional)</Label>
-                        <Input type="file" name="imagen" id="imagen" onChange={handleImageChange} />
-                      </FormGroup>
-                    </Col>
-                  </Row>
+
                   <Button type="submit" color="primary" disabled={loading}>
                     {loading ? 'Guardando...' : 'Guardar'}
                   </Button>
