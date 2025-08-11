@@ -337,14 +337,19 @@ useEffect(() => {
   };        
         
   const agregarDescuento = () => {        
-    setDescuentos([...descuentos, { idDescuento: '', monto: 0 }]);        
+    // Solo agregar descuento si hay descuentos disponibles y son válidos
+    if (descuentosDisponibles.length > 0 && descuentosDisponibles.some(d => d.idDescuento > 0)) {
+      setDescuentos([...descuentos, { idDescuento: '', monto: 0 }]);        
+    } else {
+      console.warn('No hay descuentos válidos disponibles para agregar');
+    }
   };        
 
   // Descuento 0% por defecto al cargar
   useEffect(() => {
-    if (descuentosDisponibles.length >= 0 && descuentos.length === 0) {
-      // Insertar un renglón de descuento 0% (monto 0)
-      setDescuentos([{ idDescuento: '', monto: 0 }]);
+    if (descuentosDisponibles.length > 0 && descuentos.length === 0) {
+      // Solo agregar descuento si hay descuentos disponibles
+      // No agregar descuentos vacíos por defecto
     }
   }, [descuentosDisponibles]);
         
@@ -388,10 +393,28 @@ useEffect(() => {
         
       if (detalles.some(d => !d.idProducto || d.cantidad <= 0)) {        
         throw new Error('Todos los productos deben tener ID válido y cantidad mayor a 0');        
+      }
+      
+      // Validar que si hay descuentos, tengan ID válido
+      if (descuentos.some(d => d.idDescuento && d.idDescuento !== '')) {
+        if (descuentos.some(d => !d.idDescuento || d.idDescuento === '' || d.idDescuento === '0' || parseInt(d.idDescuento) <= 0)) {
+          throw new Error('Todos los descuentos deben tener un tipo de descuento válido seleccionado');
+        }
       }        
       if (!factura.idFactura || !factura.idCliente || !factura.idFormaPago || !factura.idEmpleado) {        
         throw new Error('Todos los campos obligatorios deben ser completados');        
       }  
+      // Filtrar descuentos válidos antes de procesar
+      const descuentosValidos = descuentos.filter(d => 
+        d.idDescuento && 
+        d.idDescuento !== '' && 
+        d.idDescuento !== '0' && 
+        parseInt(d.idDescuento) > 0
+      );
+      
+      console.log('🔍 Descuentos originales:', descuentos);
+      console.log('✅ Descuentos válidos filtrados:', descuentosValidos);
+      
       const data = {         
         factura: {        
           ...factura,       
@@ -406,11 +429,11 @@ useEffect(() => {
           idProducto: parseInt(d.idProducto),        
           cantidad: parseInt(d.cantidad)        
         })),         
-        descuentos: descuentos.map(d => ({        
+        descuentos: descuentosValidos.length > 0 ? descuentosValidos.map(d => ({        
           ...d,        
           idDescuento: parseInt(d.idDescuento),        
           monto: parseFloat(d.monto)        
-        }))        
+        })) : []        
       };        
         
       const response = await facturaService.crearFacturaCompleta(data);        
@@ -444,7 +467,7 @@ useEffect(() => {
         constanciaExonerado: ''      
       });        
       setDetalles([{ idProducto: '', cantidad: 1 }]);        
-      setDescuentos([]);        
+      setDescuentos([]); // No agregar descuentos vacíos por defecto        
         
     } catch (error) {        
       console.error('Error:', error);        
@@ -489,25 +512,7 @@ useEffect(() => {
                   <Col>        
                     <h3 className="mb-0">Crear Nueva Factura - Canal 40</h3>        
                   </Col>        
-                  <Col xs="auto">
-                    <Button
-                      color="info"
-                      size="sm"
-                      onClick={() => {
-                        console.log('🔍 === DATOS DE DEPURACIÓN ===');
-                        console.log('📋 Clientes:', clientes);
-                        console.log('👥 Empleados:', empleados);
-                        console.log('📦 Productos:', productos);
-                        console.log('💳 Formas de pago:', formasPago);
-                        console.log('🏷️ Descuentos:', descuentosDisponibles);
-                        console.log('📺 Órdenes de publicidad:', ordenesPublicidad);
-                        console.log('📄 Estado actual de factura:', factura);
-                        console.log('🔍 === FIN DEPURACIÓN ===');
-                      }}
-                    >
-                      <i className="fas fa-bug" /> Debug
-                    </Button>
-                  </Col>
+
                 </Row>        
               </CardHeader>        
               <CardBody>        
@@ -663,17 +668,7 @@ useEffect(() => {
                               {ordenesPublicidad.length} orden(es) de publicidad disponible(s)
                             </small>
                           )}
-                          <div className="mt-2">
-                            <Button
-                              color="secondary"
-                              size="sm"
-                              onClick={cargarOrdenesPublicidad}
-                              disabled={loadingData}
-                            >
-                              <i className="fas fa-sync-alt mr-1"></i>
-                              Recargar Órdenes
-                            </Button>
-                          </div>
+
                         </FormGroup>
                       </Col>
                       <Col lg="4">        
