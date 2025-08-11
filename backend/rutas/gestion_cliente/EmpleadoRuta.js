@@ -88,13 +88,17 @@ const validarEmpleado = [
 router.post('/empleado',
   verificarUsuario,
   [
-    body('idPersona').isInt({ min: 1 }).withMessage('El idPersona debe ser un número entero positivo')
-      .custom(async value => {
-        const Persona = require('../../modelos/seguridad/Persona');
-        const existe = await Persona.findByPk(value);
-        if (!existe) throw new Error('La persona asociada no existe');
+    body('idPersona').optional().isInt({ min: 1 }).withMessage('El idPersona debe ser un número entero positivo')
+      .custom(async (value, { req }) => {
+        // Solo validar si se envía idPersona y no hay personaData
+        if (value && !req.body.personaData) {
+          const Persona = require('../../modelos/seguridad/Persona');
+          const existe = await Persona.findByPk(value);
+          if (!existe) throw new Error('La persona asociada no existe');
+        }
         return true;
       }),
+    body('personaData').optional().isObject().withMessage('personaData debe ser un objeto válido'),
     body('Fecha_Registro').optional().isISO8601().withMessage('La fecha debe tener un formato válido (YYYY-MM-DD)')
   ],
   empleadoController.crearEmpleado

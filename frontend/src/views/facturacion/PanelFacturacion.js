@@ -160,10 +160,7 @@ const PanelFacturacion = () => {
                     Lista de Facturas  
                   </Button> 
                     
-                  <Button color="info" href="/admin/facturacion/pagos" className="m-2">  
-                    <i className="ni ni-credit-card mr-2" />  
-                    Registrar Pago  
-                  </Button>  
+ 
                     
                   <Button color="success" href="/admin/facturacion/contratos" className="m-2">  
                     <i className="ni ni-folder-17 mr-2" />  

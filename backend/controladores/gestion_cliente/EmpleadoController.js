@@ -7,14 +7,17 @@ const { Op } = require('sequelize');
 // === VALIDACIONES ===
 const reglasCrear = [
   body('idPersona')
-    .notEmpty().withMessage('El idPersona es obligatorio')
+    .optional() // Ahora es opcional porque puede venir en personaData
     .isInt({ min: 1 }).withMessage('El idPersona debe ser un número entero positivo'),
   body('idRol')
     .optional()
     .isInt({ min: 1 }).withMessage('El idRol debe ser un número entero positivo'),
   body('Fecha_Registro')
     .optional()
-    .isISO8601().withMessage('La fecha debe tener un formato válido (YYYY-MM-DD)')
+    .isISO8601().withMessage('La fecha debe tener un formato válido (YYYY-MM-DD)'),
+  body('personaData')
+    .optional()
+    .isObject().withMessage('personaData debe ser un objeto válido')
 ];
 
 const reglasEditar = [
@@ -38,14 +41,71 @@ exports.crearEmpleado = [
       return res.status(400).json({ errores: errores.array() });
     }
     try {
-      // Validar existencia de idPersona
-      const persona = await Persona.findByPk(req.body.idPersona);
-      if (!persona) {
-        return res.status(400).json({ mensaje: 'La persona asociada (idPersona) no existe' });
+      let personaId = req.body.idPersona;
+      
+      // Si se envían datos de persona nueva, crear la persona primero
+      if (req.body.personaData && !personaId) {
+        console.log('📝 Creando nueva persona para empleado:', req.body.personaData);
+        
+        // Validar campos obligatorios de persona
+        const { Pnombre, Papellido, DNI, correo } = req.body.personaData;
+        if (!Pnombre || !Papellido || !DNI || !correo) {
+          return res.status(400).json({ 
+            mensaje: 'Los campos Pnombre, Papellido, DNI y correo son obligatorios para crear una nueva persona' 
+          });
+        }
+        
+        // Verificar que el DNI no exista
+        const personaExistente = await Persona.findOne({ where: { DNI } });
+        if (personaExistente) {
+          return res.status(400).json({ 
+            mensaje: 'Ya existe una persona con el DNI proporcionado' 
+          });
+        }
+        
+        // Crear la nueva persona
+        const nuevaPersona = await Persona.create(req.body.personaData);
+        personaId = nuevaPersona.idPersona;
+        console.log('✅ Nueva persona creada con ID:', personaId);
       }
-      const empleado = await Empleado.create(req.body);
-      res.status(201).json({ mensaje: 'Empleado creado', empleado });
+      
+      // Si no hay personaId válido, retornar error
+      if (!personaId) {
+        return res.status(400).json({ 
+          mensaje: 'Debe proporcionar un idPersona existente o datos de persona nueva' 
+        });
+      }
+      
+      // Validar que la persona existe
+      const persona = await Persona.findByPk(personaId);
+      if (!persona) {
+        return res.status(400).json({ mensaje: 'La persona asociada no existe' });
+      }
+      
+      // Crear el empleado con el personaId
+      const datosEmpleado = {
+        idPersona: personaId,
+        idRol: req.body.idRol || null,
+        Fecha_Registro: req.body.Fecha_Registro || new Date()
+      };
+      
+      console.log('💼 Creando empleado con datos:', datosEmpleado);
+      const empleado = await Empleado.create(datosEmpleado);
+      
+      // Obtener el empleado creado con sus relaciones
+      const empleadoCompleto = await Empleado.findByPk(empleado.idEmpleado, {
+        include: [
+          { model: Persona, as: 'persona' },
+          { model: Rol, as: 'rol' }
+        ]
+      });
+      
+      res.status(201).json({ 
+        mensaje: 'Empleado creado exitosamente', 
+        empleado: empleadoCompleto 
+      });
     } catch (error) {
+      console.error('❌ Error al crear empleado:', error);
       res.status(500).json({ mensaje: 'Error al crear empleado', error: error.message });
     }
   }
