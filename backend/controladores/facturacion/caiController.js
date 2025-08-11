@@ -2,17 +2,22 @@ const CAI = require('../../modelos/facturacion/Cai');
   
 exports.obtenerCAIActivo = async (req, res) => {  
   try {  
+    console.log('🔍 Buscando CAI activo...');
+    
     const caiActivo = await CAI.findOne({  
       where: { activo: true },  
       order: [['fechaEmision', 'DESC']]  
     });  
       
     if (!caiActivo) {  
+      console.log('⚠️ No hay CAI activo configurado');
       return res.status(404).json({ mensaje: 'No hay CAI activo configurado' });  
     }  
       
+    console.log('✅ CAI activo encontrado:', caiActivo.codigoCAI);
     res.json({ cai: caiActivo });  
   } catch (error) {  
+    console.error('❌ Error al obtener CAI:', error);
     res.status(500).json({ mensaje: 'Error al obtener CAI', error: error.message });  
   }  
 };  

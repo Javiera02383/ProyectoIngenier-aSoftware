@@ -10,6 +10,12 @@ const PDFDocument = require('pdfkit');
 const path = require('path');
 const fs = require('fs');
 
+// Configuración para formateo de números
+const formatearNumero = new Intl.NumberFormat('es-HN', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+});
+
 const Empleado = require('../../modelos/gestion_cliente/Empleado');  
 const Persona = require('../../modelos/seguridad/Persona');  
 
@@ -193,11 +199,6 @@ const formatearMoneda = new Intl.NumberFormat('es-HN', {
   maximumFractionDigits: 2    
 });    
     
-const formatearNumero = new Intl.NumberFormat('es-HN', {    
-  minimumFractionDigits: 2,    
-  maximumFractionDigits: 2    
-});    
-    
 // ------------------------------------------------------------------------------------------    
 // Función para convertir números a letras (agregar al inicio del archivo)  
 function convertirNumeroALetras(numero) {  
@@ -323,59 +324,107 @@ exports.crearFacturaCompleta = async (req, res) => {
     const nombreArchivo = `factura_${nuevaFactura.idFactura}.pdf`;        
     const rutaPDF = path.join(__dirname, '../../uploads', nombreArchivo);        
         
-    const doc = new PDFDocument({ margin: 50 });          
+    const doc = new PDFDocument({ 
+      size: 'A4', 
+      margin: 40,
+      info: {
+        Title: `Factura ${nuevaFactura.idFactura}`,
+        Author: 'Canal 40',
+        Subject: 'Factura Comercial',
+        Keywords: 'factura, canal 40, publicidad',
+        Creator: 'Sistema de Facturación Canal 40'
+      }
+    });          
     doc.pipe(fs.createWriteStream(rutaPDF));          
       
+    // FONDO DEL ENCABEZADO
+    doc.rect(0, 0, 595, 240)
+      .fill('##758384'); // Negro profundo
+    
     // LOGO DEL CANAL (lado izquierdo)
     const logoPath = path.join(__dirname, '../../img/logoCanal.png');
     if (fs.existsSync(logoPath)) {
-      // pdfkit: image(src, x, y, options)
-      doc.image(logoPath, 10, 10, { width: 30, height: 30 });
+      doc.image(logoPath, 20, 20, { width: 80, height: 80 });
     } else {
-      console.log('Logo no encontrado en la ruta especificada:', logoPath);
+      // Si no hay logo, crear un placeholder
+      doc.rect(20, 20, 80, 80)
+        .fill('#ffffff')
+        .fontSize(12)
+        .font('Helvetica-Bold')
+        .fill('#1a1a1a')
+        .text('CANAL 40', 25, 55);
     }
       
-    // ENCABEZADO DE LA EMPRESA (centrado, al lado del logo)  
-    doc.fontSize(16).font('Helvetica-Bold')  
-      .text('TELEVISIÓN COMAYAGUA - CANAL 40', 120, 55);  
+    // ENCABEZADO DE LA EMPRESA (en blanco sobre fondo azul)  
+    doc.fill('#ffffff')
+      .fontSize(24).font('Helvetica-Bold')  
+      .text('TELEVISIÓN COMAYAGUA', 120, 30)
+      .fontSize(20)
+      .text('CANAL 40', 120, 55);  
       
     doc.fontSize(10).font('Helvetica')  
-      .text('COLONIA SAN MIGUEL N°2, BOULEVARD DEL SUR', 120, 75)  
-      .text('CONTIGUO A RESTAURANTE LO DE KERPO,', 120, 88)  
-      .text('COMAYAGUA, COMAYAGUA, HONDURAS, C.A.', 120, 101)  
-      .text('Tel: 2772-7427 / 2770-6810 Fax: 2772-6810 Cel: 9957-4580', 120, 114)  
-      .text(`Propietario: José Dolores Gámez Suazo   RTN: ${caiActivo.rtnEmpresa}  E-mail: televisioncomayagua@yahoo.com`, 120, 140)  
+      .text('COLONIA SAN MIGUEL N°2, BOULEVARD DEL SUR', 120, 80)  
+      .text('CONTIGUO A RESTAURANTE LO DE KERPO,', 120, 93)  
+      .text('COMAYAGUA, COMAYAGUA, HONDURAS, C.A.', 120, 106);
+      
+    // Información de contacto en columnas
+    doc.fontSize(9)
+      .text('Tel: 2772-7427 / 2770-6810', 120, 125)
+      .text(' Cel: 9957-4580', 120, 138)
+      .text('E-mail: televisioncomayagua@yahoo.com', 120, 151)
+      .text(`RTN: ${caiActivo.rtnEmpresa}`, 120, 164)
+      .text('Propietario: José Dolores Gámez Suazo', 120, 177);  
   
   
-    // Línea separadora          
-    doc.moveTo(50, 170).lineTo(550, 170).stroke();          
-    doc.moveDown(2);          
-              
+    // SECCIÓN DE TÍTULO DE FACTURA
+    doc.moveDown(3);
+    
+    // Fondo para el título
+    doc.rect(50, 200, 495, 60)
+      .fill('#f8fafc')
+      .stroke('#e2e8f0');
+    
     // TÍTULO FACTURA          
-    doc.fontSize(18).font('Helvetica-Bold')          
-      .text('FACTURA', { align: 'center' });  
+    doc.fill('#1a1a1a')
+      .fontSize(24).font('Helvetica-Bold')          
+      .text('FACTURA', 200, 215, { align: 'center' });  
       
     // Tipo de factura  
-    doc.fontSize(12).font('Helvetica')  
-      .text('Contado', { align: 'center' });  
-    doc.moveDown();          
+    doc.fill('#475569')
+      .fontSize(12).font('Helvetica-Bold')  
+      .text('Contado', 200, 245, { align: 'center' });
+    
+    // Línea decorativa
+    doc.moveTo(100, 270).lineTo(495, 270)
+      .stroke('#1a1a1a', 2);          
               
     // INFORMACIÓN DE LA FACTURA (Lado izquierdo)        
-    const facturaY = doc.y;        
-    doc.fontSize(10).font('Helvetica-Bold')        
-      .text('Factura No:', 50, facturaY)        
+    const facturaY = 290;        
+    
+    // Fondo para información de factura
+    doc.rect(50, facturaY - 10, 220, 120)
+      .fill('#f8f9fa')
+      .stroke('#6c757d');
+    
+    doc.fill('#1a1a1a')
+      .fontSize(12).font('Helvetica-Bold')        
+      .text('INFORMACIÓN DE LA FACTURA', 60, facturaY);        
+    
+    doc.fill('#475569')
+      .fontSize(10).font('Helvetica-Bold')        
+      .text('Factura No:', 60, facturaY + 20)        
       .font('Helvetica')        
-      .text(`000-001-01-000-${nuevaFactura.idFactura.toString().padStart(5, '0')}`, 130, facturaY);        
+      .text(`000-001-01-000-${nuevaFactura.idFactura.toString().padStart(5, '0')}`, 130, facturaY + 20);        
             
     doc.font('Helvetica-Bold')        
-      .text('CAI:', 50, facturaY + 15)        
+      .text('CAI:', 60, facturaY + 35)        
       .font('Helvetica')        
-      .text(caiActivo.codigoCAI, 130, facturaY + 15);        
+      .text(caiActivo.codigoCAI, 130, facturaY + 35);        
             
     doc.font('Helvetica-Bold')        
-      .text('Fecha de emisión:', 50, facturaY + 30)        
+      .text('Fecha/Emisión:', 60, facturaY + 50)        
       .font('Helvetica')        
-      .text(new Date(nuevaFactura.Fecha).toLocaleDateString('es-HN'), 130, facturaY + 30);        
+      .text(new Date(nuevaFactura.Fecha).toLocaleDateString('es-HN'), 130, facturaY + 50);        
             
     // DATOS DEL EMPLEADO        
     const empleadoPersona = empleado?.persona;        
@@ -383,9 +432,9 @@ exports.crearFacturaCompleta = async (req, res) => {
       `${empleadoPersona.Pnombre} ${empleadoPersona.Snombre || ''} ${empleadoPersona.Papellido} ${empleadoPersona.Sapellido || ''}`.trim() : 'N/A';        
             
     doc.font('Helvetica-Bold')        
-      .text('Atendido por:', 50, facturaY + 45)        
+      .text('Atendido por:', 60, facturaY + 65)        
       .font('Helvetica')        
-      .text(nombreEmpleado, 130, facturaY + 45);        
+      .text(nombreEmpleado, 130, facturaY + 65);        
             
     // DATOS DEL CLIENTE (Lado derecho) - MEJORADOS        
     const clientePersona = cliente?.persona;        
@@ -399,11 +448,21 @@ exports.crearFacturaCompleta = async (req, res) => {
         nombreCliente = `${clientePersona.Pnombre} ${clientePersona.Snombre || ''} ${clientePersona.Papellido} ${clientePersona.Sapellido || ''}`.trim();
       }
     }
+    
+    // Fondo para información del cliente
+    doc.rect(300, facturaY - 10, 245, 120)
+      .fill('#e9ecef')
+      .stroke('#495057');
+    
+    doc.fill('#1a1a1a')
+      .fontSize(12).font('Helvetica-Bold')        
+      .text('INFORMACIÓN DEL CLIENTE', 310, facturaY);
             
-    doc.font('Helvetica-Bold')        
-      .text('Cliente:', 300, facturaY)        
+    doc.fill('#1a1a1a')
+      .fontSize(10).font('Helvetica-Bold')        
+      .text('Cliente:', 310, facturaY + 20)        
       .font('Helvetica')        
-      .text(nombreCliente, 350, facturaY);        
+      .text(nombreCliente, 370, facturaY + 20);        
             
     // RTN/DNI DEL CLIENTE        
     let identificacionCliente = 'N/A';
@@ -418,71 +477,82 @@ exports.crearFacturaCompleta = async (req, res) => {
     const etiquetaIdentificacion = clientePersona?.tipoPersona === 'comercial' ? 'RTN:' : 'DNI:';
     const tieneIdentificacion = identificacionCliente && identificacionCliente !== 'N/A';
             
-    doc.font('Helvetica-Bold')        
-      .text(etiquetaIdentificacion, 300, facturaY + 15)        
+    doc.fill('#1a1a1a')
+      .font('Helvetica-Bold')        
+      .text(etiquetaIdentificacion, 310, facturaY + 35)        
       .font('Helvetica')        
-      .text(identificacionCliente, 350, facturaY + 15);        
+      .text(identificacionCliente, 370, facturaY + 35);        
       
     // CAMPOS ESPECÍFICOS PARA TV - TODOS LOS CAMPOS INCLUIDOS  
-    let currentYY = facturaY + 30;    
+    let currentYY = facturaY + 50;    
       
-    // Agencia/Nombre Comercial (SIEMPRE mostrar)  
-    doc.font('Helvetica-Bold')    
-      .text('Agencia:', 300, currentYY)    
-      .font('Helvetica')    
-      .text(nuevaFactura.agencia || 'N/A', 400, currentYY);    
-    currentYY += 15;    
+          // Agencia/Nombre Comercial (SIEMPRE mostrar)  
+      doc.fill('#1a1a1a')
+        .font('Helvetica-Bold')    
+        .text('Agencia:', 310, currentYY)    
+        .font('Helvetica')    
+        .text(nuevaFactura.agencia || 'N/A', 400, currentYY);    
+      currentYY += 15;    
+        
+      // Producto del Cliente (SIEMPRE mostrar)  
+      doc.fill('#1a1a1a')
+        .font('Helvetica-Bold')    
+        .text('Producto Cliente:', 310, currentYY)    
+        .font('Helvetica')    
+        .text(nuevaFactura.mencion || 'N/A', 400, currentYY);    
+      currentYY += 15;    
+        
+      // Mención (SIEMPRE mostrar)  
+      doc.fill('#1a1a1a')
+        .font('Helvetica-Bold')    
+        .text('Mención:', 310, currentYY)    
+        .font('Helvetica')    
+        .text(nuevaFactura.mencion || 'N/A', 400, currentYY);    
+      currentYY += 15;    
+        
+      // Tipo de Servicio (SIEMPRE mostrar)  
+      doc.fill('#1a1a1a')
+        .font('Helvetica')    
+        .text('Tipo Servicio:', 310, currentYY)    
+        .text(nuevaFactura.tipoServicio || 'N/A', 400, currentYY);    
+      currentYY += 15;    
       
-    // Producto del Cliente (SIEMPRE mostrar)  
-    doc.font('Helvetica-Bold')    
-      .text('Producto Cliente:', 300, currentYY)    
-      .font('Helvetica')    
-      .text(nuevaFactura.productoCliente || 'N/A', 400, currentYY);    
-    currentYY += 15;    
-      
-    // Mención (SIEMPRE mostrar)  
-    doc.font('Helvetica-Bold')    
-      .text('Mención:', 300, currentYY)    
-      .font('Helvetica')    
-      .text(nuevaFactura.mencion || 'N/A', 400, currentYY);    
-    currentYY += 15;    
-      
-    // Tipo de Servicio (SIEMPRE mostrar)  
-    doc.font('Helvetica-Bold')    
-      .text('Tipo Servicio:', 300, currentYY)    
-      .font('Helvetica')    
-      .text(nuevaFactura.tipoServicio || 'N/A', 400, currentYY);    
-    currentYY += 15;    
-      
-    // Período (SIEMPRE mostrar)  
-    let periodoTexto = 'N/A';  
-    if (nuevaFactura.periodoInicio && nuevaFactura.periodoFin) {    
-      periodoTexto = `Del ${new Date(nuevaFactura.periodoInicio).toLocaleDateString('es-HN')} al ${new Date(nuevaFactura.periodoFin).toLocaleDateString('es-HN')}`;    
-    } else if (nuevaFactura.periodoInicio) {  
-      periodoTexto = `Desde: ${new Date(nuevaFactura.periodoInicio).toLocaleDateString('es-HN')}`;  
-    } else if (nuevaFactura.periodoFin) {  
-      periodoTexto = `Hasta: ${new Date(nuevaFactura.periodoFin).toLocaleDateString('es-HN')}`;  
-    }  
-      
-    doc.font('Helvetica-Bold')    
-      .text('Período:', 300, currentYY)    
-      .font('Helvetica')    
-      .text(periodoTexto, 400, currentYY);    
-    currentYY += 15;    
-      
-    // Orden No (SIEMPRE mostrar)  
-    doc.font('Helvetica-Bold')    
-      .text('Orden No:', 300, currentYY)    
-      .font('Helvetica')    
-      .text(nuevaFactura.ordenNo || 'N/A', 400, currentYY);    
-    currentYY += 15;    
+          // Período (SIEMPRE mostrar)  
+      let periodoTexto = 'N/A';  
+      if (nuevaFactura.periodoInicio && nuevaFactura.periodoFin) {    
+        periodoTexto = `Del ${new Date(nuevaFactura.periodoInicio).toLocaleDateString('es-HN')} al ${new Date(nuevaFactura.periodoFin).toLocaleDateString('es-HN')}`;    
+      } else if (nuevaFactura.periodoInicio) {  
+        periodoTexto = `Desde: ${new Date(nuevaFactura.periodoInicio).toLocaleDateString('es-HN')}`;  
+      } else if (nuevaFactura.periodoFin) {  
+        periodoTexto = `Hasta: ${new Date(nuevaFactura.periodoFin).toLocaleDateString('es-HN')}`;  
+      }  
+        
+      doc.fill('#1a1a1a')
+        .font('Helvetica-Bold')    
+        .text('Período:', 310, currentYY)    
+        .font('Helvetica')    
+        .text(periodoTexto, 400, currentYY);    
+      currentYY += 15;    
+        
+      // Orden No (SIEMPRE mostrar)  
+      doc.fill('#1a1a1a')
+        .font('Helvetica-Bold')    
+        .text('Orden No:', 310, currentYY)    
+        .font('Helvetica')    
+        .text(nuevaFactura.ordenNo || 'N/A', 400, currentYY);    
+      currentYY += 15;    
       
     // SECCIÓN DE DATOS DE EXONERACIÓN - SIEMPRE MOSTRAR  
-    doc.moveDown(2);    
-    doc.fontSize(9).font('Helvetica-Bold')    
-      .text('DATOS ADQUIRIDOS EXONERADOS:', 50, doc.y);    
-      
-    let exoneracionY = doc.y + 15;  
+    const exoneracionY = currentYY + 30;  
+    
+    // Fondo para la sección de exoneración
+    doc.rect(50, exoneracionY - 10, 495, 40)
+      .fill('#f8f9fa')
+      .stroke('#495057');
+    
+    doc.fill('#1a1a1a')
+      .fontSize(10).font('Helvetica-Bold')    
+      .text('DATOS ADQUIRIDOS EXONERADOS:', 60, exoneracionY);  
   
     // Todos los datos de exoneración en una sola línea  
     const datosExoneracion = [  
@@ -491,27 +561,27 @@ exports.crearFacturaCompleta = async (req, res) => {
       `Constancia Exonerado: ${nuevaFactura.constanciaExonerado || 'N/A'}`  
     ].join(' | ');  
       
-    doc.font('Helvetica')  
+    doc.fill('#1a1a1a')
+      .font('Helvetica')  
       .fontSize(8)  
-      .text(datosExoneracion, 50, exoneracionY, { width: 500 });  
-      
-    exoneracionY += 15;
-      
-    // Ajustar posición para continuar con el resto del PDF  
-    doc.y = exoneracionY + 10;    
-              
-    doc.moveDown(4);       
+      .text(datosExoneracion, 60, exoneracionY + 15, { width: 475 });       
             
     // TABLA DE PRODUCTOS/SERVICIOS        
-    const tableTop = doc.y;        
+    const tableTop = exoneracionY + 60;        
     const itemCodeX = 50;        
     const descriptionX = 120;        
     const quantityX = 320;        
     const priceX = 380;        
     const totalX = 480;        
+    
+    // Fondo del encabezado de tabla
+    doc.rect(itemCodeX - 5, tableTop - 10, 500, 25)
+      .fill('#1a1a1a')
+      .stroke('#1a1a1a');
             
     // Encabezados de tabla        
-    doc.fontSize(9).font('Helvetica-Bold');        
+    doc.fill('#758384')
+      .fontSize(10).font('Helvetica-Bold');        
     doc.text('CÓDIGO', itemCodeX, tableTop);        
     doc.text('DESCRIPCIÓN', descriptionX, tableTop);        
     doc.text('CANT.', quantityX, tableTop);        
@@ -519,15 +589,21 @@ exports.crearFacturaCompleta = async (req, res) => {
     doc.text('TOTAL', totalX, tableTop);        
             
     // Línea bajo encabezados        
-    doc.moveTo(itemCodeX, tableTop + 15).lineTo(550, tableTop + 15).stroke();        
+    doc.moveTo(itemCodeX, tableTop + 15).lineTo(550, tableTop + 15).stroke('#ffffff', 2);        
             
     // ITERAR SOBRE LOS DETALLES REALES DE LA FACTURA      
     let currentY = tableTop + 25;        
-    doc.fontSize(8).font('Helvetica');        
+    doc.fontSize(9).font('Helvetica');        
             
     for (let i = 0; i < detallesConProductos.length; i++) {      
       const detalle = detallesConProductos[i];      
       const producto = detalle.producto;      
+      
+      // Fondo alternado para las filas
+      const rowColor = i % 2 === 0 ? '#f8fafc' : '#ffffff';
+      doc.rect(itemCodeX - 5, currentY - 5, 500, 20)
+        .fill(rowColor)
+        .stroke('#e2e8f0');
             
       // Validación defensiva para precios usando Intl.NumberFormat    
       const precioReal = Number(producto?.precioVenta || detalle.precioUnitario || 0);    
@@ -538,7 +614,8 @@ exports.crearFacturaCompleta = async (req, res) => {
       const precioFormateado = `L. ${formatearNumero.format(precioReal)}`;    
       const totalLinea = `L. ${formatearNumero.format(cantidad * precioReal)}`;    
             
-      doc.text(producto ? producto.idProducto.toString().padStart(3, '0') : (detalle.idProducto || '000').toString().padStart(3, '0'), itemCodeX, currentY);      
+      doc.fill('#1e293b')
+        .text(producto ? producto.idProducto.toString().padStart(3, '0') : (detalle.idProducto || '000').toString().padStart(3, '0'), itemCodeX, currentY);      
       doc.text(producto ? producto.Nombre : 'Producto', descriptionX, currentY);      
       doc.text(cantidad.toString(), quantityX, currentY);      
       doc.text(precioFormateado, priceX, currentY);      
@@ -549,7 +626,14 @@ exports.crearFacturaCompleta = async (req, res) => {
             
     // TOTALES          
     const totalsY = currentY + 30;        
-    doc.moveTo(350, totalsY - 10).lineTo(550, totalsY - 10).stroke();        
+    
+    // Fondo para la sección de totales
+    doc.rect(350, totalsY - 15, 200, 80)
+      .fill('#f8f9fa')
+      .stroke('#495057');
+    
+    // Línea separadora
+    doc.moveTo(350, totalsY - 10).lineTo(550, totalsY - 10).stroke('#495057', 2);        
             
     // Calcular subtotal con validación usando Intl.NumberFormat      
     const subtotal = detallesConProductos.reduce((sum, detalle) => {        
@@ -566,27 +650,28 @@ exports.crearFacturaCompleta = async (req, res) => {
     const isv = subtotalConDescuento * 0.15;        
     const totalFinal = subtotalConDescuento + isv;        
             
-    doc.fontSize(10).font('Helvetica-Bold');        
+    doc.fill('#1a1a1a')
+      .fontSize(10).font('Helvetica-Bold');        
     doc.text('SUBTOTAL:', 400, totalsY);        
     doc.text(`L. ${formatearNumero.format(subtotal)}`, 480, totalsY);        
             
     if (totalDescuentos > 0) {        
-      doc.text('DESCUENTOS:', 400, totalsY + 15);        
-      doc.text(`L. ${formatearNumero.format(totalDescuentos)}`, 480, totalsY + 15);        
+      doc.text('DESCUENTOS:', 400, totalsY + 20);        
+      doc.text(`L. ${formatearNumero.format(totalDescuentos)}`, 480, totalsY + 20);        
               
-      doc.text('ISV (15%):', 400, totalsY + 30);        
-      doc.text(`L. ${formatearNumero.format(isv)}`, 480, totalsY + 30);        
+      doc.text('ISV (15%):', 400, totalsY + 40);        
+      doc.text(`L. ${formatearNumero.format(isv)}`, 480, totalsY + 40);        
               
       doc.fontSize(12).font('Helvetica-Bold');        
-      doc.text('TOTAL:', 400, totalsY + 50);        
-      doc.text(`L. ${formatearNumero.format(totalFinal)}`, 480, totalsY + 50);        
+      doc.text('TOTAL:', 400, totalsY + 65);        
+      doc.text(`L. ${formatearNumero.format(totalFinal)}`, 480, totalsY + 65);        
     } else {        
-      doc.text('ISV (15%):', 400, totalsY + 15);        
-      doc.text(`L. ${formatearNumero.format(isv)}`, 480, totalsY + 15);        
+      doc.text('ISV (15%):', 400, totalsY + 20);        
+      doc.text(`L. ${formatearNumero.format(isv)}`, 480, totalsY + 20);        
               
       doc.fontSize(12).font('Helvetica-Bold');        
-      doc.text('TOTAL:', 400, totalsY + 35);        
-      doc.text(`L. ${formatearNumero.format(totalFinal)}`, 480, totalsY + 35);        
+      doc.text('TOTAL:', 400, totalsY + 45);        
+      doc.text(`L. ${formatearNumero.format(totalFinal)}`, 480, totalsY + 45);        
     }      
       
     // Actualizar el Total_Facturado en la factura    
@@ -594,30 +679,60 @@ exports.crearFacturaCompleta = async (req, res) => {
     await nuevaFactura.save({ transaction: t });  
       
     // INFORMACIÓN LEGAL COMPLETA - SAR usando datos del CAI activo  
-    const legalY = totalDescuentos > 0 ? totalsY + 80 : totalsY + 65;  
+    const legalY = totalDescuentos > 0 ? totalsY + 90 : totalsY + 70;  
+    
+    // Fondo para información legal
+    doc.rect(50, legalY - 10, 280, 140)
+      .fill('#f8f9fa')
+      .stroke('#495057');
       
     doc.fontSize(8).font('Helvetica')    
-      .text('Esta factura es válida por 30 días', 50, legalY)    
-      .text(`Resolución ${caiActivo.resolucionSAR}`, 50, legalY + 15)    
-      .text(`CAI: ${caiActivo.codigoCAI}`, 50, legalY + 30)    
-      .text(`Rango Autorizado: Del ${caiActivo.numeroFacturaInicio} al ${caiActivo.numeroFacturaFin}`, 50, legalY + 45)    
-      .text(`Fecha límite de emisión: ${new Date(caiActivo.fechaVencimiento).toLocaleDateString('es-HN')}`, 50, legalY + 60)    
-      .text('Original: Cliente / Copia: Obligación Tributaria', 50, legalY + 75);       
+      .fill('#1a1a1a')
+      .text('Esta factura es válida por 30 días', 60, legalY)    
+      .text(`Resolución ${caiActivo.resolucionSAR}`, 60, legalY + 15)    
+      .text(`CAI: ${caiActivo.codigoCAI}`, 60, legalY + 30)    
+      .text(`Rango Autorizado: Del ${caiActivo.numeroFacturaInicio} al ${caiActivo.numeroFacturaFin}`, 60, legalY + 45)    
+      .text(`Fecha límite de emisión: ${new Date(caiActivo.fechaVencimiento).toLocaleDateString('es-HN')}`, 60, legalY + 60)    
+      .text('Original: Cliente / Copia: Obligación Tributaria', 60, legalY + 75);       
           
     // LEYENDA TERRITORIAL OBLIGATORIA    
     doc.fontSize(9).font('Helvetica-Bold')    
-      .text('Este documento es válido en todo el territorio nacional', 50, legalY + 95);    
+      .fill('#1a1a1a')
+      .text('Este documento es válido en todo el territorio nacional', 60, legalY + 95);    
       
     // Agregar cantidad en letras (función que necesitarás implementar)  
     const totalEnLetras = convertirNumeroALetras(totalFinal);  
     doc.fontSize(8).font('Helvetica')  
-      .text(`Cantidad en letras: ${totalEnLetras}`, 50, legalY + 110);  
+      .fill('#1a1a1a')
+      .text(`Cantidad en letras: ${totalEnLetras}`, 60, legalY + 110);  
         
-    // FIRMA Y EMPLEADO    
-    doc.text('_________________________', 400, legalY + 20);    
-    doc.text('Firma Autorizada:', 430, legalY + 35);    
-    doc.fontSize(7).text(`Atendido por: ${nombreEmpleado}`, 400, legalY + 50);   
+    // FIRMA Y EMPLEADO - Con fondo mejorado
+    doc.rect(350, legalY - 10, 200, 80)
+      .fill('#f8f9fa')
+      .stroke('#495057');
       
+    doc.fill('#1a1a1a')
+      .text('_________________________', 380, legalY + 20)    
+      .text('Firma Autorizada:', 410, legalY + 35)    
+      .fontSize(7).text(`Atendido por: ${nombreEmpleado}`, 380, legalY + 50);   
+      
+    // FOOTER PROFESIONAL
+    const footerY = legalY + 100;
+    
+    // Línea separadora del footer
+    doc.moveTo(50, footerY).lineTo(545, footerY)
+      .stroke('#1a1a1a', 2);
+    
+    // Fondo del footer
+    doc.rect(0, footerY + 5, 595, 40)
+      .fill('#1a1a1a');
+    
+    // Información del footer
+    doc.fill('##758384')
+      .fontSize(8).font('Helvetica')
+      .text('© 2025 Televisión Comayagua - Canal 40. Todos los derechos reservados.', 50, footerY + 15)
+      .text('Sistema de Facturación Automatizado | Generado el ' + new Date().toLocaleString('es-HN'), 50, footerY + 30);
+    
     doc.end();
         
   

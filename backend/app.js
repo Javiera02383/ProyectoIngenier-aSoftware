@@ -260,6 +260,15 @@ const startServer = async () => {
     // Establecer relaciones entre modelos de programación
     establecerRelaciones();
 
+    // Middleware básico de manejo de errores
+    app.use((err, req, res, next) => {
+      console.error('❌ Error no manejado:', err);
+      res.status(500).json({
+        mensaje: 'Error interno del servidor',
+        error: 'Error interno del sistema'
+      });
+    });
+
     // Iniciar servidor
     const PORT = process.env.puerto || 4051;
     app.listen(PORT, () => {

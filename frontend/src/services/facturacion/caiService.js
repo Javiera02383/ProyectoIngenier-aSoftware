@@ -10,25 +10,48 @@ const getAuthToken = () => {
 export const caiService = {    
   // Obtener CAI activo    
   obtenerCAIActivo: async () => {    
-    const response = await axiosInstance.get('/cai/activo');  
-    return response.data;  
+    try {
+      const response = await axiosInstance.get('/cai/activo');  
+      return response.data;  
+    } catch (error) {
+      console.error('Error al obtener CAI activo:', error);
+      if (error.response?.status === 404) {
+        return { cai: null };
+      }
+      throw error;
+    }
   },  
   
   // Guardar datos CAI    
   guardarCAI: async (caiData) => {    
-    const response = await axiosInstance.post('/cai', caiData);  
-    return response.data;  
+    try {
+      const response = await axiosInstance.post('/cai', caiData);  
+      return response.data;  
+    } catch (error) {
+      console.error('Error al guardar CAI:', error);
+      throw error;
+    }
   },    
     
   // Obtener CAI por ID    
   obtenerCAIPorId: async (idCAI) => {    
-    const response = await axiosInstance.get(`/cai/${idCAI}`);  
-    return response.data;  
+    try {
+      const response = await axiosInstance.get(`/cai/${idCAI}`);  
+      return response.data;  
+    } catch (error) {
+      console.error('Error al obtener CAI por ID:', error);
+      throw error;
+    }
   },    
     
   // Actualizar CAI    
   actualizarCAI: async (idCAI, caiData) => {    
-    const response = await axiosInstance.put(`/cai/${idCAI}`, caiData);  
-    return response.data;  
+    try {
+      const response = await axiosInstance.put(`/cai/${idCAI}`, caiData);  
+      return response.data;  
+    } catch (error) {
+      console.error('Error al actualizar CAI:', error);
+      throw error;
+    }
   }    
 };

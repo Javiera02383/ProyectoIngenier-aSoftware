@@ -56,12 +56,18 @@ const CAI = () => {
           tipo: 'info',  
           texto: `CAI activo cargado: ${data.cai.codigoCAI}`  
         });  
+      } else {
+        // No hay CAI activo
+        setMensaje({  
+          tipo: 'warning',  
+          texto: 'No se encontró CAI activo. Configurando nuevo CAI.'  
+        });  
       }    
     } catch (error) {    
-      console.log('No hay CAI activo configurado o error al cargar:', error.message);    
+      console.error('Error al cargar CAI activo:', error);    
       setMensaje({  
-        tipo: 'warning',  
-        texto: 'No se encontró CAI activo. Configurando nuevo CAI.'  
+        tipo: 'danger',  
+        texto: 'Error al cargar CAI activo. Intente nuevamente.'  
       });  
     } finally {  
       setLoading(false);  
@@ -140,50 +146,29 @@ const CAI = () => {
         rtnEmpresa: caiData.rtnEmpresa,    
         activo: caiData.activo,    
         facturasEmitidas: parseInt(caiData.facturasEmitidas) || 0    
-
-        
       };    
   
-      // Incluir idCAI si estamos en modo edición  
+      let result;
+      
+      // Usar el servicio apropiado según si es creación o actualización
       if (idCAI) {  
-        datosParaEnviar.idCAI = idCAI;  
-      }  
-    
-      const token = localStorage.getItem('token');    
-      const url = idCAI ? `/api/optica/cai/${idCAI}` : '/api/optica/cai';  
-      const method = idCAI ? 'PUT' : 'POST';  
-        
-      const response = await fetch(url, {    
-        method: method,    
-        headers: {    
-          'Content-Type': 'application/json',    
-          'Authorization': `Bearer ${token}`    
-        },    
-        body: JSON.stringify(datosParaEnviar)    
-      });    
-    
-      if (response.ok) {    
-        const result = await response.json();  
-          
-        if (!idCAI && result.idCAI) {  
+        result = await caiService.actualizarCAI(idCAI, datosParaEnviar);
+        setMensaje({    
+          tipo: 'success',    
+          texto: 'Datos del CAI actualizados correctamente en la base de datos.'  
+        });    
+        // Recargar datos actualizados
+        await cargarCAIActivo();    
+      } else {  
+        result = await caiService.guardarCAI(datosParaEnviar);
+        if (result.idCAI) {  
           setIdCAI(result.idCAI);  
           setModoEdicion(true);  
         }  
-          
         setMensaje({    
           tipo: 'success',    
-          texto: idCAI ?   
-            'Datos del CAI actualizados correctamente en la base de datos.' :  
-            `CAI creado exitosamente. ID: ${result.idCAI || result.cai?.idCAI}`  
+          texto: `CAI creado exitosamente. ID: ${result.idCAI || result.cai?.idCAI}`  
         });    
-          
-        // Recargar datos actualizados solo si no estamos creando uno nuevo  
-        if (idCAI) {  
-          await cargarCAIActivo();    
-        }  
-      } else {    
-        const errorData = await response.json();  
-        throw new Error(errorData.mensaje || 'Error al guardar CAI en el servidor');    
       }    
     
     } catch (error) {    
@@ -364,7 +349,7 @@ const CAI = () => {
                   <Input     
                     type="date"    
                     name="fechaVencimiento"     
-                    value={caiData.ffechaVencimiento}     
+                                         value={caiData.fechaVencimiento}     
                     onChange={handleChange}  
                     disabled={loading}  
                     required    
