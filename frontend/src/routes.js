@@ -100,6 +100,7 @@ const routes = [
     hidden: true,
     
   },
+
   {
     path: "/empleados",
     name: "Empleados",

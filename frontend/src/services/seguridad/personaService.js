@@ -16,7 +16,7 @@ export const personaService = {
     return response.data;
   },
 
-  actualizarPersona: async (id, personaData) => {
+  editarPersona: async (id, personaData) => {
     const response = await axiosInstance.put(`/personas/persona/${id}`, personaData);
     return response.data;
   },

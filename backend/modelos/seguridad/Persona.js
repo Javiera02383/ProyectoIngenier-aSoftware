@@ -9,7 +9,7 @@ const Persona = db.define('Persona', {
   },
   Pnombre: {
     type: DataTypes.STRING(45),
-    allowNull: false
+    allowNull: true // Cambiado a true para permitir personas comerciales sin nombre
   },
   Snombre: {
     type: DataTypes.STRING(45),
@@ -42,8 +42,25 @@ const Persona = db.define('Persona', {
   genero: {
     type: DataTypes.STRING(1),
     allowNull: false,
-    default: "M"
-
+    defaultValue: 'M'
+  },
+  tipoPersona: {
+    type: DataTypes.ENUM('natural', 'comercial'),
+    allowNull: false,
+    defaultValue: 'natural'
+  },
+  // Campos específicos para personas comerciales
+  razonSocial: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  rtn: {
+    type: DataTypes.STRING(20),
+    allowNull: true
+  },
+  nombreComercial: {
+    type: DataTypes.STRING(100),
+    allowNull: true
   }
 }, {
   tableName: 'persona',

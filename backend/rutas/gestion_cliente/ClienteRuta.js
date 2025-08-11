@@ -82,15 +82,63 @@ const validarCliente = [
 // Validaciones POST (crear)
 router.post('/cliente',
   [
-    body('idPersona').isInt({ min: 1 }).withMessage('El idPersona debe ser un número entero positivo')
+    // Validar que se envíe personaData o idPersona
+    body().custom((value, { req }) => {
+      if (!value.personaData && !value.idPersona) {
+        throw new Error('Debe enviar personaData para crear nueva persona o idPersona para usar persona existente');
+      }
+      return true;
+    }),
+    // Validaciones para personaData cuando se crea nueva persona
+    body('personaData.Pnombre')
+      .if(body('personaData.tipoPersona').equals('natural'))
+      .notEmpty().withMessage('El primer nombre es requerido para personas naturales'),
+    body('personaData.correo')
+      .if(body('personaData').exists())
+      .notEmpty().withMessage('El correo es requerido')
+      .isEmail().withMessage('El correo debe tener un formato válido'),
+    body('personaData.tipoPersona')
+      .if(body('personaData').exists())
+      .isIn(['natural', 'comercial']).withMessage('El tipo de persona debe ser natural o comercial'),
+    // Validaciones específicas para personas naturales
+    body('personaData.Papellido')
+      .if(body('personaData.tipoPersona').equals('natural'))
+      .notEmpty().withMessage('El primer apellido es requerido para personas naturales'),
+    body('personaData.DNI')
+      .if(body('personaData.tipoPersona').equals('natural'))
+      .notEmpty().withMessage('El DNI es requerido para personas naturales'),
+    // Validaciones específicas para personas comerciales
+    body('personaData.razonSocial')
+      .if(body('personaData.tipoPersona').equals('comercial'))
+      .notEmpty().withMessage('La razón social es requerida para personas comerciales'),
+    body('personaData.rtn')
+      .if(body('personaData.tipoPersona').equals('comercial'))
+      .notEmpty().withMessage('El RTN es requerido para personas comerciales'),
+    body('personaData.nombreComercial')
+      .if(body('personaData.tipoPersona').equals('comercial'))
+      .notEmpty().withMessage('El nombre comercial es requerido para personas comerciales'),
+    // Validación para idPersona cuando se usa persona existente
+    body('idPersona')
+      .optional()
+      .isInt({ min: 1 }).withMessage('El idPersona debe ser un número entero positivo')
       .custom(async value => {
-        const Persona = require('../../modelos/seguridad/Persona');
-        const existe = await Persona.findByPk(value);
-        if (!existe) throw new Error('La persona asociada no existe');
+        if (value) {
+          const Persona = require('../../modelos/seguridad/Persona');
+          const existe = await Persona.findByPk(value);
+          if (!existe) throw new Error('La persona asociada no existe');
+        }
         return true;
       }),
     body('fechaRegistro').optional().isISO8601().withMessage('La fecha debe tener un formato válido (YYYY-MM-DD)')
-  ], verificarUsuario,
+  ], 
+  (req, res, next) => {
+    const errores = validationResult(req);
+    if (!errores.isEmpty()) {
+      return res.status(400).json({ errores: errores.array() });
+    }
+    next();
+  },
+  verificarUsuario,
   clienteController.crearCliente
 );
 
@@ -326,7 +374,6 @@ router.get('/cliente/:id',
 
 
 // Validaciones PUT (editar)
-//hola
 router.put('/cliente/:id',
   [
     param('id').isInt({ min: 1 }).withMessage('El id debe ser un número entero positivo')
@@ -336,6 +383,33 @@ router.put('/cliente/:id',
         if (!existe) throw new Error('El cliente no existe');
         return true;
       }),
+    // Validar personaData si se envía
+    body('personaData.Pnombre')
+      .if(body('personaData.tipoPersona').equals('natural'))
+      .optional().notEmpty().withMessage('El primer nombre no puede estar vacío para personas naturales'),
+    body('personaData.correo')
+      .if(body('personaData').exists())
+      .optional().isEmail().withMessage('El correo debe tener un formato válido'),
+    body('personaData.tipoPersona')
+      .if(body('personaData').exists())
+      .optional().isIn(['natural', 'comercial']).withMessage('El tipo de persona debe ser natural o comercial'),
+    // Validaciones específicas para personas naturales cuando se edita
+    body('personaData.Papellido')
+      .if(body('personaData.tipoPersona').equals('natural'))
+      .optional().notEmpty().withMessage('El primer apellido no puede estar vacío para personas naturales'),
+    body('personaData.DNI')
+      .if(body('personaData.tipoPersona').equals('natural'))
+      .optional().notEmpty().withMessage('El DNI no puede estar vacío para personas naturales'),
+    // Validaciones específicas para personas comerciales cuando se edita
+    body('personaData.razonSocial')
+      .if(body('personaData.tipoPersona').equals('comercial'))
+      .optional().notEmpty().withMessage('La razón social no puede estar vacía para personas comerciales'),
+    body('personaData.rtn')
+      .if(body('personaData.tipoPersona').equals('comercial'))
+      .optional().notEmpty().withMessage('El RTN no puede estar vacío para personas comerciales'),
+    body('personaData.nombreComercial')
+      .if(body('personaData.tipoPersona').equals('comercial'))
+      .optional().notEmpty().withMessage('El nombre comercial no puede estar vacío para personas comerciales'),
     body('idPersona').optional().isInt({ min: 1 }).withMessage('El idPersona debe ser un número entero positivo')
       .custom(async value => {
         if (value) {
@@ -346,7 +420,15 @@ router.put('/cliente/:id',
         return true;
       }),
     body('fechaRegistro').optional().isISO8601().withMessage('La fecha debe tener un formato válido (YYYY-MM-DD)')
-  ], verificarUsuario,
+  ], 
+  (req, res, next) => {
+    const errores = validationResult(req);
+    if (!errores.isEmpty()) {
+      return res.status(400).json({ errores: errores.array() });
+    }
+    next();
+  },
+  verificarUsuario,
   clienteController.editarCliente
 );
 

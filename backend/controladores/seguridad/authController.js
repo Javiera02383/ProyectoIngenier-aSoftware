@@ -214,10 +214,11 @@ exports.registrarPersona = async (req, res) => {
     return res.status(400).json({ errores: errores.array() });
   }
 
-  const { Pnombre, Snombre, Papellido, Sapellido, Direccion, DNI, correo, fechaNacimiento, genero } = req.body;
+  const { Pnombre, Snombre, Papellido, Sapellido, Direccion, DNI, correo, fechaNacimiento, genero, tipoPersona, razonSocial, rtn, nombreComercial } = req.body;
 
   try {
-    const nuevaPersona = await Persona.create({
+    // Establecer valores por defecto para compatibilidad
+    const personaData = {
       Pnombre,
       Snombre,
       Papellido,
@@ -226,8 +227,38 @@ exports.registrarPersona = async (req, res) => {
       DNI,
       correo,
       fechaNacimiento,
-      genero
-    });
+      genero: genero || 'M',
+      tipoPersona: tipoPersona || 'natural',
+      razonSocial,
+      rtn,
+      nombreComercial
+    };
+
+    // Validar campos requeridos según el tipo de persona
+    if (personaData.tipoPersona === 'comercial') {
+      if (!razonSocial) {
+        return res.status(400).json({ mensaje: 'La razón social es obligatoria para personas comerciales' });
+      }
+      if (!rtn) {
+        return res.status(400).json({ mensaje: 'El RTN es obligatorio para personas comerciales' });
+      }
+      if (!nombreComercial) {
+        return res.status(400).json({ mensaje: 'El nombre comercial es obligatorio para personas comerciales' });
+      }
+    } else {
+      // Para personas naturales, validar campos obligatorios
+      if (!Papellido) {
+        return res.status(400).json({ mensaje: 'El primer apellido es obligatorio para personas naturales' });
+      }
+      if (!DNI) {
+        return res.status(400).json({ mensaje: 'El DNI es obligatorio para personas naturales' });
+      }
+      if (!genero) {
+        return res.status(400).json({ mensaje: 'El género es obligatorio para personas naturales' });
+      }
+    }
+
+    const nuevaPersona = await Persona.create(personaData);
 
     res.status(201).json({ mensaje: 'Persona registrada exitosamente', idPersona: nuevaPersona.idPersona });
 

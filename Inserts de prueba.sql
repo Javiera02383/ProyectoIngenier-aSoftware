@@ -15,39 +15,49 @@ INSERT INTO atributo (nombre, tipo) VALUES
 ('Horario', 'texto');  
   
 -- Tabla: persona  
-INSERT INTO persona (Pnombre, Snombre, Papellido, Sapellido, Direccion, DNI, correo, fechaNacimiento, genero) VALUES
--- Empleados
-('José', 'Dolores', 'Gámez', 'Suazo', 'Colonia San Miguel N°2', '12171961001526', 'jose.gamez@televisioncomayagua.com', '1961-07-12', 'M'),
-('Luisa', 'María', 'Gómez', 'Hernández', 'Boulevard del Sur', '0801198505678', 'luisa.gomez@televisioncomayagua.com', '1985-03-15', 'F'),
-('Carlos', 'Eduardo', 'Martínez', 'López', 'Col. Kennedy', '0801199001234', 'carlos.martinez@massPublicidad.com', '1990-01-15', 'M'),
-('Laura', 'Beatriz', 'Castro', 'Gómez', 'Col. Trejo', '0801199505678', 'laura.castro@creativosunidos.com', '1995-06-22', 'F'),
-('Juan', 'Antonio', 'Pérez', 'Rodríguez', 'Centro Comayagua', '0801198801234', 'juan.perez@empresa.com', '1988-08-10', 'M'),
-('Juana', 'A', 'Pérez', 'Rodríguez', 'Centro Comayagua', '0801198801235', 'juana.perez@empresa.com', '1988-08-10', 'F'),
+-- NOTA: Esta tabla ha sido actualizada para soportar tanto personas naturales como comerciales
+-- Campos nuevos: tipoPersona (ENUM: 'natural', 'comercial'), razonSocial, rtn, nombreComercial
+-- Para personas naturales: se requieren DNI, genero, fechaNacimiento
+-- Para personas comerciales: se requieren razonSocial, rtn, nombreComercial
+-- 
+-- CLASIFICACIÓN:
+-- - Empleados: personas naturales (con DNI, genero, fechaNacimiento)
+-- - Proveedores: personas comerciales (con razonSocial, rtn, nombreComercial)
+-- - Empresas anunciantes: personas comerciales (con razonSocial, rtn, nombreComercial)
+-- 
+-- NOTA: Los proveedores son empresas, por lo que se registran como personas comerciales
+-- con estructura: Pnombre, tipoPersona, razonSocial, rtn, nombreComercial, Direccion, correo
+-- 
+INSERT INTO `persona` VALUES
+(1,  'José',  'Dolores', 'Gámez', 'Suazo', 'Colonia San Miguel N°2', '1217196100156', 'jose.gamez@televisioncomayagua.com', '1961-07-12 00:00:00', 'M', 'natural', NULL, NULL, NULL),
+(2,  'Luisa', 'María',   'Gómez', 'Hernández', 'Boulevard del Sur', '0801198505678', 'luisa.gomez@televisioncomayagua.com', '1985-03-15 00:00:00', 'F', 'natural', NULL, NULL, NULL),
+(3,  'Carlos', 'Eduardo', 'Martínez', 'López', 'Col. Kennedy', '0801199001234', 'carlos.martinez@massPublicidad.com', '1990-01-15 00:00:00', 'M', 'natural', NULL, NULL, NULL),
+(4,  'Laura', 'Beatriz', 'Castro', 'Gómez', 'Col. Trejo', '0801199505678', 'laura.castro@creativosunidos.com', '1995-06-22 00:00:00', 'F', 'natural', NULL, NULL, NULL),
+(5,  'Juan', 'Antonio', 'Pérez', 'Rodríguez', 'Centro Comayagua', '0801198801234', 'juan.perez@empresa.com', '1988-08-10 00:00:00', 'M', 'natural', NULL, NULL, NULL),
+(6,  'Juana', 'A', 'Pérez', 'Rodríguez', 'Centro Comayagua', '0801198801235', 'juana.perez@empresa.com', '1988-08-10 00:00:00', 'F', 'natural', NULL, NULL, NULL),
+(7,  'TECNOHONDURAS', NULL, 'L.A.', NULL, 'Tegucigalpa, Honduras', NULL, 'ventas@tecnohonduras.hn', NULL, NULL, 'comercial', 'DISTRIBUIDORA TECNOHONDURAS, S.A.', '08011998765434', 'TECNOHONDURAS'),
+(8,  'SONY', NULL, 'Honduras', NULL, 'Miami, FL, USA', NULL, 'sales@sonypro.com', NULL, NULL, 'comercial', 'SONY PROFESSIONAL SOLUTIONS, INC.', '03011998154421', 'SONY PRO'),
+(9,  'CANON', NULL, 'USA', NULL, 'San Pedro Sula, Honduras', NULL, 'info@canonhn.com', NULL, NULL, 'comercial', 'CANON HONDURAS, S.A.', '08011998765443', 'CANON HONDURAS'),
+(10, 'SHURE', NULL, 'USA', NULL, 'Illinois, USA', NULL, 'sales@shure.com', NULL, NULL, 'comercial', 'SHURE INCORPORATED', '03021998451444', 'SHURE'),
+(11, 'CLARO', NULL, 'Telefonias', NULL, 'Tegucigalpa, Honduras', NULL, 'publicidad@claro.hn', NULL, NULL, 'comercial', 'AMERICA MOVIL HONDURAS, S.A.', '08011990025357', 'CLARO HONDURAS'),
+(12, 'SECOPV', NULL, 'Seguros', NULL, 'Comayagua, Honduras', NULL, 'marketing@secopv.hn', NULL, NULL, 'comercial', 'SECOPV SEGUROS, S.A.', '08011990525454', 'SECOPV SEGUROS'),
+(13, 'MUNICOM', NULL, 'Comunicaiones', NULL, 'Comayagua, Honduras', NULL, 'ventas@municom.hn', NULL, NULL, 'comercial', 'MUNICIPALIDAD DE COMAYAGUA', '08011990024545', 'MUNICOM'),
+(14, 'MACONSA', NULL, 'Constructora', NULL, 'Comayagua, Honduras', NULL, 'publicidad@maconsa.hn', NULL, NULL, 'comercial', 'MACONSA CONSTRUCTORA, S.A.', '08011990065654', 'MACONSA'),
+(15, 'UNAH', NULL, 'Universidad', NULL, 'Tegucigalpa, Honduras', NULL, 'comunicacion@unah.edu.hn', NULL, NULL, 'comercial', 'UNIVERSIDAD NACIONAL AUTONOMA DE HONDURAS', '08011990565005', 'UNAH'),
+(16, 'MOTOMUNDO', NULL, 'Concesionario', NULL, 'Comayagua, Honduras', NULL, 'ventas@motomundo.hn', NULL, NULL, 'comercial', 'MOTOMUNDO HONDURAS, S.A.', '08011991111006', 'MOTOMUNDO'),
+(17, 'SINET', NULL, 'Telecomunicaiones', NULL, 'San Pedro Sula, Honduras', NULL, 'marketing@sinet.hn', NULL, NULL, 'comercial', 'SINET TELECOMUNICACIONES, S.A.', '08011997254547', 'SINET'),
+(18, 'SANMARQUEÑA COOP', NULL, 'Cooperativa', NULL, 'La Esperanza, Honduras', NULL, 'publicidad@sanmarquena.hn', NULL, NULL, 'comercial', 'COOPERATIVA SANMARQUEÑA, S.A.', '08011252525258', 'COOPERATIVA SANMARQUEÑA'),
+(19, 'SONRÍA', NULL, 'Clinica Dental', NULL, 'Comayagua, Honduras', NULL, 'info@sonria.hn', NULL, NULL, 'comercial', 'CLINICA DENTAL SONRÍA, S.A.', '08011990558759', 'SONRÍA'),
+(20, 'COFICESA', NULL, 'Financiera', NULL, 'Tegucigalpa, Honduras', NULL, 'marketing@coficesa.hn', NULL, NULL, 'comercial', 'COFICESA FINANCIERA, S.A.', '08011992575710', 'COFICESA'),
+(21, 'VILLAMIX', NULL, 'Constructora', NULL, 'Comayagua, Honduras', NULL, 'ventas@villamix.hn', NULL, NULL, 'comercial', 'VILLAMIX CONSTRUCCION, S.A.', '08011990575711', 'VILLAMIX'),
+(22, 'LACOLONIA', NULL, 'Supermercado', NULL, 'Tegucigalpa, Honduras', NULL, 'publicidad@lacolonia.hn', NULL, NULL, 'comercial', 'SUPERMERCADOS LA COLONIA, S.A.', '08011990557512', 'LA COLONIA'),
+(23, 'TIENDAERFA', NULL, 'Tienda', NULL, 'Comayagua, Honduras', NULL, 'marketing@tiendaerfa.hn', NULL, NULL, 'comercial', 'TIENDA ERFA HONDURAS, S.A.', '08011992455713', 'TIENDA ERFA'),
+(24, 'CABLECOLOR', NULL, 'Telecomunicaciones', NULL, 'Tegucigalpa, Honduras', NULL, 'ventas@cablecolor.hn', NULL, NULL, 'comercial', 'CABLE COLOR HONDURAS, S.A.', '08011995450014', 'CABLE COLOR'),
+(25, 'PROMODJFLECHA', NULL, 'DJ', NULL, 'Comayagua, Honduras', NULL, 'info@promodjflecha.hn', NULL, NULL, 'comercial', 'PROMOCIONES DJ FLECHA, S.A.', '08011994540015', 'PROMODJFLECHA'),
+(26, 'CHAVERYASOCIADO', NULL, 'Bufete ', NULL, 'Comayagua, Honduras', NULL, 'contacto@chaveryasociado.hn', NULL, NULL, 'comercial', 'CHAVER Y ASOCIADOS, S.A.', '08011997878016', 'CHAVER Y ASOCIADOS'),
+(27, 'Alma', 'Javiera', 'Gámez', 'Dubón', 'Comayagua, Honduras', '0301200202383', 'ajgamez02@gmail.com', '2025-08-07 00:00:00', 'F', 'natural', NULL, NULL, NULL);
 
--- Proveedores (valores NULL en campos no aplicables)
-('Distribuidora', NULL, 'TecnoHonduras', NULL, 'Tegucigalpa, Honduras', '0801199876543', 'ventas@tecnohonduras.hn', NULL, 'M'),
-('Sony', NULL, 'Professional', NULL, 'Miami, FL, USA', '0000000000001', 'sales@sonypro.com', NULL, 'M'),
-('Canon', NULL, 'Honduras', NULL, 'San Pedro Sula, Honduras', '0801199876544', 'info@canonhn.com', NULL, 'M'),
-('Shure', NULL, 'Incorporated', NULL, 'Illinois, USA', '0000000000002', 'sales@shure.com', NULL, 'M');
-  
--- Personas para empresas anunciantes  
-INSERT INTO persona (Pnombre, Papellido, Direccion, DNI, correo, genero) VALUES  
-('CLARO', 'Honduras', 'Tegucigalpa, Honduras', '0801199000001', 'publicidad@claro.hn', 'M'),  
-('SECOPV', 'Seguros', 'Comayagua, Honduras', '0801199000002', 'marketing@secopv.hn', 'M'),  
-('MUNICOM', 'Comunicaciones', 'Comayagua, Honduras', '0801199000003', 'ventas@municom.hn', 'M'),  
-('MACONSA', 'Constructora', 'Comayagua, Honduras', '0801199000004', 'publicidad@maconsa.hn', 'M'),  
-('UNAH', 'Universidad', 'Tegucigalpa, Honduras', '0801199000005', 'comunicacion@unah.edu.hn', 'M'),  
-('MOTOMUNDO', 'Concesionario', 'Comayagua, Honduras', '0801199000006', 'ventas@motomundo.hn', 'M'),  
-('SINET', 'Telecomunicaciones', 'San Pedro Sula, Honduras', '0801199000007', 'marketing@sinet.hn', 'M'),  
-('SANMARQUEÑA COOP', 'Cooperativa', 'La Esperanza, Honduras', '0801199000008', 'publicidad@sanmarquena.hn', 'M'),  
-('SONRÍA', 'Dental', 'Comayagua, Honduras', '0801199000009', 'info@sonria.hn', 'M'),  
-('COFICESA', 'Financiera', 'Tegucigalpa, Honduras', '0801199000010', 'marketing@coficesa.hn', 'M'),  
-('VILLAMIX', 'Construcción', 'Comayagua, Honduras', '0801199000011', 'ventas@villamix.hn', 'M'),  
-('LACOLONIA', 'Seguros', 'Tegucigalpa, Honduras', '0801199000012', 'publicidad@lacolonia.hn', 'M'),  
-('TIENDAERFA', 'Retail', 'Comayagua, Honduras', '0801199000013', 'marketing@tiendaerfa.hn', 'M'),  
-('CABLECOLOR', 'Televisión', 'Tegucigalpa, Honduras', '0801199000014', 'ventas@cablecolor.hn', 'M'),  
-('PROMODJFLECHA', 'Promociones', 'Comayagua, Honduras', '0801199000015', 'info@promodjflecha.hn', 'M'),  
-('CHAVERYASOCIADO', 'Servicios', 'Comayagua, Honduras', '0801199000016', 'contacto@chaveryasociado.hn', 'M');  
+
   
 
 -- Tabla: rol  
@@ -93,7 +103,8 @@ INSERT INTO usuario (Nombre_Usuario, contraseña, estado, idPersona, idrol) VALU
 INSERT INTO empleado (idPersona, idRol, Fecha_Registro) VALUES   
 (1, 1, NOW()),  
 (2, 2, NOW()),  
-(3, 2, NOW());  
+(3, 2, NOW()),
+(4, 2, now()); 
 
 
 -- Tabla: Proveedores  
@@ -734,6 +745,7 @@ INSERT INTO mantenimiento (
 (1, 'Mantenimiento preventivo: limpieza interna y cambio de filtros.', 1500.00, '2025-07-01', '2025-07-03', NULL, 'filtros-limpieza.jpg'),
 (2, 'Reparación de fuente de poder dañada.', 3200.00, '2025-07-15', '2025-07-17', 5, 'fuente-pc-reparada.jpg'),
 (3, 'Actualización de firmware y revisión de conectores.', 0.00, '2025-07-25', NULL, NULL, NULL);
+
 
 
 

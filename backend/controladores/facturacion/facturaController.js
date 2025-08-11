@@ -389,22 +389,39 @@ exports.crearFacturaCompleta = async (req, res) => {
             
     // DATOS DEL CLIENTE (Lado derecho) - MEJORADOS        
     const clientePersona = cliente?.persona;        
-    const nombreCliente = clientePersona ?         
-      `${clientePersona.Pnombre} ${clientePersona.Snombre || ''} ${clientePersona.Papellido} ${clientePersona.Sapellido || ''}`.trim() : 'N/A';        
+    
+    // Determinar nombre del cliente según tipo de persona
+    let nombreCliente = 'N/A';
+    if (clientePersona) {
+      if (clientePersona.tipoPersona === 'comercial') {
+        nombreCliente = clientePersona.razonSocial || clientePersona.nombreComercial || 'N/A';
+      } else {
+        nombreCliente = `${clientePersona.Pnombre} ${clientePersona.Snombre || ''} ${clientePersona.Papellido} ${clientePersona.Sapellido || ''}`.trim();
+      }
+    }
             
     doc.font('Helvetica-Bold')        
       .text('Cliente:', 300, facturaY)        
       .font('Helvetica')        
       .text(nombreCliente, 350, facturaY);        
             
-    // RTN DEL CLIENTE        
-    const rtnCliente = clientePersona?.DNI;        
-    const tieneRTN = rtnCliente && rtnCliente.length >= 13;        
+    // RTN/DNI DEL CLIENTE        
+    let identificacionCliente = 'N/A';
+    if (clientePersona) {
+      if (clientePersona.tipoPersona === 'comercial') {
+        identificacionCliente = clientePersona.rtn || 'N/A';
+      } else {
+        identificacionCliente = clientePersona.DNI || 'N/A';
+      }
+    }
+    
+    const etiquetaIdentificacion = clientePersona?.tipoPersona === 'comercial' ? 'RTN:' : 'DNI:';
+    const tieneIdentificacion = identificacionCliente && identificacionCliente !== 'N/A';
             
     doc.font('Helvetica-Bold')        
-      .text('RTN:', 300, facturaY + 15)        
+      .text(etiquetaIdentificacion, 300, facturaY + 15)        
       .font('Helvetica')        
-      .text(rtnCliente || 'N/A', 350, facturaY + 15);        
+      .text(identificacionCliente, 350, facturaY + 15);        
       
     // CAMPOS ESPECÍFICOS PARA TV - TODOS LOS CAMPOS INCLUIDOS  
     let currentYY = facturaY + 30;    

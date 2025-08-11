@@ -254,7 +254,7 @@ const startServer = async () => {
     console.log('✅ Modelos de Facturacion sincronizados.');
 
     // Iniciar servidor
-    const PORT = process.env.puerto || 3000;
+    const PORT = process.env.puerto || 4051;
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
     });
