@@ -138,13 +138,14 @@ app.use('/api/optica/inventario', proveedorRutas);
 app.use('/api/optica/inventario', movimientoRutas);  
 app.use('/api/optica/inventario', mantenimientoRutas);
 
-// Usar rutas de Programacion Publicidad 
+// === RUTAS DE ORDENES DE PUBLICIDAD ===
+app.use('/api/optica/ordenes-publicidad', ordenPublicidadRuta);  
+app.use('/api/optica/ordenes-publicidad', ordenProgramacionRuta);
+
+// === RUTAS DE PROGRAMACION (Gestión de Programas) ===
 app.use('/api/optica/programacion', programaRuta);  
 app.use('/api/optica/programacion', bloquePublicitarioRuta);  
 app.use('/api/optica/programacion', anuncioBloqueRuta);  
-app.use('/api/optica/programacion', ordenPublicidadRuta);  
-app.use('/api/optica/programacion', ordenProgramacionRuta);
-
 app.use('/api/optica/programacion', programacionRutas);
 
 /* ========== MODELOS A SINCRONIZAR (si querés controlar uno a uno) ========== */
@@ -196,6 +197,9 @@ const AnuncioBloque = require('./modelos/programacion/AnuncioBloque');
 const OrdenPublicidad = require('./modelos/programacion/OrdenPublicidad');  
 const OrdenProgramacion = require('./modelos/programacion/OrdenProgramacion'); 
 
+// Importar relaciones de programación
+const { establecerRelaciones } = require('./modelos/programacion/relaciones');
+
 
 const startServer = async () => {
   try {
@@ -240,8 +244,8 @@ const startServer = async () => {
     await Programa.sync();  
     await BloquePublicitario.sync();  
     await AnuncioBloque.sync();  
-    await OrdenPublicidad.sync();  
-    await OrdenProgramacion.sync();  
+    await OrdenPublicidad.sync({ alter: true }); // Permitir alteraciones automáticas
+    await OrdenProgramacion.sync({ alter: true }); // Permitir alteraciones automáticas
     console.log('✅ Modelos de programación-publicidad sincronizados.');
 
         // Sincronizar modelos de Facturacion
@@ -252,6 +256,9 @@ const startServer = async () => {
     await FacturaDetalle.sync();
     await Cai.sync();
     console.log('✅ Modelos de Facturacion sincronizados.');
+
+    // Establecer relaciones entre modelos de programación
+    establecerRelaciones();
 
     // Iniciar servidor
     const PORT = process.env.puerto || 4051;

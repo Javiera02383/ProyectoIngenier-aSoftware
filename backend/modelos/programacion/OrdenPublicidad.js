@@ -12,8 +12,7 @@ const OrdenPublicidad = db.define('OrdenPublicidad', {
   },    
   numeroOrden: {    
     type: DataTypes.STRING(20),    
-    allowNull: false,    
-    unique: true    
+    allowNull: false    
   },    
   idCliente: {    
     type: DataTypes.INTEGER,    
@@ -38,7 +37,7 @@ const OrdenPublicidad = db.define('OrdenPublicidad', {
   impuesto: {    
     type: DataTypes.DECIMAL(10, 2),    
     allowNull: false,    
-    defaultValue: 0.15  
+    defaultValue: 0.15    
   },    
   costoTotal: {    
     type: DataTypes.DECIMAL(10, 2),    
@@ -59,7 +58,7 @@ const OrdenPublicidad = db.define('OrdenPublicidad', {
   },    
   idEmpleado: {    
     type: DataTypes.INTEGER,    
-    allowNull: false  
+    allowNull: false    
   },    
   fechaCreacion: {    
     type: DataTypes.DATE,    
@@ -73,7 +72,7 @@ const OrdenPublicidad = db.define('OrdenPublicidad', {
   observaciones: {    
     type: DataTypes.TEXT,    
     allowNull: true    
-  }    
+  }
 }, {    
   tableName: 'orden_publicidad',    
   timestamps: false    
@@ -99,5 +98,5 @@ Factura.belongsTo(OrdenPublicidad, {
   foreignKey: 'idOrdenPublicidad',  
   as: 'ordenPublicidad'  
 });  
-  
+
 module.exports = OrdenPublicidad;

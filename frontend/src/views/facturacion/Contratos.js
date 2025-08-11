@@ -16,11 +16,13 @@ import {
   ModalBody, ModalFooter,
   ModalHeader,
   Row,
-  Table
+  Table,
+  Spinner
 } from "reactstrap";
 import { clienteService } from "../../services/gestion_cliente/clienteService";
 import { empleadoService } from "../../services/gestion_cliente/empleadoService";
 import { ordenPublicidadService } from "../../services/programacion/ordenpublicidadService";
+import { ordenProgramacionService } from "../../services/programacion/ordenProgramacionService";
   
 const Contratos = () => {  
   // Estados principales  
@@ -30,20 +32,31 @@ const Contratos = () => {
   const [loading, setLoading] = useState(false);  
   const [loadingData, setLoadingData] = useState(true);  
   const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });  
+  // Estados para programación
+  const [programas, setProgramas] = useState([]);
   
   // Estados del formulario  
   const [nuevaOrden, setNuevaOrden] = useState({  
-    idCliente: "",  
-    producto: "",  
-    periodoInicio: "",  
-    periodoFin: "",  
-    valorSinImpuesto: "",  
-    impuesto: "",  // Agregar este campo  
-    costoTotal: "",  
-    costoPeriodo: "",  
-    idEmpleado: "",  
-    fechaAlAire: "",  
-    observaciones: ""  
+    // Información básica de la orden
+    idCliente: '',
+    producto: '',
+    periodoInicio: '',
+    periodoFin: '',
+    valorSinImpuesto: '',
+    costoTotal: '',
+    costoPeriodo: '',
+    idEmpleado: '',
+    observaciones: ''
+  });
+
+  // Estado para manejar múltiples pautas de programación
+  const [pautas, setPautas] = useState([]);
+  const [nuevaPauta, setNuevaPauta] = useState({
+    idPrograma: '',
+    duracionPauta: 30,
+    cantidadSpots: 1,
+    diasEmision: '',
+    observaciones: ''
   }); 
   
   // Estados de filtros  
@@ -63,6 +76,11 @@ const Contratos = () => {
   useEffect(() => {  
     cargarDatosIniciales();  
   }, []);  
+
+  // Debug effect para monitorear cambios en programas
+  useEffect(() => {
+    console.log('🔄 Estado actual de programas:', programas);
+  }, [programas]);
   
   // Cargar órdenes cuando cambien los filtros  
   useEffect(() => {  
@@ -78,7 +96,7 @@ const Contratos = () => {
       ...prev,
       impuesto: impuesto.toFixed(2),
       costoTotal: total.toFixed(2),
-      costoPeriodo: total.toFixed(2),
+      costoPeriodo: total.toFixed(2)
     }));
   }
 }, [nuevaOrden.valorSinImpuesto]);
@@ -86,13 +104,19 @@ const Contratos = () => {
   const cargarDatosIniciales = async () => {  
     try {  
       setLoadingData(true);  
-      const [clientesRes, empleadosRes] = await Promise.all([  
+      const [clientesRes, empleadosRes, programasRes] = await Promise.all([  
         clienteService.obtenerTodosLosClientes(),  
-        empleadoService.obtenerTodosLosEmpleados()  
+        empleadoService.obtenerTodosLosEmpleados(),
+        ordenProgramacionService.obtenerProgramas()
       ]);  
+
+      console.log('Respuesta de programas:', programasRes);
   
       setClientes(clientesRes.data || clientesRes || []);  
       setEmpleados(empleadosRes.data || empleadosRes || []);  
+      setProgramas(programasRes.data || programasRes || []);
+        
+      console.log('Programas cargados:', programasRes.data || programasRes || []);
         
       await cargarOrdenes();  
     } catch (error) {  
@@ -171,40 +195,144 @@ const Contratos = () => {
   };  
   
   const crearOrden = async () => {  
-    if (!validarFormulario()) return;  
-  
-    try {  
+  try {
+    if (!nuevaOrden.idCliente || !nuevaOrden.producto || !nuevaOrden.periodoInicio || 
+        !nuevaOrden.periodoFin || !nuevaOrden.valorSinImpuesto || !nuevaOrden.idEmpleado) {
+      mostrarToast('Por favor complete todos los campos obligatorios de la orden', 'warning');
+      return;
+    }
+
+    if (pautas.length === 0) {
+      mostrarToast('Debe agregar al menos una pauta de programación', 'warning');
+      return;
+    }
+
       setLoading(true);  
+
+    // 1. Crear la orden básica
       const ordenData = {  
-        ...nuevaOrden,  
-        idCliente: parseInt(nuevaOrden.idCliente),  
-        idEmpleado: parseInt(nuevaOrden.idEmpleado),  
+      idCliente: nuevaOrden.idCliente,
+      producto: nuevaOrden.producto,
+      periodoInicio: nuevaOrden.periodoInicio,
+      periodoFin: nuevaOrden.periodoFin,
         valorSinImpuesto: parseFloat(nuevaOrden.valorSinImpuesto),  
         costoTotal: parseFloat(nuevaOrden.costoTotal),  
-        costoPeriodo: parseFloat(nuevaOrden.costoPeriodo)  
-      };  
-  
-      await ordenPublicidadService.crearOrden(ordenData);  
-        
-      setMensaje({  
-        tipo: 'success',  
-        texto: 'Orden de publicidad creada exitosamente.'  
-      });  
-  
-      limpiarFormulario();  
-      setModalCrear(false);  
-      cargarOrdenes();  
+      costoPeriodo: parseFloat(nuevaOrden.costoPeriodo),
+      idEmpleado: nuevaOrden.idEmpleado,
+      observaciones: nuevaOrden.observaciones
+    };
+
+    const ordenCreada = await ordenPublicidadService.crearOrden(ordenData);
+    const idOrden = ordenCreada.orden?.idOrden || ordenCreada.idOrden;
+
+    // 2. Crear todas las pautas de programación
+    const pautasData = pautas.map(pauta => {
+      const programa = programas.find(p => p.idPrograma == pauta.idPrograma);
+      return {
+        idOrden: idOrden,
+        idPrograma: pauta.idPrograma,
+        duracionPauta: parseInt(pauta.duracionPauta),
+        cantidadSpots: parseInt(pauta.cantidadSpots),
+        diasEmision: pauta.diasEmision,
+        observaciones: pauta.observaciones || null
+      };
+    });
+
+    await ordenProgramacionService.crearMultiplesPautas(idOrden, pautasData);
+
+    // 3. Generar PDF automáticamente
+    await ordenPublicidadService.generarPDF(idOrden);
+
+    mostrarToast('Orden de publicidad creada exitosamente con todas las pautas', 'success');
+    
+    // Limpiar formularios
+    limpiarFormularios();
+    
+    // Cerrar modal y recargar datos
+    toggleModalCrear();
+    cargarDatosIniciales();
+    
     } catch (error) {  
-      console.error('Error creando orden:', error);  
-      setMensaje({  
-        tipo: 'danger',  
-        texto: error.response?.data?.mensaje || 'Error al crear la orden de publicidad.'  
-      });  
+    console.error('Error al crear orden:', error);
+    mostrarToast('Error al crear la orden de publicidad', 'error');
     } finally {  
       setLoading(false);  
     }  
   };  
   
+// Función para agregar una nueva pauta
+const agregarPauta = () => {
+  if (!nuevaPauta.idPrograma || !nuevaPauta.diasEmision) {
+    mostrarToast('Por favor complete todos los campos obligatorios de la pauta', 'warning');
+    return;
+  }
+
+  const pautaConId = {
+    ...nuevaPauta,
+    id: Date.now() // ID temporal para el frontend
+  };
+
+  setPautas([...pautas, pautaConId]);
+  
+  // Limpiar formulario de pauta
+  setNuevaPauta({
+    idPrograma: '',
+    duracionPauta: 30,
+    cantidadSpots: 1,
+    diasEmision: '',
+    observaciones: ''
+  });
+
+  mostrarToast('Pauta agregada exitosamente', 'success');
+};
+
+// Función para remover una pauta
+const removerPauta = (idPauta) => {
+  setPautas(pautas.filter(pauta => pauta.id !== idPauta));
+  mostrarToast('Pauta removida', 'info');
+};
+
+// Función para editar una pauta
+const editarPauta = (idPauta) => {
+  const pauta = pautas.find(p => p.id === idPauta);
+  if (pauta) {
+    setNuevaPauta(pauta);
+    setPautas(pautas.filter(p => p.id !== idPauta));
+    mostrarToast('Pauta cargada para edición', 'info');
+  }
+};
+
+// Función para limpiar formularios
+const limpiarFormularios = () => {
+  setNuevaOrden({
+    idCliente: '',
+    producto: '',
+    periodoInicio: '',
+    periodoFin: '',
+    valorSinImpuesto: '',
+    costoTotal: '',
+    costoPeriodo: '',
+    idEmpleado: '',
+    observaciones: ''
+  });
+  
+  setPautas([]);
+  setNuevaPauta({
+    idPrograma: '',
+    duracionPauta: 30,
+    cantidadSpots: 1,
+    diasEmision: '',
+    observaciones: ''
+  });
+};
+
+// Función para mostrar toast (si no existe)
+const mostrarToast = (mensaje, tipo = 'info') => {
+  // Si tienes un sistema de toast, úsalo aquí
+  // Por ahora usamos console.log
+  console.log(`${tipo.toUpperCase()}: ${mensaje}`);
+};
+
 const editarOrden = async () => {
   if (!validarFormulario()) return;
 
@@ -302,39 +430,97 @@ const editarOrden = async () => {
   
   const generarPDF = async (id) => {  
     try {  
+      setLoading(true);
       await ordenPublicidadService.generarPDF(id);  
       setMensaje({  
         tipo: 'success',  
-        texto: 'PDF generado exitosamente.'  
+        texto: 'PDF generado exitosamente. Ahora puede visualizarlo o descargarlo.'  
       });  
+      // Recargar las órdenes para obtener la información actualizada del PDF
+      await cargarOrdenes();
     } catch (error) {  
       console.error('Error generando PDF:', error);  
+      let mensajeError = 'Error al generar el PDF.';
+      
+      if (error.response?.status === 404) {
+        mensajeError = 'Orden no encontrada.';
+      } else if (error.response?.status === 401) {
+        mensajeError = 'No autorizado. Verifique su sesión.';
+      } else if (error.response?.status === 500) {
+        mensajeError = 'Error del servidor al generar el PDF.';
+      }
+      
       setMensaje({  
         tipo: 'danger',  
-        texto: 'Error al generar el PDF.'  
+        texto: mensajeError
       });  
+    } finally {
+      setLoading(false);
     }  
   };  
   
-  const visualizarPDF = (id) => {  
-    ordenPublicidadService.visualizarPDF(id);  
+  const visualizarPDF = async (id) => {  
+    try {
+      await ordenPublicidadService.visualizarPDF(id);
+      setMensaje({
+        tipo: 'success',
+        texto: 'PDF abierto en nueva pestaña.'
+      });
+    } catch (error) {
+      console.error('Error visualizando PDF:', error);
+      let mensajeError = 'Error al visualizar el PDF.';
+      
+      if (error.response?.status === 404) {
+        mensajeError = 'PDF no encontrado. Intente generar el PDF primero.';
+      } else if (error.response?.status === 401) {
+        mensajeError = 'No autorizado. Verifique su sesión.';
+      } else if (error.response?.status === 500) {
+        mensajeError = 'Error del servidor al procesar el PDF.';
+      }
+      
+      setMensaje({
+        tipo: 'danger',
+        texto: mensajeError
+      });
+    }
   };  
   
   const descargarPDF = async (id) => {  
     try {  
       await ordenPublicidadService.descargarPDF(id);  
+      setMensaje({
+        tipo: 'success',
+        texto: 'PDF descargado exitosamente.'
+      });
     } catch (error) {  
       console.error('Error descargando PDF:', error);  
+      let mensajeError = 'Error al descargar el PDF.';
+      
+      if (error.response?.status === 404) {
+        mensajeError = 'PDF no encontrado. Intente generar el PDF primero.';
+      } else if (error.response?.status === 401) {
+        mensajeError = 'No autorizado. Verifique su sesión.';
+      } else if (error.response?.status === 500) {
+        mensajeError = 'Error del servidor al procesar el PDF.';
+      }
+      
       setMensaje({  
         tipo: 'danger',  
-        texto: 'Error al descargar el PDF.'  
+        texto: mensajeError
       });  
     }  
   };  
   
   const abrirModalCrear = () => {  
-    limpiarFormulario();  
     setModalCrear(true);  
+  limpiarFormularios();
+};
+
+const toggleModalCrear = () => {
+  setModalCrear(!modalCrear);
+  if (!modalCrear) {
+    limpiarFormularios();
+  }
   };  
   
   const abrirModalEditar = (orden) => {  
@@ -348,7 +534,6 @@ const editarOrden = async () => {
       costoTotal: orden.costoTotal,  
       costoPeriodo: orden.costoPeriodo,  
       idEmpleado: orden.idEmpleado,  
-      fechaAlAire: orden.fechaAlAire || "",  
       observaciones: orden.observaciones || ""  
     });  
     setModalEditar(true);  
@@ -364,8 +549,7 @@ const editarOrden = async () => {
       costoTotal: "",  
       costoPeriodo: "",  
       idEmpleado: "",  
-      fechaAlAire: "",  
-      observaciones: ""  
+      observaciones: ""
     });  
     setMensaje({ tipo: '', texto: '' });  
   };  
@@ -518,6 +702,8 @@ const editarOrden = async () => {
                 <Table className="align-items-center table-flush" responsive>  
                   <thead className="thead-light">  
                     <tr>  
+                      <th>Acciones</th>
+                      <th>Estado</th>
                       <th>No. Orden</th>  
                       <th>Cliente</th>  
                       <th>Producto</th>  
@@ -525,29 +711,15 @@ const editarOrden = async () => {
                       <th>Valor Sin ISV</th>  
                       <th>Impuesto (15%)</th>  
                       <th>Costo Total</th>  
-                      <th>Estado</th>  
-                      <th>Acciones</th>  
+                        
+                      <th>PDF</th>
                     </tr>  
                   </thead> 
                   <tbody>  
                     {ordenes.map(orden => (  
-                      <tr key={orden.idOrden}>  
-                        <td>  
-                          <span className="font-weight-bold">  
-                            {orden.numeroOrden}  
-                          </span>  
-                        </td>  
-                        <td>{getNombreCliente(orden)}</td>  
-                        <td>{orden.producto}</td>  
-                        <td>  
-                          {new Date(orden.periodoInicio).toLocaleDateString()} -   
-                          {new Date(orden.periodoFin).toLocaleDateString()}  
-                        </td>  
-                        <td>L. {parseFloat(orden.valorSinImpuesto).toFixed(2)}</td>
-                        <td>L. {parseFloat(orden.impuesto).toFixed(2)}</td>
-                        <td>L. {parseFloat(orden.costoTotal).toFixed(2)}</td>
-                        <td>{getEstadoBadge(orden.estado)}</td>  
-                        <td>  
+                      
+                      <tr key={orden.idOrden}> 
+                       <td>  
                           <div className="btn-group" role="group">  
                             <Button  
                               color="info"  
@@ -606,7 +778,36 @@ const editarOrden = async () => {
                               </Button>  
                             )}  
                           </div>  
+                        </td> 
+                        <td>{getEstadoBadge(orden.estado)}</td>  
+                        <td>  
+                          <span className="font-weight-bold">  
+                            {orden.numeroOrden}  
+                          </span>  
                         </td>  
+                        <td>{getNombreCliente(orden)}</td>  
+                        <td>{orden.producto}</td>  
+                        <td>  
+                          {new Date(orden.periodoInicio).toLocaleDateString()} -   
+                          {new Date(orden.periodoFin).toLocaleDateString()}  
+                        </td>  
+                        <td>L. {parseFloat(orden.valorSinImpuesto).toFixed(2)}</td>
+                        <td>L. {parseFloat(orden.impuesto).toFixed(2)}</td>
+                        <td>L. {parseFloat(orden.costoTotal).toFixed(2)}</td>
+                        
+                        <td>
+                          {orden.archivo_pdf ? (
+                            <Badge color="success" className="d-flex align-items-center">
+                              <i className="fas fa-file-pdf mr-1" />
+                              Disponible
+                            </Badge>
+                          ) : (
+                            <Badge color="warning" className="d-flex align-items-center">
+                              <i className="fas fa-exclamation-triangle mr-1" />
+                              Pendiente
+                            </Badge>
+                          )}
+                        </td>
                       </tr>  
                     ))}  
                   </tbody>  
@@ -624,43 +825,138 @@ const editarOrden = async () => {
         </Row>  
   
         {/* Modal Crear Orden */}  
-        <Modal isOpen={modalCrear} toggle={() => setModalCrear(false)} size="lg">  
-          <ModalHeader toggle={() => setModalCrear(false)}>  
-            Nueva Orden de Publicidad  
+        <Modal isOpen={modalCrear} toggle={toggleModalCrear} size="lg">
+          <ModalHeader toggle={toggleModalCrear}>
+            Crear Nueva Orden de Publicidad
           </ModalHeader>  
           <ModalBody>  
-            <Form>  
+            <Alert color="info">
+              <strong>Información:</strong> El PDF se generará automáticamente después de crear la orden.
+            </Alert>
+            
+            {/* Sección 1: Información básica de la orden */}
+            <h5 className="mb-3">Información de la Orden</h5>
               <Row>  
-                <Col md="6">  
+              <Col md={6}>
                   <FormGroup>  
                     <Label>Cliente *</Label>  
                     <Input  
                       type="select"  
-                      name="idCliente"  
                       value={nuevaOrden.idCliente}  
-                      onChange={handleChange}  
-                      required  
+                    onChange={(e) => setNuevaOrden({...nuevaOrden, idCliente: e.target.value})}
                     >  
-                      <option value="">Seleccionar cliente...</option>  
+                    <option value="">Seleccionar cliente</option>
                       {clientes.map(cliente => (  
                         <option key={cliente.idCliente} value={cliente.idCliente}>  
-                          {cliente.persona?.Pnombre} {cliente.persona?.Snombre} {cliente.persona?.Papellido} {cliente.persona?.Sapellido}  
+                        {cliente.persona?.Pnombre} {cliente.persona?.Papellido}
                         </option>  
                       ))}  
                     </Input>  
                   </FormGroup>  
                 </Col>  
-                <Col md="6">  
+              <Col md={6}>
                   <FormGroup>  
-                    <Label>Empleado Responsable *</Label>  
+                  <Label>Producto *</Label>
+                  <Input
+                    value={nuevaOrden.producto}
+                    onChange={(e) => setNuevaOrden({...nuevaOrden, producto: e.target.value})}
+                    placeholder="Descripción del producto o servicio"
+                  />
+                </FormGroup>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col md={6}>
+                <FormGroup>
+                  <Label>Período de Inicio *</Label>
+                  <Input
+                    type="date"
+                    value={nuevaOrden.periodoInicio}
+                    onChange={(e) => setNuevaOrden({...nuevaOrden, periodoInicio: e.target.value})}
+                  />
+                </FormGroup>
+              </Col>
+              <Col md={6}>
+                <FormGroup>
+                  <Label>Período de Fin *</Label>
+                  <Input
+                    type="date"
+                    value={nuevaOrden.periodoFin}
+                    onChange={(e) => setNuevaOrden({...nuevaOrden, periodoFin: e.target.value})}
+                  />
+                </FormGroup>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col md={4}>
+                <FormGroup>
+                  <Label>Valor sin Impuesto *</Label>
+                  <Input
+                    type="number"
+                    value={nuevaOrden.valorSinImpuesto}
+                    onChange={(e) => {
+                      const valor = parseFloat(e.target.value) || 0;
+                      const impuesto = valor * 0.15;
+                      const total = valor + impuesto;
+                      setNuevaOrden({
+                        ...nuevaOrden, 
+                        valorSinImpuesto: e.target.value,
+                        costoTotal: total.toFixed(2)
+                      });
+                    }}
+                    placeholder="0.00"
+                    step="0.01"
+                  />
+                </FormGroup>
+              </Col>
+              <Col md={4}>
+                <FormGroup>
+                  <Label>Impuesto (15%)</Label>
+                  <Input
+                    type="number"
+                    value={((parseFloat(nuevaOrden.valorSinImpuesto) || 0) * 0.15).toFixed(2)}
+                    disabled
+                  />
+                </FormGroup>
+              </Col>
+              <Col md={4}>
+                <FormGroup>
+                  <Label>Costo Total</Label>
+                  <Input
+                    type="number"
+                    value={nuevaOrden.costoTotal}
+                    onChange={(e) => setNuevaOrden({...nuevaOrden, costoTotal: e.target.value})}
+                    placeholder="0.00"
+                    step="0.01"
+                  />
+                </FormGroup>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col md={6}>
+                <FormGroup>
+                  <Label>Costo del Período *</Label>
+                  <Input
+                    type="number"
+                    value={nuevaOrden.costoPeriodo}
+                    onChange={(e) => setNuevaOrden({...nuevaOrden, costoPeriodo: e.target.value})}
+                    placeholder="0.00"
+                    step="0.01"
+                  />
+                </FormGroup>
+              </Col>
+              <Col md={6}>
+                <FormGroup>
+                  <Label>Empleado *</Label>
                     <Input  
                       type="select"  
-                      name="idEmpleado"  
                       value={nuevaOrden.idEmpleado}  
-                      onChange={handleChange}  
-                      required  
+                    onChange={(e) => setNuevaOrden({...nuevaOrden, idEmpleado: e.target.value})}
                     >  
-                      <option value="">Seleccionar empleado...</option>  
+                    <option value="">Seleccionar empleado</option>
                       {empleados.map(empleado => (  
                         <option key={empleado.idEmpleado} value={empleado.idEmpleado}>  
                           {empleado.persona?.Pnombre} {empleado.persona?.Papellido}  
@@ -672,148 +968,202 @@ const editarOrden = async () => {
               </Row>  
   
               <Row>  
-                <Col md="12">  
+              <Col md={12}>
                   <FormGroup>  
-                    <Label>Producto/Servicio *</Label>  
+                  <Label>Observaciones</Label>
                     <Input  
-                      type="text"  
-                      name="producto"  
-                      value={nuevaOrden.producto}  
-                      onChange={handleChange}  
-                      placeholder="Ej: Spot publicitario 30 segundos"  
-                      required  
+                    type="textarea"
+                    value={nuevaOrden.observaciones}
+                    onChange={(e) => setNuevaOrden({...nuevaOrden, observaciones: e.target.value})}
+                    placeholder="Observaciones adicionales sobre la orden"
                     />  
                   </FormGroup>  
                 </Col>  
               </Row>  
   
+            <hr className="my-4" />
+
+            {/* Sección 2: Gestión de pautas de programación */}
+            <h5 className="mb-3">Pautas de Programación</h5>
+            
+            {/* Indicador de estado de datos */}
+            <Alert color={loadingData ? "warning" : "success"} className="mb-3">
+              {loadingData ? (
+                <><i className="fas fa-spinner fa-spin mr-2" />Cargando datos de programación...</>
+              ) : (
+                <><i className="fas fa-check mr-2" />
+                  Datos cargados: {programas.length} programas disponibles
+                </>
+              )}
+              <Button 
+                color="info" 
+                size="sm" 
+                className="ml-3" 
+                onClick={() => {
+                  console.log('🔄 Recargando datos manualmente...');
+                  cargarDatosIniciales();
+                }}
+              >
+                <i className="fas fa-sync-alt mr-1" />Recargar
+              </Button>
+            </Alert>
+
+            {/* Formulario para nueva pauta */}
+            <Card className="mb-3">
+              <CardHeader>
+                <h6 className="mb-0">Agregar Nueva Pauta</h6>
+              </CardHeader>
+              <CardBody>
               <Row>  
-                <Col md="6">  
+                  <Col md={4}>
                   <FormGroup>  
-                    <Label>Período Inicio *</Label>  
+                      <Label>Programa *</Label>
                     <Input  
-                      type="date"  
-                      name="periodoInicio"  
-                      value={nuevaOrden.periodoInicio}  
-                      onChange={handleChange}  
-                      required  
-                    />  
+                        type="select"
+                        value={nuevaPauta.idPrograma}
+                        onChange={(e) => setNuevaPauta({...nuevaPauta, idPrograma: e.target.value})}
+                        disabled={loadingData}
+                      >
+                        <option value="">
+                          {loadingData ? 'Cargando programas...' : 'Seleccionar programa'}
+                        </option>
+                        {programas.map(programa => (
+                          <option key={programa.idPrograma} value={programa.idPrograma}>
+                            {programa.nombre}
+                          </option>
+                        ))}
+                      </Input>
                   </FormGroup>  
                 </Col>  
-                <Col md="6">  
+                  <Col md={4}>
                   <FormGroup>  
-                    <Label>Período Fin *</Label>  
-                    <Input  
-                      type="date"  
-                      name="periodoFin"  
-                      value={nuevaOrden.periodoFin}  
-                      onChange={handleChange}  
-                      required  
-                    />  
-                  </FormGroup>  
-                </Col>  
-              </Row>  
-  
-              <Row>  
-                <Col md="3">  
-                  <FormGroup>  
-                    <Label>Valor Sin ISV (L.) *</Label>  
+                      <Label>Duración (min) *</Label>
                     <Input  
                       type="number"  
-                      step="0.01"  
-                      name="valorSinImpuesto"  
-                      value={nuevaOrden.valorSinImpuesto}  
-                      onChange={handleChange}  
-                      placeholder="0.00"  
-                      required  
+                        value={nuevaPauta.duracionPauta}
+                        onChange={(e) => setNuevaPauta({...nuevaPauta, duracionPauta: e.target.value})}
+                        min="1"
                     />  
                   </FormGroup>  
                 </Col>  
-                <Col md="3">  
+                  <Col md={4}>
                   <FormGroup>  
-                    <Label>Impuesto 15% ISV (L.)</Label>  
+                      <Label>Cantidad Spots *</Label>
                     <Input  
                       type="number"  
-                      step="0.01"  
-                      name="impuesto"  
-                      value={nuevaOrden.impuesto || ''}  
-                      readOnly  
-                      placeholder="Calculado automáticamente"  
+                        value={nuevaPauta.cantidadSpots}
+                        onChange={(e) => setNuevaPauta({...nuevaPauta, cantidadSpots: e.target.value})}
+                        min="1"
                     />  
                   </FormGroup>  
                 </Col>  
-                <Col md="3">  
+                  <Col md={6}>
                   <FormGroup>  
-                    <Label>Costo Total (L.)</Label>  
+                      <Label>Días de Emisión *</Label>
                     <Input  
-                      type="number"  
-                      step="0.01"  
-                      name="costoTotal"  
-                      value={nuevaOrden.costoTotal}  
-                      readOnly  
-                      placeholder="Calculado automáticamente"  
+                        value={nuevaPauta.diasEmision}
+                        onChange={(e) => setNuevaPauta({...nuevaPauta, diasEmision: e.target.value})}
+                        placeholder="Lunes,Martes,Miércoles"
                     />  
                   </FormGroup>  
                 </Col>  
-                <Col md="3">  
+                </Row>
+
+                <Row>
+                  <Col md={12}>
                   <FormGroup>  
-                    <Label>Costo Período (L.)</Label>  
-                    <Input  
-                      type="number"  
-                      step="0.01"  
-                      name="costoPeriodo"  
-                      value={nuevaOrden.costoPeriodo}  
-                      readOnly  
-                      placeholder="Calculado automáticamente"  
-                    />  
-                  </FormGroup>  
-                </Col>  
-              </Row> 
-  
-              <Row>  
-                <Col md="6">  
-                  <FormGroup>  
-                    <Label>Fecha Al Aire</Label>  
-                    <Input  
-                      type="date"  
-                      name="fechaAlAire"  
-                      value={nuevaOrden.fechaAlAire}  
-                      onChange={handleChange}  
-                    />  
-                  </FormGroup>  
-                </Col>  
-              </Row>  
-  
-              <Row>  
-                <Col md="12">  
-                  <FormGroup>  
-                    <Label>Observaciones</Label>  
+                      <Label>Observaciones de Pauta</Label>
                     <Input  
                       type="textarea"  
-                      name="observaciones"  
-                      value={nuevaOrden.observaciones}  
-                      onChange={handleChange}  
-                      rows="3"  
-                      placeholder="Observaciones adicionales..."  
+                        value={nuevaPauta.observaciones}
+                        onChange={(e) => setNuevaPauta({...nuevaPauta, observaciones: e.target.value})}
+                        placeholder="Observaciones específicas de esta pauta"
                     />  
                   </FormGroup>  
                 </Col>  
               </Row>  
-            </Form>  
+
+                <div className="text-center mt-3">
+                  <Button color="primary" onClick={agregarPauta}>
+                    <i className="fas fa-plus mr-2"></i>
+                    Agregar Pauta
+                  </Button>
+                </div>
+              </CardBody>
+            </Card>
+
+            {/* Lista de pautas agregadas */}
+            {pautas.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <h6 className="mb-0">Pautas Agregadas ({pautas.length})</h6>
+                </CardHeader>
+                <CardBody>
+                  <div className="table-responsive">
+                    <Table size="sm">
+                      <thead>
+                        <tr>
+                          <th>Programa</th>
+                          <th>Hora</th>
+                          <th>Duración</th>
+                          <th>Spots</th>
+                          <th>Días</th>
+                          <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {pautas.map((pauta, index) => (
+                          <tr key={pauta.id}>
+                            <td>
+                              {programas.find(p => p.idPrograma == pauta.idPrograma)?.nombre || 'N/A'}
+                            </td>
+                            <td>
+                              {programas.find(p => p.idPrograma == pauta.idPrograma)?.horaInicio || 'N/A'}
+                            </td>
+                            <td>{pauta.duracionPauta} min</td>
+                            <td>{pauta.cantidadSpots}</td>
+                            <td>{pauta.diasEmision}</td>
+                            <td>
+                              <Button
+                                color="warning"
+                                size="sm"
+                                onClick={() => editarPauta(pauta.id)}
+                                className="mr-1"
+                              >
+                                <i className="fas fa-edit"></i>
+                              </Button>
+                              <Button
+                                color="danger"
+                                size="sm"
+                                onClick={() => removerPauta(pauta.id)}
+                              >
+                                <i className="fas fa-trash"></i>
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </div>
+                </CardBody>
+              </Card>
+            )}
           </ModalBody>  
           <ModalFooter>  
-            <Button color="primary" onClick={crearOrden} disabled={loading}>  
+            <Button color="primary" onClick={crearOrden} disabled={loading || pautas.length === 0}>
               {loading ? (  
                 <>  
-                  <i className="fas fa-spinner fa-spin" /> Creando...  
+                  <Spinner size="sm" className="mr-2" />
+                  Creando...
                 </>  
               ) : (  
                 <>  
-                  <i className="fas fa-save" /> Crear Orden  
+                  <i className="fas fa-save mr-2"></i>
+                  Crear Orden
                 </>  
               )}  
             </Button>  
-            <Button color="secondary" onClick={() => setModalCrear(false)}>  
+            <Button color="secondary" onClick={toggleModalCrear}>
               Cancelar  
             </Button>  
           </ModalFooter>  
@@ -954,19 +1304,9 @@ const editarOrden = async () => {
                 </Col>  
               </Row>  
   
-              <Row>  
-                <Col md="6">  
-                  <FormGroup>  
-                    <Label>Fecha Al Aire</Label>  
-                    <Input  
-                      type="date"  
-                      name="fechaAlAire"  
-                      value={nuevaOrden.fechaAlAire}  
-                      onChange={handleChange}  
-                    />  
-                  </FormGroup>  
-                </Col>  
-              </Row>  
+  
+  
+
   
               <Row>  
                 <Col md="12">  

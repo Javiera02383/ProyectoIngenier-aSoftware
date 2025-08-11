@@ -42,7 +42,30 @@ exports.validarAutenticacion = passport.use(
 // ========================
 // Middleware para proteger rutas
 // ========================
-exports.verificarUsuario = passport.authenticate('jwt', { session: false });
+exports.verificarUsuario = (req, res, next) => {
+  console.log('🔐 Verificando autenticación...');
+  console.log('📋 Headers recibidos:', req.headers);
+  
+  passport.authenticate('jwt', { session: false }, (err, user, info) => {
+    if (err) {
+      console.error('❌ Error en autenticación:', err);
+      return next(err);
+    }
+    
+    if (!user) {
+      console.log('❌ Usuario no autenticado. Info:', info);
+      return res.status(401).json({ mensaje: 'No autorizado - Token inválido o expirado' });
+    }
+    
+    console.log('✅ Usuario autenticado:', {
+      idUsuario: user.idUsuario,
+      Nombre_Usuario: user.Nombre_Usuario
+    });
+    
+    req.user = user;
+    next();
+  })(req, res, next);
+};
 
 // ========================
 // Función para verificar contraseña con argon2

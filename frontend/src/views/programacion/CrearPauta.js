@@ -7,6 +7,7 @@ import {
 } from "reactstrap";  
 import HeaderResponsive from "components/Headers/HeaderResponsive";  
 import { programacionService } from "../../services/programacion/programacionService";  
+import { ordenProgramacionService } from "../../services/programacion/ordenProgramacionService";  
 import { clienteService } from '../../services/gestion_cliente/clienteService';  
   
 const CrearPauta = () => {  

@@ -87,9 +87,11 @@ const obtenerProgramacionPorTipoCalendario = async (req, res) => {
 
     // Formatear datos para el frontend  
     const programacionFormateada = programas.map(programa => ({  
-      bloque: programa.nombre,  
+      bloque: programa.nombre,
+      idPrograma: programa.idPrograma, // Agregar ID del programa
       comerciales: programa.BloquePublicitarios?.map(bloque => ({  
         hora: bloque.horaBloque.substring(0, 5), // HH:MM format  
+        idPauta: bloque.idBloque, // Agregar ID del bloque como pauta
         empresas: bloque.AnuncioBloques?.map(anuncio =>   
           anuncio.Cliente?.persona ?   
           `${anuncio.Cliente.persona.Pnombre} ${anuncio.Cliente.persona.Papellido}`.toUpperCase() :   
@@ -299,7 +301,195 @@ const crearPauta = async (req, res) => {
     });  
   }  
 };
+
+// Eliminar programa
+const eliminarPrograma = async (req, res) => {
+  const { id } = req.params;
+  const { eliminarOrdenes } = req.query; // Nuevo parámetro para eliminar en cascada
   
+  try {
+    console.log(`🗑️ Intentando eliminar programa ${id}`);
+    
+    // Verificar que el programa existe
+    const programa = await Programa.findByPk(id);
+    if (!programa) {
+      return res.status(404).json({ mensaje: 'Programa no encontrado' });
+    }
+
+    // Verificar si tiene bloques asociados
+    const bloquesAsociados = await BloquePublicitario.findAll({
+      where: { idPrograma: id }
+    });
+
+    if (bloquesAsociados.length > 0) {
+      return res.status(400).json({ 
+        mensaje: 'No se puede eliminar el programa porque tiene bloques publicitarios asociados. Elimine primero los bloques.',
+        codigo: 'PROGRAMA_CON_BLOQUES',
+        bloquesAsociados: bloquesAsociados.length
+      });
+    }
+
+    // Verificar si tiene órdenes de programación asociadas
+    const ordenesAsociadas = await OrdenProgramacion.findAll({
+      where: { idPrograma: id },
+      include: [{
+        model: OrdenPublicidad,
+        attributes: ['idOrden', 'numeroOrden', 'fechaCreacion']
+      }]
+    });
+
+    if (ordenesAsociadas.length > 0) {
+      // Si se solicita eliminar en cascada
+      if (eliminarOrdenes === 'true') {
+        console.log(`🗑️ Eliminando programa ${id} con ${ordenesAsociadas.length} órdenes en cascada`);
+        
+        // Eliminar todas las órdenes de programación asociadas primero
+        const ordenesEliminadas = await OrdenProgramacion.destroy({
+          where: { idPrograma: id }
+        });
+        
+        console.log(`✅ ${ordenesEliminadas} órdenes de programación eliminadas`);
+        
+        // Ahora eliminar el programa
+        await programa.destroy();
+        console.log(`✅ Programa ${id} eliminado exitosamente`);
+        
+        return res.json({ 
+          mensaje: `Programa eliminado exitosamente junto con ${ordenesAsociadas.length} órdenes de programación`,
+          ordenesEliminadas: ordenesAsociadas.length,
+          programaEliminado: true
+        });
+      } else {
+        // Informar al usuario sobre las órdenes asociadas
+        return res.status(400).json({ 
+          mensaje: `No se puede eliminar el programa porque tiene ${ordenesAsociadas.length} orden(es) de programación asociada(s).`,
+          opciones: [
+            'Eliminar programa y órdenes en cascada',
+            'Cancelar eliminación',
+            'Eliminar primero las órdenes manualmente'
+          ],
+          ordenesAsociadas: ordenesAsociadas.map(orden => ({
+            id: orden.idOrdenProgramacion,
+            numeroOrden: orden.OrdenPublicidad?.numeroOrden || 'Sin número',
+            fechaCreacion: orden.OrdenPublicidad?.fechaCreacion || 'Sin fecha'
+          })),
+          codigo: 'PROGRAMA_CON_ORDENES'
+        });
+      }
+    }
+
+    // Si no tiene dependencias, eliminar directamente
+    console.log(`🗑️ Eliminando programa ${id} sin dependencias`);
+    await programa.destroy();
+    console.log(`✅ Programa ${id} eliminado exitosamente`);
+    
+    res.json({ mensaje: 'Programa eliminado exitosamente' });
+  } catch (error) {
+    console.error('❌ Error eliminando programa:', error);
+    res.status(500).json({ 
+      mensaje: 'Error al eliminar el programa', 
+      error: error.message 
+    });
+  }
+};
+
+// Eliminar pauta (bloque publicitario)
+const eliminarPauta = async (req, res) => {
+  const { id } = req.params;
+  const { eliminarAnuncios } = req.query; // Nuevo parámetro para eliminar en cascada
+  
+  try {
+    // Verificar que el bloque existe
+    const bloque = await BloquePublicitario.findByPk(id);
+    if (!bloque) {
+      return res.status(404).json({ mensaje: 'Bloque publicitario no encontrado' });
+    }
+
+    // Verificar si tiene anuncios asociados
+    const anunciosAsociados = await AnuncioBloque.findAll({
+      where: { idBloque: id }
+    });
+
+    if (anunciosAsociados.length > 0) {
+      // Si se solicita eliminar en cascada
+      if (eliminarAnuncios === 'true') {
+        console.log(`🗑️ Eliminando bloque ${id} con ${anunciosAsociados.length} anuncios en cascada`);
+        
+        // Eliminar todos los anuncios asociados primero
+        const anunciosEliminados = await AnuncioBloque.destroy({
+          where: { idBloque: id }
+        });
+        
+        console.log(`✅ ${anunciosEliminados} anuncios eliminados`);
+        
+        // Luego eliminar el bloque
+        await bloque.destroy();
+        
+        console.log(`✅ Bloque ${id} eliminado exitosamente`);
+        
+        return res.json({ 
+          mensaje: `Bloque publicitario y ${anunciosAsociados.length} anuncios eliminados exitosamente`,
+          anunciosEliminados: anunciosAsociados.length,
+          bloqueEliminado: true
+        });
+      } else {
+        // Informar al usuario sobre los anuncios asociados
+        return res.status(400).json({ 
+          mensaje: `No se puede eliminar el bloque porque tiene ${anunciosAsociados.length} anuncio(s) asociado(s).`,
+          opciones: [
+            'Eliminar solo el bloque (los anuncios quedarán huérfanos)',
+            'Eliminar bloque y anuncios en cascada',
+            'Eliminar primero los anuncios manualmente'
+          ],
+          anunciosAsociados: anunciosAsociados.map(anuncio => ({
+            id: anuncio.idAnuncioBloque,
+            nombre: anuncio.nombreComercial || 'Sin nombre',
+            cliente: anuncio.idCliente
+          })),
+          codigo: 'BLOQUE_CON_ANUNCIOS'
+        });
+      }
+    }
+
+    // Si no tiene anuncios, eliminar directamente
+    console.log(`🗑️ Eliminando bloque ${id} sin anuncios`);
+    await bloque.destroy();
+    console.log(`✅ Bloque ${id} eliminado exitosamente`);
+    
+    res.json({ mensaje: 'Bloque publicitario eliminado exitosamente' });
+  } catch (error) {
+    console.error('Error eliminando bloque:', error);
+    res.status(500).json({ 
+      mensaje: 'Error al eliminar el bloque publicitario', 
+      error: error.message 
+    });
+  }
+};
+
+// Eliminar anuncio individual
+const eliminarAnuncio = async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    // Verificar que el anuncio existe
+    const anuncio = await AnuncioBloque.findByPk(id);
+    if (!anuncio) {
+      return res.status(404).json({ mensaje: 'Anuncio no encontrado' });
+    }
+
+    // Eliminar el anuncio
+    await anuncio.destroy();
+    
+    res.json({ mensaje: 'Anuncio eliminado exitosamente' });
+  } catch (error) {
+    console.error('Error eliminando anuncio:', error);
+    res.status(500).json({ 
+      mensaje: 'Error al eliminar el anuncio', 
+      error: error.message 
+    });
+  }
+};
+
 module.exports = {  
   obtenerProgramas,  
   obtenerProgramasPorTipoCalendario,
@@ -309,5 +499,8 @@ module.exports = {
   obtenerProgramacionCompleta,  
   obtenerOrdenesProgramacion,
   crearPrograma,
-    crearPauta  
+  crearPauta,
+  eliminarPrograma,
+  eliminarPauta,
+  eliminarAnuncio
 };

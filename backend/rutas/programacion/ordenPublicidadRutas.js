@@ -156,5 +156,11 @@ router.delete('/orden/:id',
   ],  
   ordenController.eliminarOrden  
 );  
-  
+
+// Obtener programas disponibles para pautas de publicidad
+router.get('/programas',
+  verificarUsuario,
+  ordenController.obtenerProgramasDisponibles
+);
+
 module.exports = router;

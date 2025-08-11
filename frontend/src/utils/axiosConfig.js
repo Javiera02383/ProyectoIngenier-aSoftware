@@ -16,12 +16,21 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+    console.log('🚀 Enviando request a:', config.url);
+    console.log('🔑 Token disponible:', token ? 'Sí' : 'No');
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('✅ Token añadido al header Authorization');
+    } else {
+      console.log('⚠️ No hay token disponible');
     }
+    
+    console.log('📋 Headers finales:', config.headers);
     return config;
   },
   (error) => {
+    console.error('❌ Error en interceptor de request:', error);
     return Promise.reject(error);
   }
 );
