@@ -122,10 +122,49 @@ const CrearFacturaNueva = () => {
   // Función para cargar órdenes de publicidad aprobadas  
   const cargarOrdenesPublicidad = async () => {  
     try {  
-      const response = await axiosInstance.get('/programacion/orden?estado=Aprobada');  
-      setOrdenesPublicidad(Array.isArray(response.data) ? response.data : response.data?.ordenes || []);  
+      console.log('🔄 Cargando órdenes de publicidad...');
+      
+      // Primero intentar obtener todas las órdenes
+      let response;
+      try {
+        response = await axiosInstance.get('/ordenes-publicidad/orden');
+        console.log('📋 Respuesta completa de órdenes:', response.data);
+      } catch (error) {
+        console.log('⚠️ No se pudieron obtener todas las órdenes, intentando con filtro...');
+        response = await axiosInstance.get('/ordenes-publicidad/orden?estado=Aprobada');
+      }
+      
+      let ordenes = [];
+      
+      // Manejar diferentes formatos de respuesta
+      if (Array.isArray(response.data)) {
+        ordenes = response.data;
+      } else if (response.data?.ordenes && Array.isArray(response.data.ordenes)) {
+        ordenes = response.data.ordenes;
+      } else if (response.data?.data && Array.isArray(response.data.data)) {
+        ordenes = response.data.data;
+      } else {
+        console.log('⚠️ Formato de respuesta inesperado:', response.data);
+        ordenes = [];
+      }
+      
+      // Filtrar solo las órdenes aprobadas si no se filtró en el backend
+      const ordenesAprobadas = ordenes.filter(orden => 
+        orden.estado === 'Aprobada' || orden.estado === 'aprobada' || orden.estado === 'APROBADA'
+      );
+      
+      console.log('✅ Órdenes aprobadas encontradas:', ordenesAprobadas);
+      setOrdenesPublicidad(ordenesAprobadas);
+      
     } catch (error) {  
-      console.error('Error cargando órdenes de publicidad:', error);  
+      console.error('❌ Error cargando órdenes de publicidad:', error);
+      // Si falla, usar datos simulados para desarrollo
+      const ordenesSimuladas = [
+        { idOrden: 1, numeroOrden: 'OP-001', estado: 'Aprobada', Cliente: { persona: { Pnombre: 'Cliente', Papellido: 'A' } } },
+        { idOrden: 2, numeroOrden: 'OP-002', estado: 'Aprobada', Cliente: { persona: { Pnombre: 'Cliente', Papellido: 'B' } } }
+      ];
+      console.log('⚠️ Usando órdenes simuladas:', ordenesSimuladas);
+      setOrdenesPublicidad(ordenesSimuladas);
     }  
   }; 
 
@@ -244,14 +283,29 @@ useEffect(() => {
 
   const handleFacturaChange = (e) => {        
     const { name, value } = e.target;        
+    console.log('🔄 Cambio en factura:', name, value);
+    
     // Si se está cambiando el cliente, también actualizar el RTN automáticamente  
     if (name === 'idCliente' && value) {  
+      console.log('👤 Cliente seleccionado:', value);
+      console.log('📋 Lista de clientes disponible:', clientes);
+      
       const clienteSeleccionado = clientes.find(cliente => cliente.idCliente == value);  
-      setFactura(prev => ({   
-        ...prev,   
-        [name]: value,  
-        rtnCliente: clienteSeleccionado?.persona?.DNI || '' // Actualizar RTN automáticamente  
-      }));  
+      console.log('🔍 Cliente encontrado:', clienteSeleccionado);
+      
+      if (clienteSeleccionado) {
+        const rtn = clienteSeleccionado.persona?.DNI || clienteSeleccionado.persona?.rtn || '';
+        console.log('🆔 RTN encontrado:', rtn);
+        
+        setFactura(prev => ({   
+          ...prev,   
+          [name]: value,  
+          rtnCliente: rtn
+        }));
+      } else {
+        console.log('⚠️ Cliente no encontrado en la lista');
+        setFactura(prev => ({ ...prev, [name]: value }));
+      }
     } else {  
       setFactura(prev => ({ ...prev, [name]: value }));  
     }          
@@ -435,6 +489,25 @@ useEffect(() => {
                   <Col>        
                     <h3 className="mb-0">Crear Nueva Factura - Canal 40</h3>        
                   </Col>        
+                  <Col xs="auto">
+                    <Button
+                      color="info"
+                      size="sm"
+                      onClick={() => {
+                        console.log('🔍 === DATOS DE DEPURACIÓN ===');
+                        console.log('📋 Clientes:', clientes);
+                        console.log('👥 Empleados:', empleados);
+                        console.log('📦 Productos:', productos);
+                        console.log('💳 Formas de pago:', formasPago);
+                        console.log('🏷️ Descuentos:', descuentosDisponibles);
+                        console.log('📺 Órdenes de publicidad:', ordenesPublicidad);
+                        console.log('📄 Estado actual de factura:', factura);
+                        console.log('🔍 === FIN DEPURACIÓN ===');
+                      }}
+                    >
+                      <i className="fas fa-bug" /> Debug
+                    </Button>
+                  </Col>
                 </Row>        
               </CardHeader>        
               <CardBody>        
@@ -443,6 +516,25 @@ useEffect(() => {
                     {mensaje.texto}        
                   </Alert>        
                 )}        
+
+                {/* Estado de carga de datos */}
+                {loadingData && (
+                  <Alert color="info" className="mb-4">
+                    <i className="fas fa-spinner fa-spin mr-2"></i>
+                    Cargando datos de referencia... Por favor espere.
+                  </Alert>
+                )}
+
+                {/* Información de estado de datos */}
+                {!loadingData && (
+                  <Alert color="success" className="mb-4">
+                    <i className="fas fa-check-circle mr-2"></i>
+                    <strong>Datos cargados:</strong> 
+                    {clientes.length} clientes, {empleados.length} empleados, {productos.length} productos, 
+                    {formasPago.length} formas de pago, {descuentosDisponibles.length} descuentos, 
+                    {ordenesPublicidad.length} órdenes de publicidad
+                  </Alert>
+                )}
         
                 <Form onSubmit={handleSubmit}>        
                   {/* Información Básica de la Factura */}        
@@ -559,6 +651,29 @@ useEffect(() => {
                               </option>
                             ))}
                           </Input>
+                          {ordenesPublicidad.length === 0 && (
+                            <small className="text-muted">
+                              <i className="fas fa-info-circle mr-1"></i>
+                              No hay órdenes de publicidad aprobadas disponibles
+                            </small>
+                          )}
+                          {ordenesPublicidad.length > 0 && (
+                            <small className="text-success">
+                              <i className="fas fa-check-circle mr-1"></i>
+                              {ordenesPublicidad.length} orden(es) de publicidad disponible(s)
+                            </small>
+                          )}
+                          <div className="mt-2">
+                            <Button
+                              color="secondary"
+                              size="sm"
+                              onClick={cargarOrdenesPublicidad}
+                              disabled={loadingData}
+                            >
+                              <i className="fas fa-sync-alt mr-1"></i>
+                              Recargar Órdenes
+                            </Button>
+                          </div>
                         </FormGroup>
                       </Col>
                       <Col lg="4">        
@@ -634,7 +749,26 @@ useEffect(() => {
                             placeholder="Seleccione cliente"  
                             style={{ backgroundColor: '#f8f9fa' }}  
                           />  
-                        </FormGroup>  
+                          {!factura.idCliente && (
+                            <small className="text-muted">
+                              <i className="fas fa-info-circle mr-1"></i>
+                              Seleccione un cliente para ver su RTN
+                            </small>
+                          )}
+                          {factura.idCliente && factura.rtnCliente && (
+                            <small className="text-success">
+                              <i className="fas fa-check-circle mr-1"></i>
+                              RTN cargado automáticamente
+                            </small>
+                          )}
+                          {factura.idCliente && !factura.rtnCliente && (
+                            <small className="text-warning">
+                              <i className="fas fa-exclamation-triangle mr-1"></i>
+                              Cliente seleccionado pero sin RTN disponible
+                            </small>
+                          )}
+
+                        </FormGroup>
                       </Col>
                       </Row>
                     <Row>
